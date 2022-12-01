@@ -1,0 +1,30 @@
+{
+  "name": "bolao-maia",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.4.2",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@luigiminardim/next-endpoint": "^0.0.1-alpha.10",
+    "@notionhq/client": "^2.2.2",
+    "@types/node": "18.11.10",
+    "@types/react": "18.0.25",
+    "@types/react-dom": "18.0.9",
+    "eslint": "8.28.0",
+    "eslint-config-next": "13.0.5",
+    "formik": "^2.2.9",
+    "framer-motion": "^7.6.15",
+    "next": "13.0.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "4.9.3",
+    "yup": "^0.32.11"
+  }
+}
