@@ -4,14 +4,13 @@ import {
   Flex,
   Heading,
   HStack,
-  Icon,
   Link,
   SimpleGrid,
   Spacer,
 } from "@chakra-ui/react";
 import { BallIcon } from "../src/BallIcon";
 import { CriarApostaForm } from "../src/CriarApostaForm";
-import { RulesArticle } from "../src/RulesArticle";
+import { RulesArticle } from "../src/RegrasArticle";
 
 export default function Home() {
   return (

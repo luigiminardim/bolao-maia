@@ -15,6 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { ErrorMessage, useFormik } from "formik";
 import Image from "next/image";
+import medalha1Img from "../public/medalha1.png";
+import medalha2Img from "../public/medalha2.png";
+import medalha3Img from "../public/medalha3.png";
+import medalha4Img from "../public/medalha4.png";
 
 import brasilPng from "../public/Brasil.png";
 import { CriarApostaApiGateway } from "./CriarApostaApiGateway";
@@ -22,6 +26,11 @@ import { CriarApostaParam, CriarApostaUsecase } from "./CriarApostaUsecase";
 import { Time, times } from "./times";
 
 const criarApostaUsecase = new CriarApostaUsecase(new CriarApostaApiGateway());
+
+const timesOrdenados = [...times].sort((a, b) => a.nome.localeCompare(b.nome));
+function getBandeira(time: Time["nome"]) {
+  return times.find((t) => t.nome === time)?.bandeira;
+}
 
 export function CriarApostaForm() {
   const toast = useToast();
@@ -42,7 +51,7 @@ export function CriarApostaForm() {
         toast({
           title: "Aposta criada com sucesso",
           status: "success",
-          duration: 5000
+          duration: 5000,
         });
         actions.resetForm();
       } catch (error) {
@@ -78,17 +87,29 @@ export function CriarApostaForm() {
         <VStack spacing={4}>
           {(
             [
-              { name: "1", label: "1ª", placeholder: "Selecione a campeã" },
-              { name: "2", label: "2ª", placeholder: "Selecione a vice" },
+              {
+                name: "1",
+                label: "1ª",
+                placeholder: "Selecione a campeã",
+                defaulFlag: medalha1Img,
+              },
+              {
+                name: "2",
+                label: "2ª",
+                placeholder: "Selecione a vice",
+                defaulFlag: medalha2Img,
+              },
               {
                 name: "3",
                 label: "3ª",
                 placeholder: "Selecione a 3ª colocada",
+                defaulFlag: medalha3Img,
               },
               {
                 name: "4",
                 label: "4ª",
                 placeholder: "Selecione a 4ª colocada",
+                defaulFlag: medalha4Img,
               },
             ] as const
           ).map((inputConfig) => (
@@ -103,8 +124,9 @@ export function CriarApostaForm() {
                   name={inputConfig.name}
                   onChange={formik.handleChange}
                   value={formik.values[inputConfig.name]}
+                  zIndex={1}
                 >
-                  {times.map((time) => (
+                  {timesOrdenados.map((time) => (
                     <option key={time.nome} value={time.nome}>
                       {time.nome}
                     </option>
@@ -112,10 +134,18 @@ export function CriarApostaForm() {
                 </Select>
                 <InputRightAddon
                   position={"relative"}
-                  width="16"
+                  width={16}
                   overflow={"hidden"}
                 >
-                  <Image alt="bandeira" src={brasilPng} fill />
+                  <Image
+                    alt="bandeira"
+                    style={{ objectFit: "cover" }}
+                    src={
+                      getBandeira(formik.values[inputConfig.name]) ??
+                      inputConfig.defaulFlag
+                    }
+                    fill
+                  />
                 </InputRightAddon>
               </InputGroup>
               <FormErrorMessage>

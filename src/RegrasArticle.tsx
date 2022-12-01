@@ -34,8 +34,10 @@ export function RulesArticle() {
       <TableContainer>
         <Table variant="striped" size={"sm"}>
           <Thead>
-            <Th>Acerto</Th>
-            <Th isNumeric>Pontuação</Th>
+            <Tr>
+              <Th>Acerto</Th>
+              <Th isNumeric>Pontuação</Th>
+            </Tr>
           </Thead>
           <Tbody>
             <Tr>
