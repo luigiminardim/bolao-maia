@@ -59,7 +59,7 @@ export function CriarApostaForm() {
   });
 
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <form id="CriarApostaForm" onSubmit={formik.handleSubmit}>
       <VStack spacing={8} align="stretch">
         <Heading size="lg">Faça seu palpite</Heading>
 
