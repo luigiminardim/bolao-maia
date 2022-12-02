@@ -6,8 +6,8 @@ import argentinaSrc from "../public/Argentina.png";
 import poloniaSrc from "../public/Polônia.png";
 import francaSrc from "../public/França.png";
 import australiaSrc from "../public/Austrália.png";
+import japaoSrc from "../public/Japão.png";
 import espanhaSrc from "../public/Espanha.png";
-import alemanhaSrc from "../public/Alemanha.png";
 import marrocosSrc from "../public/Marrocos.png";
 import croaciaSrc from "../public/Croácia.png";
 import brasilSrc from "../public/Brasil.png";
@@ -24,8 +24,8 @@ export const times = [
   { nome: "Polônia", bandeira: poloniaSrc },
   { nome: "França", bandeira: francaSrc },
   { nome: "Austrália", bandeira: australiaSrc },
+  { nome: "Japão", bandeira: japaoSrc },
   { nome: "Espanha", bandeira: espanhaSrc },
-  { nome: "Alemanha", bandeira: alemanhaSrc },
   { nome: "Marrocos", bandeira: marrocosSrc },
   { nome: "Croácia", bandeira: croaciaSrc },
   { nome: "Brasil", bandeira: brasilSrc },
