@@ -18,7 +18,7 @@ export function RulesArticle() {
         Regras
       </Heading>
       <Text as="p">
-        Cada participante deverá paga R$50,00 para o PIX 572.748.436-72 (CPF do
+        Cada participante deverá pagar R$50,00 para o PIX 572.748.436-72 (CPF do
         Irineu Luiz Maia) até o dia 10/12/2022.
       </Text>
       <Text as="p">
@@ -28,7 +28,7 @@ export function RulesArticle() {
       </Text>
       <Text as="p">
         As apostas serão liberadas dia 02/12/2022 às 19h, logo depois do último
-        jogo da primeira fase. E adata limite para adesão e envio dos palpites é
+        jogo da primeira fase. A data limite para adesão e envio dos palpites é
         às 11h do dia 03/12/2022.
       </Text>
       <TableContainer>
