@@ -25,9 +25,10 @@ import { CriarApostaApiGateway } from "./CriarApostaApiGateway";
 import { CriarApostaParam, CriarApostaUsecase } from "./CriarApostaUsecase";
 import { Time, times } from "./times";
 
-const criarApostaUsecase = new CriarApostaUsecase(new CriarApostaApiGateway());
+export const criarApostaUsecase = new CriarApostaUsecase(new CriarApostaApiGateway());
 
 const timesOrdenados = [...times].sort((a, b) => a.nome.localeCompare(b.nome));
+
 function getBandeira(time: Time["nome"]) {
   return times.find((t) => t.nome === time)?.bandeira;
 }
@@ -112,47 +113,56 @@ export function CriarApostaForm() {
                 defaulFlag: medalha4Img,
               },
             ] as const
-          ).map((inputConfig) => (
-            <FormControl
-              key={inputConfig.name}
-              isInvalid={!!formik.errors[inputConfig.name]}
-            >
-              <InputGroup size="lg">
-                <InputLeftAddon>{inputConfig.label}</InputLeftAddon>
-                <Select
-                  placeholder={inputConfig.placeholder}
-                  name={inputConfig.name}
-                  onChange={formik.handleChange}
-                  value={formik.values[inputConfig.name]}
-                  zIndex={1}
-                >
-                  {timesOrdenados.map((time) => (
-                    <option key={time.nome} value={time.nome}>
-                      {time.nome}
-                    </option>
-                  ))}
-                </Select>
-                <InputRightAddon
-                  position={"relative"}
-                  width={16}
-                  overflow={"hidden"}
-                >
-                  <Image
-                    alt="bandeira"
-                    style={{ objectFit: "cover" }}
-                    src={
-                      getBandeira(formik.values[inputConfig.name]) ??
-                      inputConfig.defaulFlag
-                    }
-                    fill
-                  />
-                </InputRightAddon>
-              </InputGroup>
-              <FormErrorMessage>
-                {formik.errors[inputConfig.name]}
-              </FormErrorMessage>
-            </FormControl>
-          ))}
+          ).map((inputConfig) => {
+            const bandeira = getBandeira(formik.values[inputConfig.name]);
+            return (
+              <FormControl
+                key={inputConfig.name}
+                isInvalid={!!formik.errors[inputConfig.name]}
+              >
+                <InputGroup size="lg">
+                  <InputLeftAddon>{inputConfig.label}</InputLeftAddon>
+                  <Select
+                    placeholder={inputConfig.placeholder}
+                    name={inputConfig.name}
+                    onChange={formik.handleChange}
+                    value={formik.values[inputConfig.name]}
+                    zIndex={1}
+                  >
+                    {timesOrdenados.map((time) => (
+                      <option key={time.nome} value={time.nome}>
+                        {time.nome}
+                      </option>
+                    ))}
+                  </Select>
+                  <InputRightAddon
+                    position={"relative"}
+                    width={16}
+                    overflow={"hidden"}
+                  >
+                    {bandeira ? (
+                      <Image
+                        alt="bandeira"
+                        style={{ objectFit: "cover" }}
+                        src={bandeira}
+                        fill
+                      />
+                    ) : (
+                      <Image
+                        alt="bandeira"
+                        style={{ objectFit: "scale-down" }}
+                        src={inputConfig.defaulFlag}
+                        fill
+                      />
+                    )}
+                  </InputRightAddon>
+                </InputGroup>
+                <FormErrorMessage>
+                  {formik.errors[inputConfig.name]}
+                </FormErrorMessage>
+              </FormControl>
+            );
+          })}
         </VStack>
         <FormControl isInvalid={!!formik.status}>
           <FormErrorMessage>{formik.status}</FormErrorMessage>

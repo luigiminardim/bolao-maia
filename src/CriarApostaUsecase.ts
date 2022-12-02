@@ -30,7 +30,16 @@ export class CriarApostaUsecase {
     "4": timeSchema,
   });
 
+  public ehPeriodoDeCriarAposta(): boolean {
+    const agora = new Date();
+    const fim = new Date("2022-12-03T11:00:00+03:00"); // 11:00 do dia 03/12/2022
+    return agora <= fim;
+  }
+
   async execute(param: CriarApostaParam): Promise<void> {
+    if (!this.ehPeriodoDeCriarAposta()) {
+      throw new Error("Fora do período de criação de apostas");
+    }
     await this.gateway.execute(param);
   }
 }

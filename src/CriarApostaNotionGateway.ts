@@ -1,7 +1,5 @@
 import { CriarApostaGateway, CriarApostaParam } from "./CriarApostaUsecase";
-import { Client } from "@notionhq/client";
-
-const notionClient = new Client({ auth: process.env.NOTION_TOKEN });
+import { notionClient } from "./notionClient";
 
 export class CriarApostaNotionGateway implements CriarApostaGateway {
   async execute(param: CriarApostaParam): Promise<void> {
@@ -29,6 +27,5 @@ export class CriarApostaNotionGateway implements CriarApostaGateway {
         },
       },
     });
-    console.log(result)
   }
 }

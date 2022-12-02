@@ -8,11 +8,25 @@ import {
   SimpleGrid,
   Spacer,
 } from "@chakra-ui/react";
+import { GetStaticProps } from "next";
+import { Aposta } from "../src/Aposta";
+import { ApostasTable } from "../src/ApostasTable";
 import { BallIcon } from "../src/BallIcon";
-import { CriarApostaForm } from "../src/CriarApostaForm";
+import { CriarApostaForm, criarApostaUsecase } from "../src/CriarApostaForm";
+import { ObterApostasNotionGateway } from "../src/ObterApostasNotionGateway";
+import { ObterApostasUsecase } from "../src/ObterApostasUsecase";
 import { RulesArticle } from "../src/RegrasArticle";
 
-export default function Home() {
+const obterApostasUsecase = new ObterApostasUsecase(
+  new ObterApostasNotionGateway()
+);
+
+type HomeProps = {
+  apostas: null | Aposta[];
+  ehParaMostrarForm: boolean;
+};
+
+export default function Home({ apostas, ehParaMostrarForm }: HomeProps) {
   return (
     <Flex position={"relative"} height={"100vh"} flexDirection="column">
       <Box position={"absolute"} top={0} left={0} right={0} zIndex={-1}>
@@ -59,9 +73,22 @@ export default function Home() {
           columns={{ base: 1, lg: 2 }}
         >
           <RulesArticle />
-          <CriarApostaForm />
+          {ehParaMostrarForm && <CriarApostaForm />}
+          {!!apostas && <ApostasTable apostas={apostas} />}
         </SimpleGrid>
       </Container>
     </Flex>
   );
 }
+
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+  const apostas = await obterApostasUsecase.execute();
+  const ehParaMostrarForm = criarApostaUsecase.ehPeriodoDeCriarAposta();
+  return {
+    revalidate: 10 * 60, // 10 minutes
+    props: {
+      apostas,
+      ehParaMostrarForm,
+    },
+  };
+};
