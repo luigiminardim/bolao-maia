@@ -13,7 +13,7 @@ import croaciaSrc from "../public/Croácia.png";
 import brasilSrc from "../public/Brasil.png";
 import suicaSrc from "../public/Suíça.png";
 import portugalSrc from "../public/Portugal.png";
-import ganaSrc from "../public/Gana.png";
+import coreiaDoSulSrc from "../public/Coreia do Sul.png";
 
 export const times = [
   { nome: "Holanda", bandeira: holandaSrc },
@@ -31,7 +31,7 @@ export const times = [
   { nome: "Brasil", bandeira: brasilSrc },
   { nome: "Suíça", bandeira: suicaSrc },
   { nome: "Portugal", bandeira: portugalSrc },
-  { nome: "Gana", bandeira: ganaSrc },
+  { nome: "Coreia do Sul", bandeira: coreiaDoSulSrc },
 ] as const;
 
 export type Time = typeof times[number];
