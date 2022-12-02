@@ -27,10 +27,16 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>Bolão dos Maia</title>
         <meta
           name="description"
-          content="Participe do Bolão da Copa da Família Maia"
+          content="Participe do Bolão da Copa da Família Maia!"
         />
         <meta name="keywords" content="Bolão, Família Maia" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta property="og:title" content="Bolão dos Maia" />
+        <meta property="og:image" content="/favicon.png" />
+        <meta
+          property="og:description"
+          content="Participe do Bolão da Copa da Família Maia!"
+        />
       </Head>
       <Component {...pageProps} />
     </ChakraProvider>
