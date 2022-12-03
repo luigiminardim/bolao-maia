@@ -1,9 +1,11 @@
 import {
   Heading,
+  HStack,
   Table,
   TableContainer,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
@@ -41,30 +43,42 @@ export function ApostasTable({ apostas }: ApostasTableProps) {
           <Thead>
             <Tr>
               <Th>Nome</Th>
-              <Th>1º</Th>
-              <Th>2º</Th>
-              <Th>3º</Th>
-              <Th>4º</Th>
+              <Th>Palpite</Th>
             </Tr>
           </Thead>
           <Tbody>
             {apostas.map((aposta) => (
               <Tr key={aposta.nome}>
-                <Td>{formatarNome(aposta.nome)}</Td>
-                {(["1", "2", "3", "4"] as const).map((position) => {
-                  const bandeira = getBandeira(aposta.palpite[position]);
-                  return (
-                    <Td key={position} padding={4}>
-                      {bandeira && (
-                        <Image
-                          src={bandeira}
-                          alt={aposta.palpite[position]}
-                          style={{ width: "max-content" }}
-                        />
-                      )}
-                    </Td>
-                  );
-                })}
+                <Td>
+                  <VStack align={"stretch"}>
+                    <Text as="b">{formatarNome(aposta.nome)}</Text>
+                    <Text as="p">
+                      <Text as="span">{aposta.minimoDePontos} </Text> a{" "}
+                      <Text as="span">{aposta.maximoDePontos} </Text>
+                      pontos
+                    </Text>
+                  </VStack>
+                </Td>
+                <Td>
+                  <VStack align="stretch">
+                    {(["1", "2", "3", "4"] as const).map((position) => {
+                      const bandeira = getBandeira(aposta.palpite[position]);
+                      return (
+                        <HStack key={position}>
+                          {bandeira && (
+                            <Image
+                              src={bandeira}
+                              alt={aposta.palpite[position]}
+                              width={32}
+                              height={24}
+                            />
+                          )}
+                          <Text as="span">{aposta.palpite[position]}</Text>
+                        </HStack>
+                      );
+                    })}
+                  </VStack>
+                </Td>
               </Tr>
             ))}
           </Tbody>

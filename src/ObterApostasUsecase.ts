@@ -1,7 +1,17 @@
-import { Aposta } from "./Aposta";
+import { Aposta, calcularPontuacao, gerarTodasPossibilidades } from "./Aposta";
+import { Time } from "./times";
 
+export type ObterApostasGatewayReturnItem = {
+  nome: string;
+  palpite: {
+    "1": Time["nome"];
+    "2": Time["nome"];
+    "3": Time["nome"];
+    "4": Time["nome"];
+  };
+};
 export interface ObterApostasGateway {
-  execute(): Promise<Aposta[]>;
+  execute(): Promise<ObterApostasGatewayReturnItem[]>;
 }
 
 export class ObterApostasUsecase {
@@ -17,6 +27,25 @@ export class ObterApostasUsecase {
     if (!this.ehPeriodoDeObterApostas()) {
       return null;
     }
-    return await this.gateway.execute();
+    const todasPossibilidades = gerarTodasPossibilidades();
+    const resultados = await this.gateway.execute();
+    const apostas = resultados.map(({ nome, palpite }): Aposta => {
+      const pontuacoes = todasPossibilidades.map((possibilidade) =>
+        calcularPontuacao(possibilidade, palpite)
+      );
+      const minimoDePontos = Math.min(...pontuacoes);
+      const maximoDePontos = Math.max(...pontuacoes);
+      return {
+        nome,
+        palpite,
+        minimoDePontos,
+        maximoDePontos,
+      };
+    });
+    return apostas.sort((a, b) =>
+      b.minimoDePontos - a.minimoDePontos === 0
+        ? b.maximoDePontos - a.maximoDePontos
+        : b.minimoDePontos - a.minimoDePontos
+    );
   }
 }
