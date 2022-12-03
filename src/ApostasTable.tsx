@@ -21,6 +21,17 @@ function getBandeira(time: Time["nome"]) {
   return times.find((t) => t.nome === time)?.bandeira;
 }
 
+function formatarNome(nome: string) {
+  const [primeiroNome, ...resto] = nome
+    .trim()
+    .split(" ")
+    .filter((n) => !!n)
+    .map((x) => x.toLowerCase())
+    .map((x) => x[0].toUpperCase() + x.slice(1));
+  const nomeFormatado = [primeiroNome, resto[resto.length - 1]].join(" ");
+  return nomeFormatado;
+}
+
 export function ApostasTable({ apostas }: ApostasTableProps) {
   return (
     <VStack spacing={4} align="stretch">
@@ -39,7 +50,7 @@ export function ApostasTable({ apostas }: ApostasTableProps) {
           <Tbody>
             {apostas.map((aposta) => (
               <Tr key={aposta.nome}>
-                <Td>{aposta.nome}</Td>
+                <Td>{formatarNome(aposta.nome)}</Td>
                 {(["1", "2", "3", "4"] as const).map((position) => {
                   const bandeira = getBandeira(aposta.palpite[position]);
                   return (
