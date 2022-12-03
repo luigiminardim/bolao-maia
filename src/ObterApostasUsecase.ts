@@ -9,7 +9,7 @@ export class ObterApostasUsecase {
 
   public ehPeriodoDeObterApostas(): boolean {
     const agora = new Date();
-    const inicio = new Date("2022-12-03T11:00:00+03:00"); // 11:00 do dia 03/12/2022
+    const inicio = new Date("2022-12-03T11:00:00-03:00"); // 11:00 do dia 03/12/2022
     return agora >= inicio;
   }
 

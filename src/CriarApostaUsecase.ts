@@ -32,7 +32,7 @@ export class CriarApostaUsecase {
 
   public ehPeriodoDeCriarAposta(): boolean {
     const agora = new Date();
-    const fim = new Date("2022-12-03T11:00:00+03:00"); // 11:00 do dia 03/12/2022
+    const fim = new Date("2022-12-03T11:00:00-03:00"); // 11:00 do dia 03/12/2022
     return agora <= fim;
   }
 
