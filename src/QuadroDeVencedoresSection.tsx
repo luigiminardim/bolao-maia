@@ -13,7 +13,7 @@ import {
 export function QuadroDeVencedoresSection() {
   return (
     <VStack as="section" align={"stretch"} spacing={4}>
-      <Heading as="h2">Quadro de Vencedores</Heading>
+      <Heading as="h2" size="lg">Quadro de Vencedores</Heading>
       <TableContainer>
         <Table>
           <Thead>

@@ -37,7 +37,7 @@ function formatarNome(nome: string) {
 export function ClassificaçãoSection({ apostas }: ApostasTableProps) {
   return (
     <VStack as="section" spacing={4} align="stretch">
-      <Heading as="h2">Classificação</Heading>
+      <Heading as="h2" size="lg">Classificação</Heading>
       <TableContainer>
         <Table variant={"striped"}>
           <Thead>
