@@ -7,15 +7,17 @@ import {
   Link,
   SimpleGrid,
   Spacer,
+  VStack,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { Aposta } from "../src/Aposta";
-import { ApostasTable } from "../src/ApostasTable";
+import { ClassificaçãoSection } from "../src/ClassificaçãoSection";
 import { BallIcon } from "../src/BallIcon";
 import { CriarApostaForm, criarApostaUsecase } from "../src/CriarApostaForm";
 import { ObterApostasNotionGateway } from "../src/ObterApostasNotionGateway";
 import { ObterApostasUsecase } from "../src/ObterApostasUsecase";
 import { RulesArticle } from "../src/RegrasArticle";
+import { QuadroDeVencedoresSection } from "../src/QuadroDeVencedoresSection";
 
 const obterApostasUsecase = new ObterApostasUsecase(
   new ObterApostasNotionGateway()
@@ -72,9 +74,12 @@ export default function Home({ apostas, ehParaMostrarForm }: HomeProps) {
           padding={{ base: 4, lg: 8 }}
           columns={{ base: 1, lg: 2 }}
         >
-          <RulesArticle />
+          <VStack align={"stretch"} spacing={16}>
+            <RulesArticle />
+            <QuadroDeVencedoresSection />
+          </VStack>
           {ehParaMostrarForm && <CriarApostaForm />}
-          {!!apostas && <ApostasTable apostas={apostas} />}
+          {!!apostas && <ClassificaçãoSection apostas={apostas} />}
         </SimpleGrid>
       </Container>
     </Flex>
