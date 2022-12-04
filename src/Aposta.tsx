@@ -19,6 +19,7 @@ type Chaveamento = {
   subChaveamentos?: [Chaveamento, Chaveamento];
 };
 
+const terceiroColocado: null | Time["nome"] = null;
 const chaveamento: Chaveamento = {
   time: null,
   subChaveamentos: [
@@ -60,11 +61,11 @@ const chaveamento: Chaveamento = {
           time: null,
           subChaveamentos: [
             {
-              time: null,
+              time: "Inglaterra",
               subChaveamentos: [{ time: "Inglaterra" }, { time: "Senegal" }],
             },
             {
-              time: null,
+              time: "França",
               subChaveamentos: [{ time: "França" }, { time: "Polônia" }],
             },
           ],
@@ -87,64 +88,64 @@ const chaveamento: Chaveamento = {
   ],
 };
 
-function getTimesDoChaveamento(chaveamento: Chaveamento): Time["nome"][] {
-  if (chaveamento.time) return [chaveamento.time];
+export function gerarTodosChaveamentosFinaisPossíveis(
+  chaveamento: Chaveamento
+): Chaveamento[] {
+  if (!!chaveamento.time) return [chaveamento];
   if (!chaveamento.subChaveamentos) return [];
-  return chaveamento.subChaveamentos.flatMap(getTimesDoChaveamento);
-}
-
-function permutator<T>(inputArr: T[]) {
-  let result: T[][] = [];
-  const permute = (arr: T[], m: T[] = []) => {
-    if (arr.length === 0) {
-      result.push(m);
-    } else {
-      for (let i = 0; i < arr.length; i++) {
-        let curr = arr.slice();
-        let next = curr.splice(i, 1);
-        permute(curr.slice(), m.concat(next));
+  const subchaveamentos0 = gerarTodosChaveamentosFinaisPossíveis(
+    chaveamento.subChaveamentos[0]
+  );
+  const subchaveamentos1 = gerarTodosChaveamentosFinaisPossíveis(
+    chaveamento.subChaveamentos[1]
+  );
+  const chaveamentosFinaisPossíveis: Chaveamento[] = [];
+  for (const subchaveamento0 of subchaveamentos0) {
+    for (const subchaveamento1 of subchaveamentos1) {
+      for (const time of [subchaveamento0.time, subchaveamento1.time]) {
+        if (!time) continue;
+        chaveamentosFinaisPossíveis.push({
+          time,
+          subChaveamentos: [subchaveamento0, subchaveamento1],
+        });
       }
     }
-  };
-  permute(inputArr);
-  return result;
+  }
+  return chaveamentosFinaisPossíveis;
+}
+
+function convChaveamentoParaPalpites(chaveamento: Chaveamento): Palpite[] {
+  const semifinalistas = [
+    chaveamento.subChaveamentos?.[0].subChaveamentos?.[0].time,
+    chaveamento.subChaveamentos?.[0].subChaveamentos?.[1].time,
+    chaveamento.subChaveamentos?.[1].subChaveamentos?.[0].time,
+    chaveamento.subChaveamentos?.[1].subChaveamentos?.[1].time,
+  ];
+  const finalistas = [
+    chaveamento.subChaveamentos?.[0].time,
+    chaveamento.subChaveamentos?.[1].time,
+  ];
+  const _1 = chaveamento.time;
+  const _2 = finalistas.filter((finalista) => finalista !== _1)[0];
+  const [_3_a, _3_b] = semifinalistas.filter(
+    (semifinalista) => semifinalista !== _1 && semifinalista !== _2
+  );
+  if (!_1 || !_2 || !_3_a || !_3_b) return [];
+  return [
+    { "1": _1, "2": _2, "3": _3_a, "4": _3_b },
+    { "1": _1, "2": _2, "3": _3_b, "4": _3_a },
+  ].filter((palpite) =>
+    terceiroColocado ? palpite["3"] === terceiroColocado : true
+  );
 }
 
 export function gerarTodasPossibilidades(): Palpite[] {
-  const _1 = chaveamento.time;
-  const _3: null | Time["nome"] = null;
-  const subchaveamento1 =
-    chaveamento.subChaveamentos?.[0]?.subChaveamentos?.[0];
-  const subchaveamento2 =
-    chaveamento.subChaveamentos?.[0]?.subChaveamentos?.[1];
-  const subchaveamento3 =
-    chaveamento.subChaveamentos?.[1]?.subChaveamentos?.[0];
-  const subchaveamento4 =
-    chaveamento.subChaveamentos?.[1]?.subChaveamentos?.[1];
-  const times1 = subchaveamento1 ? getTimesDoChaveamento(subchaveamento1) : [];
-  const times2 = subchaveamento2 ? getTimesDoChaveamento(subchaveamento2) : [];
-  const times3 = subchaveamento3 ? getTimesDoChaveamento(subchaveamento3) : [];
-  const times4 = subchaveamento4 ? getTimesDoChaveamento(subchaveamento4) : [];
-  const todasPossibilidades = times1
-    .flatMap((time1) =>
-      times2.flatMap((time2) =>
-        times3.flatMap((time3) =>
-          times4.flatMap((time4) => {
-            const palpite = [time1, time2, time3, time4];
-            return permutator(palpite);
-          })
-        )
-      )
-    )
-    .map((possibilidade) => ({
-      "1": possibilidade[0],
-      "2": possibilidade[1],
-      "3": possibilidade[2],
-      "4": possibilidade[3],
-    }))
-    .filter((palpite) => (!!_1 ? palpite["1"] === _1 : true))
-    .filter((palpite) => (!!_3 ? palpite["3"] === _3 : true));
-  return todasPossibilidades;
+  const chaveamentosFinaisPossíveis =
+    gerarTodosChaveamentosFinaisPossíveis(chaveamento);
+  const palpitesPossíveis = chaveamentosFinaisPossíveis.flatMap(
+    convChaveamentoParaPalpites
+  );
+  return palpitesPossíveis;
 }
 
 export function calcularPontuacao(resultado: Palpite, palpite: Palpite) {
