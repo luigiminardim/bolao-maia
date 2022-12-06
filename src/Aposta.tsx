@@ -43,11 +43,11 @@ const chaveamento: Chaveamento = {
           time: null,
           subChaveamentos: [
             {
-              time: null,
+              time: "Croácia",
               subChaveamentos: [{ time: "Japão" }, { time: "Croácia" }],
             },
             {
-              time: null,
+              time: "Brasil",
               subChaveamentos: [{ time: "Brasil" }, { time: "Coreia do Sul" }],
             },
           ],
@@ -74,7 +74,7 @@ const chaveamento: Chaveamento = {
           time: null,
           subChaveamentos: [
             {
-              time: null,
+              time: "Espanha",
               subChaveamentos: [{ time: "Marrocos" }, { time: "Espanha" }],
             },
             {
