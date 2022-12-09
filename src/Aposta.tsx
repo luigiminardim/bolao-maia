@@ -27,7 +27,7 @@ const chaveamento: Chaveamento = {
       time: null,
       subChaveamentos: [
         {
-          time: null,
+          time: "Argentina",
           subChaveamentos: [
             {
               time: "Holanda",
