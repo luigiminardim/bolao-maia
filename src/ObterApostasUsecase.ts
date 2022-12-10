@@ -25,6 +25,17 @@ type TabelaDePontuação = {
   vencedores: string[];
 }[];
 
+// function printarProbabilidadesDoApostador(
+//   nomeAposta: string,
+//   tabela: TabelaDePontuação
+// ) {
+//   console.log(
+//     tabela
+//       .filter(({ vencedores }) => vencedores.includes(nomeAposta))
+//       .map(({ possibilidade }) => possibilidade)
+//   );
+// }
+
 export class ObterApostasUsecase {
   constructor(private gateway: ObterApostasGateway) {}
 
@@ -63,6 +74,7 @@ export class ObterApostasUsecase {
       );
       return { possibilidade, vencedores, resultados };
     });
+    // printarProbabilidadesDoApostador("Luigi Minardi Ferreira Maia", tabela);
     return tabela;
   }
 
