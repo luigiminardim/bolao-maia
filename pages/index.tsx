@@ -24,11 +24,14 @@ const obterApostasUsecase = new ObterApostasUsecase(
 );
 
 type HomeProps = {
-  apostas: null | Aposta[];
+  resultadoObterApostas: null | { apostas: Aposta[]; nPossibilidades: number };
   ehParaMostrarForm: boolean;
 };
 
-export default function Home({ apostas, ehParaMostrarForm }: HomeProps) {
+export default function Home({
+  resultadoObterApostas,
+  ehParaMostrarForm,
+}: HomeProps) {
   return (
     <Flex position={"relative"} height={"100vh"} flexDirection="column">
       <Box position={"absolute"} top={0} left={0} right={0} zIndex={-1}>
@@ -79,7 +82,12 @@ export default function Home({ apostas, ehParaMostrarForm }: HomeProps) {
             <QuadroDeVencedoresSection />
           </VStack>
           {ehParaMostrarForm && <CriarApostaForm />}
-          {!!apostas && <ClassificaçãoSection apostas={apostas} />}
+          {!!resultadoObterApostas && (
+            <ClassificaçãoSection
+              apostas={resultadoObterApostas.apostas}
+              nPossibilidades={resultadoObterApostas.nPossibilidades}
+            />
+          )}
         </SimpleGrid>
       </Container>
     </Flex>
@@ -87,12 +95,12 @@ export default function Home({ apostas, ehParaMostrarForm }: HomeProps) {
 }
 
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  const apostas = await obterApostasUsecase.execute();
+  const resultadoObterApostas = await obterApostasUsecase.execute();
   const ehParaMostrarForm = criarApostaUsecase.ehPeriodoDeCriarAposta();
   return {
     revalidate: 10 * 60, // 10 minutes
     props: {
-      apostas,
+      resultadoObterApostas: resultadoObterApostas,
       ehParaMostrarForm,
     },
   };

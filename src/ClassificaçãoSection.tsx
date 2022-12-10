@@ -2,6 +2,7 @@ import {
   Heading,
   HStack,
   Table,
+  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -17,6 +18,7 @@ import { Time, times } from "./times";
 
 export type ApostasTableProps = {
   apostas: Aposta[];
+  nPossibilidades: number;
 };
 
 function getBandeira(time: Time["nome"]) {
@@ -34,12 +36,20 @@ function formatarNome(nome: string) {
   return nomeFormatado;
 }
 
-export function ClassificaçãoSection({ apostas }: ApostasTableProps) {
+export function ClassificaçãoSection({
+  apostas,
+  nPossibilidades,
+}: ApostasTableProps) {
   return (
     <VStack as="section" spacing={4} align="stretch">
-      <Heading as="h2" size="lg">Classificação</Heading>
+      <Heading as="h2" size="lg">
+        Classificação
+      </Heading>
       <TableContainer>
         <Table variant={"striped"}>
+          <TableCaption>
+            Total de possibilidades: {nPossibilidades}
+          </TableCaption>
           <Thead>
             <Tr>
               <Th>Nome</Th>
@@ -52,6 +62,14 @@ export function ClassificaçãoSection({ apostas }: ApostasTableProps) {
                 <Td>
                   <VStack align={"stretch"}>
                     <Text as="b">{formatarNome(aposta.nome)}</Text>
+                    <Text as="p">
+                      <b>{aposta.nPossibilidades}</b> possibilidades (
+                      {(
+                        (aposta.nPossibilidades / nPossibilidades) *
+                        100
+                      ).toFixed(0)}
+                      %)
+                    </Text>
                     <Text as="p">
                       <Text as="span">{aposta.minimoDePontos} </Text> a{" "}
                       <Text as="span">{aposta.maximoDePontos} </Text>

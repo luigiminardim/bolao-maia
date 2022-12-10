@@ -1,7 +1,12 @@
-import { Aposta, calcularPontuacao, gerarTodasPossibilidades } from "./Aposta";
+import {
+  Aposta,
+  calcularPontuacao,
+  gerarTodasPossibilidades,
+  Palpite,
+} from "./Aposta";
 import { Time } from "./times";
 
-export type ObterApostasGatewayReturnItem = {
+export type NotionAposta = {
   nome: string;
   palpite: {
     "1": Time["nome"];
@@ -11,8 +16,14 @@ export type ObterApostasGatewayReturnItem = {
   };
 };
 export interface ObterApostasGateway {
-  execute(): Promise<ObterApostasGatewayReturnItem[]>;
+  execute(): Promise<NotionAposta[]>;
 }
+
+type TabelaDePontuação = {
+  possibilidade: Palpite;
+  resultados: { notionAposta: NotionAposta; pontuação: number }[];
+  vencedores: string[];
+}[];
 
 export class ObterApostasUsecase {
   constructor(private gateway: ObterApostasGateway) {}
@@ -23,29 +34,88 @@ export class ObterApostasUsecase {
     return agora >= inicio;
   }
 
-  async execute(): Promise<null | Aposta[]> {
-    if (!this.ehPeriodoDeObterApostas()) {
-      return null;
-    }
-    const todasPossibilidades = gerarTodasPossibilidades();
-    const resultados = await this.gateway.execute();
-    const apostas = resultados.map(({ nome, palpite }): Aposta => {
-      const pontuacoes = todasPossibilidades.map((possibilidade) =>
-        calcularPontuacao(possibilidade, palpite)
+  private gerarTabelaDePontuação(
+    todasPossibilidades: Palpite[],
+    notionApostas: NotionAposta[]
+  ): TabelaDePontuação {
+    const tabela = todasPossibilidades.map((possibilidade) => {
+      const resultados = notionApostas.map((notionAposta) => {
+        const pontuação = calcularPontuacao(
+          possibilidade,
+          notionAposta.palpite
+        );
+        return { notionAposta, pontuação };
+      });
+      const { vencedores, maxPontuação } = resultados.reduce(
+        ({ vencedores, maxPontuação }, { pontuação, notionAposta }) => {
+          if (pontuação > maxPontuação) {
+            return { vencedores: [notionAposta.nome], maxPontuação: pontuação };
+          }
+          if (pontuação === maxPontuação) {
+            return {
+              vencedores: [...vencedores, notionAposta.nome],
+              maxPontuação: pontuação,
+            };
+          }
+          return { vencedores, maxPontuação };
+        },
+        { vencedores: [] as string[], maxPontuação: 0 }
       );
-      const minimoDePontos = Math.min(...pontuacoes);
-      const maximoDePontos = Math.max(...pontuacoes);
+      return { possibilidade, vencedores, resultados };
+    });
+    return tabela;
+  }
+
+  private gerarApostas(
+    tabelaDePontuação: TabelaDePontuação,
+    notionApostas: NotionAposta[]
+  ): Aposta[] {
+    const apostas = notionApostas.map(({ nome, palpite }): Aposta => {
+      const pontuaçãoesPossíveis = tabelaDePontuação.map(
+        ({ resultados }) =>
+          resultados.find(({ notionAposta }) => notionAposta.nome === nome)
+            ?.pontuação ?? -1
+      );
+      const minimoDePontos = Math.min(...pontuaçãoesPossíveis);
+      const maximoDePontos = Math.max(...pontuaçãoesPossíveis);
+      const nPossibilidades = tabelaDePontuação.filter(({ vencedores }) =>
+        vencedores.some((vencedor) => vencedor === nome)
+      ).length;
       return {
         nome,
         palpite,
         minimoDePontos,
         maximoDePontos,
+        nPossibilidades,
       };
     });
-    return apostas.sort((a, b) =>
-      b.minimoDePontos - a.minimoDePontos === 0
-        ? b.maximoDePontos - a.maximoDePontos
-        : b.minimoDePontos - a.minimoDePontos
+    return apostas;
+  }
+
+  async execute(): Promise<null | {
+    apostas: Aposta[];
+    nPossibilidades: number;
+  }> {
+    if (!this.ehPeriodoDeObterApostas()) {
+      return null;
+    }
+    const todasPossibilidades = gerarTodasPossibilidades();
+    const notionApostas = await this.gateway.execute();
+    const tabelaDePontuação = this.gerarTabelaDePontuação(
+      todasPossibilidades,
+      notionApostas
     );
+    const apostas = this.gerarApostas(tabelaDePontuação, notionApostas);
+    const apostasOrdenadas = apostas.sort((a, b) =>
+      b.nPossibilidades - a.nPossibilidades !== 0
+        ? b.nPossibilidades - a.nPossibilidades
+        : b.minimoDePontos - a.minimoDePontos !== 0
+        ? b.minimoDePontos - a.minimoDePontos
+        : b.maximoDePontos - a.maximoDePontos
+    );
+    return {
+      apostas: apostasOrdenadas,
+      nPossibilidades: todasPossibilidades.length,
+    };
   }
 }

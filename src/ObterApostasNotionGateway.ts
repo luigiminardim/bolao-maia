@@ -1,12 +1,12 @@
 import { notionClient } from "./notionClient";
 import {
   ObterApostasGateway,
-  ObterApostasGatewayReturnItem,
+  NotionAposta,
 } from "./ObterApostasUsecase";
 import { Time } from "./times";
 
 export class ObterApostasNotionGateway implements ObterApostasGateway {
-  private buidItem(page: any): ObterApostasGatewayReturnItem {
+  private buidItem(page: any): NotionAposta {
     const aposta: {
       nome: string;
       palpite: {
@@ -27,7 +27,7 @@ export class ObterApostasNotionGateway implements ObterApostasGateway {
     return aposta;
   }
 
-  async execute(): Promise<ObterApostasGatewayReturnItem[]> {
+  async execute(): Promise<NotionAposta[]> {
     const response = await notionClient.databases.query({
       database_id: "21836f376acb4364b91b9b238d799636",
     });

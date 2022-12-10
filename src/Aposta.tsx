@@ -12,6 +12,7 @@ export type Aposta = {
   palpite: Palpite;
   minimoDePontos: number;
   maximoDePontos: number;
+  nPossibilidades: number;
 };
 
 type Chaveamento = {
