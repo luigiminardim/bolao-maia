@@ -20,7 +20,7 @@ type Chaveamento = {
   subChaveamentos?: [Chaveamento, Chaveamento];
 };
 
-const terceiroColocado: null | Time["nome"] = null;
+const terceiroColocado: null | Time["nome"] = "Croácia";
 const chaveamento: Chaveamento = {
   time: null,
   subChaveamentos: [
