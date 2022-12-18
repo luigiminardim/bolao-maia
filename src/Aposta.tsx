@@ -22,7 +22,7 @@ type Chaveamento = {
 
 const terceiroColocado: null | Time["nome"] = "Croácia";
 const chaveamento: Chaveamento = {
-  time: null,
+  time: "Argentina",
   subChaveamentos: [
     {
       time: "Argentina",
