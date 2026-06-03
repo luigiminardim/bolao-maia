@@ -1,5 +1,5 @@
-import { CupChampionship, GroupListChampionship } from "./Championship";
-import { Team } from "./Team";
+import { CupChampionship, GroupListChampionship } from "./Championship.ts";
+import { Team } from "./Team.ts";
 
 export interface GroupListScorePolicy {
   groupListTeamScore(
@@ -100,8 +100,11 @@ export class InverseProbabilityQualifiedPositionGroupListScorePolicy implements 
 
 export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
   static readonly idPrefix: string = "log2";
+  readonly scorePolicy: GroupListScorePolicy;
 
-  constructor(private scorePolicy: GroupListScorePolicy) {}
+  constructor(scorePolicy: GroupListScorePolicy) {
+    this.scorePolicy = scorePolicy;
+  }
 
   groupListTeamScore(
     team: Team,
@@ -121,8 +124,11 @@ export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
 
 export class WithLogarithm2CupScorePolicy implements CupScorePolicy {
   static readonly idPrefix: string = "log2";
+  readonly scorePolicy: CupScorePolicy;
 
-  constructor(private scorePolicy: CupScorePolicy) {}
+  constructor(scorePolicy: CupScorePolicy) {
+    this.scorePolicy = scorePolicy;
+  }
 
   cupTeamScore(
     team: Team,
@@ -135,5 +141,41 @@ export class WithLogarithm2CupScorePolicy implements CupScorePolicy {
       positionGuess,
     );
     return Math.log2(score);
+  }
+}
+
+export class ScorePolicyBuilder {
+  static buildGroupListScorePolicyFromId(id: string): GroupListScorePolicy {
+    const trimmedId = id.trim();
+    if (trimmedId === InverseProbabilityPositionScorePolicy.idPrefix) {
+      return new InverseProbabilityPositionScorePolicy();
+    }
+    if (
+      trimmedId ===
+      InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix
+    ) {
+      return new InverseProbabilityQualifiedPositionGroupListScorePolicy();
+    }
+    const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
+    if (log2Match) {
+      return new WithLogarithm2GroupScorePolicy(
+        this.buildGroupListScorePolicyFromId(log2Match[1]),
+      );
+    }
+    throw new Error(`Unknown GroupListScorePolicy ID: ${id}`);
+  }
+
+  static buildCupScorePolicyFromId(id: string): CupScorePolicy {
+    const trimmedId = id.trim();
+    if (trimmedId === InverseProbabilityPositionScorePolicy.idPrefix) {
+      return new InverseProbabilityPositionScorePolicy();
+    }
+    const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
+    if (log2Match) {
+      return new WithLogarithm2CupScorePolicy(
+        this.buildCupScorePolicyFromId(log2Match[1]),
+      );
+    }
+    throw new Error(`Unknown CupScorePolicy ID: ${id}`);
   }
 }

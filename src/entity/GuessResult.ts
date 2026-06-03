@@ -55,12 +55,17 @@ export class CupGuessResult {
         };
       }
     }
-    const nextContext = (team: Team, context: { seen: Team[] }) => {
-      context.seen.push(team);
+    const nextContext = (team: null | Team, context: { seen: Team[] }) => {
+      if (team !== null) {
+        context.seen.push(team);
+      }
       return context;
     };
     const root = cup.root.scanmap(
       (team, context) => {
+        if (team === null) {
+          return { team: null, positionGuess: null, score: null };
+        }
         const guessPosition = guess.teamPosition(team) ?? (-1 as never);
         if (context.seen.includes(team)) {
           return { team, positionGuess: guessPosition, score: null };

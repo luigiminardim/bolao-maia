@@ -1,5 +1,5 @@
-import { BinaryTree } from "../utils/BinaryTree";
-import { Team } from "./Team";
+import { BinaryTree } from "../utils/BinaryTree.ts";
+import { Team } from "./Team.ts";
 
 export class GroupChampionship {
   id: string;
@@ -93,13 +93,13 @@ export class GroupListChampionship {
 
 export class CupChampionship {
   id: string;
-  root: BinaryTree<Team>;
+  root: BinaryTree<null | Team>;
   hasThirdPlaceMatch: boolean;
   thirdPlace: null | Team;
 
   constructor(
     id: string,
-    root: BinaryTree<Team>,
+    root: BinaryTree<null | Team>,
     hasThirdPlaceMatch: boolean,
     thirdPlace: null | Team,
   ) {
@@ -117,7 +117,7 @@ export class CupChampionship {
     if (this.thirdPlace !== null && team.id === this.thirdPlace.id) {
       return 3;
     }
-    const height = this.root.findHeight((t) => t.id === team.id);
+    const height = this.root.findHeight((t) => t !== null && t.id === team.id);
     if (height === null) return null;
     return Math.pow(2, height);
   }
