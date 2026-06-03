@@ -8,7 +8,6 @@ import {
   Avatar,
   Chip,
   ProgressBar,
-  Label,
   Accordion,
   Table,
   Modal,
@@ -521,11 +520,11 @@ export default function Home() {
                 <Button 
                   onPress={savePredictions}
                   className="bg-emerald-500 text-zinc-950 font-bold px-6 py-2.5 rounded-xl hover:bg-emerald-400 transition-all flex items-center gap-2 text-xs shadow-md shadow-emerald-500/10"
-                  disabled={isSubmitting}
+                  isDisabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
-                      <Spinner size="xs" className="text-zinc-950" />
+                      <Spinner size="sm" className="text-zinc-950" />
                       <span>Salvando...</span>
                     </>
                   ) : (
