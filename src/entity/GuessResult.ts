@@ -1,6 +1,10 @@
 import { BinaryTree } from "../utils/BinaryTree";
-import { CupGuess, LeagueGuess } from "./Guess";
-import { GroupAndCupSweepstake } from "./Sweepstake";
+import { CupGuess, GroupGuess, GroupListGuess, PoolGuess } from "./Guess";
+import {
+  CupSweepstake,
+  GroupListSweepstake,
+  PoolSweepstake,
+} from "./Sweepstake";
 import { Team } from "./Team";
 
 type CupGuessNodeInfo = {
@@ -9,12 +13,12 @@ type CupGuessNodeInfo = {
   score: null | number;
 };
 
-class CupGuessResult {
+export class CupGuessResult {
   score: number;
   root: BinaryTree<CupGuessNodeInfo>;
   thirdPlace: null | CupGuessNodeInfo;
 
-  private constructor(
+  constructor(
     root: BinaryTree<CupGuessNodeInfo>,
     thirdPlace: null | CupGuessNodeInfo,
   ) {
@@ -24,19 +28,19 @@ class CupGuessResult {
     this.score = rootScore + (thirdPlace?.score ?? 0);
   }
 
-  static fromGroupAndCupSweepstake(
-    sweepstake: GroupAndCupSweepstake,
+  static fromCupSweepstake(
+    sweepstake: CupSweepstake,
     guess: CupGuess,
   ): CupGuessResult {
-    const cup = sweepstake.championship.cup;
-    const scorePolicy = sweepstake.cupScorePolicy;
+    const cup = sweepstake.championship;
+    const scorePolicy = sweepstake.scorePolicy;
     let thirdPlace: null | CupGuessNodeInfo = null;
     const scanContext: { seen: Team[] } = { seen: [] };
     if (cup.hasThirdPlaceMatch) {
       if (cup.thirdPlace) {
         const team = cup.thirdPlace;
         const guessPosition = guess.teamPosition(team) ?? (-1 as never);
-        const score = scorePolicy.teamScoreFromCup(cup, team, guessPosition);
+        const score = scorePolicy.cupTeamScore(team, cup, guessPosition);
         thirdPlace = {
           team,
           positionGuess: guessPosition,
@@ -61,7 +65,7 @@ class CupGuessResult {
         if (context.seen.includes(team)) {
           return { team, positionGuess: guessPosition, score: null };
         }
-        const score = scorePolicy.teamScoreFromCup(cup, team, guessPosition);
+        const score = scorePolicy.cupTeamScore(team, cup, guessPosition);
         return { team, positionGuess: guessPosition, score };
       },
       scanContext,
@@ -72,18 +76,18 @@ class CupGuessResult {
   }
 }
 
-type LeagueGuessNodeInfo = {
+type GroupGuessNodeInfo = {
   team: null | Team;
   positionGuess: null | number;
   extraQualifiedGuess: boolean;
   score: null | number;
 };
 
-export class LeagueGuessResult {
+export class GroupGuessResult {
   score: number;
-  classification: LeagueGuessNodeInfo[];
+  classification: GroupGuessNodeInfo[];
 
-  constructor(classification: LeagueGuessNodeInfo[]) {
+  constructor(classification: GroupGuessNodeInfo[]) {
     this.classification = classification;
     this.score = classification.reduce(
       (acc, node) => acc + (node.score ?? 0),
@@ -91,27 +95,26 @@ export class LeagueGuessResult {
     );
   }
 
-  static fromGroupAndCupSweepstake(
-    sweepstake: GroupAndCupSweepstake,
+  static fromGroupListSweepstake(
+    sweepstake: GroupListSweepstake,
     groupId: string,
-    groupGuess: LeagueGuess,
+    groupGuess: GroupGuess,
     extraQualifiedListGuess: Team[],
-  ): LeagueGuessResult {
-    const { championship, leagueScorePolicy } = sweepstake;
-    const group = championship.group(groupId);
-    if (!group) return new LeagueGuessResult([]) as never;
-    const classificationInfo: LeagueGuessNodeInfo[] = group.classification.map(
+  ): GroupGuessResult {
+    const { championship, scorePolicy } = sweepstake;
+    const group = championship.getGroup(groupId);
+    if (!group) return new GroupGuessResult([]) as never;
+    const classificationInfo: GroupGuessNodeInfo[] = group.classification.map(
       (team) => {
         const guessPosition = groupGuess.teamPosition(team);
         const extraQualifiedGuess = !!extraQualifiedListGuess.find(
           (t) => t.id === team.id,
         );
-        const score = leagueScorePolicy.teamScoreFromLeague(
-          group,
-          championship.extraQualifiedList,
+        const score = scorePolicy.groupListTeamScore(
           team,
-          guessPosition ?? (-1 as never),
-          extraQualifiedGuess,
+          championship,
+          guessPosition,
+          extraQualifiedListGuess,
         );
         return {
           team,
@@ -121,41 +124,85 @@ export class LeagueGuessResult {
         };
       },
     );
-    return new LeagueGuessResult(classificationInfo);
+    return new GroupGuessResult(classificationInfo);
   }
 }
 
-export class GroupAndCupGuessResult {
+export class GroupListGuessResult {
   score: number;
-  cupResult: CupGuessResult;
-  groupResults: LeagueGuessResult[];
+  groupResults: GroupGuessResult[];
 
-  constructor(cupResult: CupGuessResult, groupResults: LeagueGuessResult[]) {
-    this.cupResult = cupResult;
+  constructor(groupResults: GroupGuessResult[]) {
     this.groupResults = groupResults;
-    this.score =
-      cupResult.score +
-      groupResults.reduce((acc, result) => acc + result.score, 0);
+    this.score = groupResults.reduce((acc, result) => acc + result.score, 0);
   }
 
-  static fromGroupAndCupSweepstake(
-    sweepstake: GroupAndCupSweepstake,
-    cupGuess: CupGuess,
-    groupGuessList: LeagueGuess[],
-    extraQualifiedListGuess: Team[],
-  ): GroupAndCupGuessResult {
-    const cupResult = CupGuessResult.fromGroupAndCupSweepstake(
-      sweepstake,
-      cupGuess,
+  static fromGroupListSweepstake(
+    sweepstake: GroupListSweepstake,
+    guess: GroupListGuess,
+  ): GroupListGuessResult {
+    const groupResults = sweepstake.championship
+      .getGroups()
+      .map((group, idx) =>
+        GroupGuessResult.fromGroupListSweepstake(
+          sweepstake,
+          group.id,
+          guess.groupGuesses[idx],
+          guess.extraQualifiedListGuess,
+        ),
+      );
+    return new GroupListGuessResult(groupResults);
+  }
+}
+
+export type GuessableGuessResult =
+  | { kind: "group"; groupResult: GroupListGuessResult; factor: number }
+  | { kind: "cup"; cupResult: CupGuessResult; factor: number };
+
+export class PoolGuessResult {
+  score: number;
+  subResults: GuessableGuessResult[];
+
+  constructor(subResults: GuessableGuessResult[]) {
+    this.subResults = subResults;
+    this.score = subResults.reduce((acc, result) => {
+      if (result.kind === "group") {
+        return acc + result.groupResult.score * result.factor;
+      } else {
+        return acc + result.cupResult.score * result.factor;
+      }
+    }, 0);
+  }
+
+  static fromPoolSweepstake(
+    sweepstake: PoolSweepstake,
+    guess: PoolGuess,
+  ): PoolGuessResult {
+    const subResults: GuessableGuessResult[] = sweepstake.subSweepstakes.map(
+      (item, idx) => {
+        const subGuess = guess.subGuesses[idx];
+        if (item.kind === "group" && subGuess.kind === "group") {
+          return {
+            kind: "group",
+            groupResult: GroupListGuessResult.fromGroupListSweepstake(
+              item.sweepstake,
+              subGuess.groupGuess,
+            ),
+            factor: item.factor,
+          };
+        } else if (item.kind === "cup" && subGuess.kind === "cup") {
+          return {
+            kind: "cup",
+            cupResult: CupGuessResult.fromCupSweepstake(
+              item.sweepstake,
+              subGuess.cupGuess,
+            ),
+            factor: item.factor,
+          };
+        }
+        throw new Error("Mismatch between sweepstake kind and guess kind");
+      },
     );
-    const groupResults = sweepstake.championship.groups.map((group, idx) =>
-      LeagueGuessResult.fromGroupAndCupSweepstake(
-        sweepstake,
-        group.id,
-        groupGuessList[idx],
-        extraQualifiedListGuess,
-      ),
-    );
-    return new GroupAndCupGuessResult(cupResult, groupResults);
+    return new PoolGuessResult(subResults);
   }
 }

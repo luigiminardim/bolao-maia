@@ -1,14 +1,22 @@
 import { BinaryTree } from "../utils/BinaryTree";
-import { CupChampionship, LeagueChampionship } from "./Championship";
-import { GroupAndCupSweepstake } from "./Sweepstake";
+import { CupSweepstake, GroupListSweepstake, PoolSweepstake } from "./Sweepstake";
 import { Team } from "./Team";
 import { User } from "./User";
 
 export class CupGuess {
+  userId: User["email"];
+  sweepstakeId: CupSweepstake["id"];
   root: BinaryTree<Team>;
   thirdPlace: null | Team;
 
-  private constructor(root: BinaryTree<Team>, thirdPlace: null | Team) {
+  constructor(
+    userId: User["email"],
+    sweepstakeId: CupSweepstake["id"],
+    root: BinaryTree<Team>,
+    thirdPlace: null | Team,
+  ) {
+    this.userId = userId;
+    this.sweepstakeId = sweepstakeId;
     this.root = root;
     this.thirdPlace = thirdPlace;
   }
@@ -20,7 +28,7 @@ export class CupGuess {
   }
 }
 
-export class LeagueGuess {
+export class GroupGuess {
   classification: Team[];
 
   constructor(classification: Team[]) {
@@ -33,24 +41,43 @@ export class LeagueGuess {
   }
 }
 
-export class GroupAndCupGuess {
+export class GroupListGuess {
   userId: User["email"];
-  sweepstakeId: GroupAndCupSweepstake["id"];
-  cup: null | CupChampionship;
-  groupList: null | LeagueChampionship[];
-  extraQualifiedList: null | Team[];
+  sweepstakeId: GroupListSweepstake["id"];
+  groupGuesses: GroupGuess[];
+  extraQualifiedListGuess: Team[];
 
   constructor(
     userId: User["email"],
-    sweepstakeId: GroupAndCupSweepstake["id"],
-    cup: null | CupChampionship,
-    groupList: null | LeagueChampionship[],
-    extraQualifiedList: Team[],
+    sweepstakeId: GroupListSweepstake["id"],
+    groupGuesses: GroupGuess[],
+    extraQualifiedListGuess: Team[],
   ) {
     this.userId = userId;
     this.sweepstakeId = sweepstakeId;
-    this.cup = cup;
-    this.groupList = groupList;
-    this.extraQualifiedList = extraQualifiedList;
+    this.groupGuesses = groupGuesses;
+    this.extraQualifiedListGuess = extraQualifiedListGuess;
+  }
+}
+
+export type GuessableGuess =
+  | { kind: "group"; groupGuess: GroupListGuess }
+  | { kind: "cup"; cupGuess: CupGuess };
+
+export type GuessbleGuess = GuessableGuess;
+
+export class PoolGuess {
+  userId: User["email"];
+  sweepstakeId: PoolSweepstake["id"];
+  subGuesses: GuessableGuess[];
+
+  constructor(
+    userId: User["email"],
+    sweepstakeId: PoolSweepstake["id"],
+    subGuesses: GuessableGuess[],
+  ) {
+    this.userId = userId;
+    this.sweepstakeId = sweepstakeId;
+    this.subGuesses = subGuesses;
   }
 }

@@ -15,6 +15,18 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     ".heroui-docs/**",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
   eslintConfigPrettier,
 ]);
 
