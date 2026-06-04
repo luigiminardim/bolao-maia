@@ -22,7 +22,6 @@ export interface CupSweepstakeDao {
   championship: string; // championship id
   scorePolicy: string; // score policy id
   startTime: string; // ISO
-  endTime: string; // ISO
 }
 
 export interface GroupListSweepstakeDao {
@@ -30,7 +29,6 @@ export interface GroupListSweepstakeDao {
   championship: string; // championship id
   scorePolicy: string; // score policy id
   startTime: string; // ISO
-  endTime: string; // ISO
 }
 
 export type SweepstakeItemDao =
@@ -98,7 +96,6 @@ export class PoolSweepstakeRepository {
           championship: sweepstake.championship.id,
           scorePolicy: serializeGroupListScorePolicy(sweepstake.scorePolicy),
           startTime: sweepstake.startTime.toISOString(),
-          endTime: sweepstake.endTime.toISOString(),
         };
         subSweepstakeDaoList.push({
           kind: "group",
@@ -112,7 +109,6 @@ export class PoolSweepstakeRepository {
           championship: sweepstake.championship.id,
           scorePolicy: serializeCupScorePolicy(sweepstake.scorePolicy),
           startTime: sweepstake.startTime.toISOString(),
-          endTime: sweepstake.endTime.toISOString(),
         };
         subSweepstakeDaoList.push({
           kind: "cup",
@@ -148,7 +144,6 @@ export class PoolSweepstakeRepository {
             championship: "2026-world-cup",
             scorePolicy: "inverse-probability-qualified-position",
             startTime: "2026-06-11T12:00:00.000Z",
-            endTime: "2026-07-19T20:00:00.000Z",
           },
           factor: 1,
         },
@@ -177,7 +172,6 @@ export class PoolSweepstakeRepository {
           championship,
           scorePolicy,
           new Date(groupDao.startTime),
-          new Date(groupDao.endTime),
         );
         subSweepstakeList.push({
           kind: "group",
@@ -200,7 +194,6 @@ export class PoolSweepstakeRepository {
           championship,
           scorePolicy,
           new Date(cupDao.startTime),
-          new Date(cupDao.endTime),
         );
         subSweepstakeList.push({
           kind: "cup",

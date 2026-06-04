@@ -6,20 +6,17 @@ export class GroupListSweepstake {
   championship: GroupListChampionship;
   scorePolicy: GroupListScorePolicy;
   startTime: Date;
-  endTime: Date;
 
   constructor(
     id: string,
     championship: GroupListChampionship,
     scorePolicy: GroupListScorePolicy,
     startDate: Date,
-    endDate: Date,
   ) {
     this.id = id;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
     this.startTime = startDate;
-    this.endTime = endDate;
   }
 }
 
@@ -28,20 +25,17 @@ export class CupSweepstake {
   championship: CupChampionship;
   scorePolicy: CupScorePolicy;
   startTime: Date;
-  endTime: Date;
 
   constructor(
     id: string,
     championship: CupChampionship,
     scorePolicy: CupScorePolicy,
     startDate: Date,
-    endDate: Date,
   ) {
     this.id = id;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
     this.startTime = startDate;
-    this.endTime = endDate;
   }
 }
 

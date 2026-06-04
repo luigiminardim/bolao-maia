@@ -35,7 +35,6 @@ describe("PoolSweepstakeRepository", () => {
         groupChampionship,
         groupScorePolicy,
         new Date("2026-06-11T12:00:00.000Z"),
-        new Date("2026-07-19T20:00:00.000Z"),
       );
 
       const subSweepstakeList = [
@@ -59,7 +58,6 @@ describe("PoolSweepstakeRepository", () => {
                 championship: "2026-world-cup",
                 scorePolicy: "inverse-probability-qualified-position",
                 startTime: "2026-06-11T12:00:00.000Z",
-                endTime: "2026-07-19T20:00:00.000Z",
               },
               factor: 1,
             },
@@ -96,7 +94,6 @@ describe("PoolSweepstakeRepository", () => {
       expect(groupSweep.championship).toBe(groupChampionship);
       expect(groupSweep.scorePolicy).toBeInstanceOf(InverseProbabilityQualifiedPositionGroupListScorePolicy);
       expect(groupSweep.startTime).toEqual(new Date("2026-06-11T12:00:00.000Z"));
-      expect(groupSweep.endTime).toEqual(new Date("2026-07-19T20:00:00.000Z"));
 
       expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith("2026-world-cup");
     });
