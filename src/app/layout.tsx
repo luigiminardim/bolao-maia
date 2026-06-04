@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Bolão Maia - Championship & Cup Predictions",
-  description: "Join the ultimate football sweepstakes, predict group stage classifications and cup brackets, and compete on the leaderboards!",
+  description:
+    "Join the ultimate football sweepstakes, predict group stage classifications and cup brackets, and compete on the leaderboards!",
 };
 
 export default function RootLayout({

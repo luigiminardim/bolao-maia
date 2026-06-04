@@ -6,6 +6,7 @@ import {
 } from "../entity/Sweepstake";
 import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
 import { CupChampionshipRepository } from "./CupChampionshipRepository";
+import { TeamRepository } from "./TeamRepository";
 import {
   ScorePolicyBuilder,
   GroupListScorePolicy,
@@ -80,7 +81,7 @@ export class PoolSweepstakeRepository {
     this.storage = storage;
     this.groupListChampionshipRepository =
       groupListChampionshipRepository ||
-      new GroupListChampionshipRepository(this.storage);
+      new GroupListChampionshipRepository(this.storage, new TeamRepository());
     this.cupChampionshipRepository =
       cupChampionshipRepository || new CupChampionshipRepository(this.storage);
   }
@@ -142,7 +143,7 @@ export class PoolSweepstakeRepository {
           sweepstake: {
             id: "2026-world-cup",
             championship: "2026-world-cup",
-            scorePolicy: "inverse-probability-qualified-position",
+            scorePolicy: "log2(inverse-probability-qualified-position)",
             startTime: "2026-06-11T12:00:00.000Z",
           },
           factor: 1,

@@ -1,5 +1,10 @@
 import { PoolGuessRepository } from "./PoolGuessRepository";
-import { PoolGuess, GroupListGuess, GroupGuess, CupGuess } from "../entity/Guess";
+import {
+  PoolGuess,
+  GroupListGuess,
+  GroupGuess,
+  CupGuess,
+} from "../entity/Guess";
 import { Team } from "../entity/Team";
 import { BinaryTree } from "../utils/BinaryTree";
 import { JsonFileStorage } from "../infra/JsonFileStorage";
@@ -39,13 +44,13 @@ describe("PoolGuessRepository", () => {
     "user@test.com",
     "group-sweep",
     [groupGuess],
-    [teamBrazil]
+    [teamBrazil],
   );
   const cupGuess = new CupGuess(
     "user@test.com",
     "cup-sweep",
     new BinaryTree<Team>(teamBrazil, [null, null]),
-    teamArgentina
+    teamArgentina,
   );
   const poolGuess = new PoolGuess("user@test.com", "pool-sweep", [
     { kind: "group", groupGuess: groupListGuess },
@@ -57,41 +62,39 @@ describe("PoolGuessRepository", () => {
       await repository.save(poolGuess);
 
       expect(mockStorage.save).toHaveBeenCalledTimes(1);
-      const expectedId = "/sweepstake/PoolGuess/user=user%40test.com&sweepstake=pool-sweep";
-      expect(mockStorage.save).toHaveBeenCalledWith(
-        expectedId,
-        {
-          userId: "user@test.com",
-          sweepstakeId: "pool-sweep",
-          subGuesses: [
-            {
-              kind: "group",
-              groupGuess: {
-                userId: "user@test.com",
-                sweepstakeId: "group-sweep",
-                groupGuesses: [
-                  {
-                    classification: ["brazil", "argentina"],
-                  },
-                ],
-                extraQualifiedListGuess: ["brazil"],
-              },
-            },
-            {
-              kind: "cup",
-              cupGuess: {
-                userId: "user@test.com",
-                sweepstakeId: "cup-sweep",
-                root: {
-                  elem: "brazil",
-                  children: [null, null],
+      const expectedId =
+        "/sweepstake/PoolGuess/user=user%40test.com&sweepstake=pool-sweep";
+      expect(mockStorage.save).toHaveBeenCalledWith(expectedId, {
+        userId: "user@test.com",
+        sweepstakeId: "pool-sweep",
+        subGuesses: [
+          {
+            kind: "group",
+            groupGuess: {
+              userId: "user@test.com",
+              sweepstakeId: "group-sweep",
+              groupGuesses: [
+                {
+                  classification: ["brazil", "argentina"],
                 },
-                thirdPlace: "argentina",
-              },
+              ],
+              extraQualifiedListGuess: ["brazil"],
             },
-          ],
-        }
-      );
+          },
+          {
+            kind: "cup",
+            cupGuess: {
+              userId: "user@test.com",
+              sweepstakeId: "cup-sweep",
+              root: {
+                elem: "brazil",
+                children: [null, null],
+              },
+              thirdPlace: "argentina",
+            },
+          },
+        ],
+      });
     });
   });
 
@@ -131,7 +134,10 @@ describe("PoolGuessRepository", () => {
 
       mockStorage.load.mockResolvedValueOnce(dao);
 
-      const result = await repository.findByUserAndSweepstake("user@test.com", "pool-sweep");
+      const result = await repository.findByUserAndSweepstake(
+        "user@test.com",
+        "pool-sweep",
+      );
 
       expect(result).not.toBeNull();
       expect(result!.userId).toBe("user@test.com");
@@ -144,7 +150,10 @@ describe("PoolGuessRepository", () => {
         expect(sub1.groupGuess.userId).toBe("user@test.com");
         expect(sub1.groupGuess.sweepstakeId).toBe("group-sweep");
         expect(sub1.groupGuess.groupGuesses).toHaveLength(1);
-        expect(sub1.groupGuess.groupGuesses[0].classification).toEqual([teamBrazil, teamArgentina]);
+        expect(sub1.groupGuess.groupGuesses[0].classification).toEqual([
+          teamBrazil,
+          teamArgentina,
+        ]);
         expect(sub1.groupGuess.extraQualifiedListGuess).toEqual([teamBrazil]);
       }
 
@@ -160,7 +169,10 @@ describe("PoolGuessRepository", () => {
 
     it("should return null if file not found", async () => {
       mockStorage.load.mockResolvedValueOnce(null);
-      const result = await repository.findByUserAndSweepstake("user@test.com", "pool-sweep");
+      const result = await repository.findByUserAndSweepstake(
+        "user@test.com",
+        "pool-sweep",
+      );
       expect(result).toBeNull();
     });
   });
@@ -194,13 +206,19 @@ describe("PoolGuessRepository", () => {
       expect(mockStorage.listIds).toHaveBeenCalledTimes(1);
       expect(mockStorage.listIds).toHaveBeenCalledWith(
         "/sweepstake/PoolGuess",
-        expect.any(Function)
+        expect.any(Function),
       );
 
       // Verify the filter logic works
-      const filterFn = mockStorage.listIds.mock.calls[0][1] as (filename: string) => boolean;
-      expect(filterFn("user=user%40test.com&sweepstake=sweep-1.json")).toBe(true);
-      expect(filterFn("user=other%40test.com&sweepstake=sweep-1.json")).toBe(false);
+      const filterFn = mockStorage.listIds.mock.calls[0][1] as (
+        filename: string,
+      ) => boolean;
+      expect(filterFn("user=user%40test.com&sweepstake=sweep-1.json")).toBe(
+        true,
+      );
+      expect(filterFn("user=other%40test.com&sweepstake=sweep-1.json")).toBe(
+        false,
+      );
     });
   });
 
@@ -233,13 +251,19 @@ describe("PoolGuessRepository", () => {
       expect(mockStorage.listIds).toHaveBeenCalledTimes(1);
       expect(mockStorage.listIds).toHaveBeenCalledWith(
         "/sweepstake/PoolGuess",
-        expect.any(Function)
+        expect.any(Function),
       );
 
       // Verify the filter logic works
-      const filterFn = mockStorage.listIds.mock.calls[0][1] as (filename: string) => boolean;
-      expect(filterFn("user=user1%40test.com&sweepstake=sweep-1.json")).toBe(true);
-      expect(filterFn("user=user1%40test.com&sweepstake=sweep-2.json")).toBe(false);
+      const filterFn = mockStorage.listIds.mock.calls[0][1] as (
+        filename: string,
+      ) => boolean;
+      expect(filterFn("user=user1%40test.com&sweepstake=sweep-1.json")).toBe(
+        true,
+      );
+      expect(filterFn("user=user1%40test.com&sweepstake=sweep-2.json")).toBe(
+        false,
+      );
     });
   });
 });

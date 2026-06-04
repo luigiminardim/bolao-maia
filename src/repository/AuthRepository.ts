@@ -1,5 +1,4 @@
 import { JsonFileStorage } from "../infra/JsonFileStorage";
-import path from "path";
 
 export interface PasswordAuthDao {
   email: string;
@@ -9,8 +8,8 @@ export interface PasswordAuthDao {
 export class AuthRepository {
   private readonly storage: JsonFileStorage;
 
-  constructor(storage?: JsonFileStorage) {
-    this.storage = storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
+  constructor(storage: JsonFileStorage) {
+    this.storage = storage;
   }
 
   async save(email: string, saltedHashPassword: string): Promise<void> {

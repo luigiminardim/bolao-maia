@@ -35,14 +35,17 @@ export class JsonFileStorage {
     }
   }
 
-  async listIds(dir: string, filter?: (filename: string) => boolean): Promise<string[]> {
+  async listIds(
+    dir: string,
+    filter?: (filename: string) => boolean,
+  ): Promise<string[]> {
     const cleanDir = dir.replace(/^\/+|\/+$/g, "");
     const dirPath = path.join(this.basePath, cleanDir);
     try {
       const files = await fs.readdir(dirPath);
-      const jsonFiles = files.filter(file => file.endsWith(".json"));
+      const jsonFiles = files.filter((file) => file.endsWith(".json"));
       const filtered = filter ? jsonFiles.filter(filter) : jsonFiles;
-      return filtered.map(file => {
+      return filtered.map((file) => {
         const nameWithoutExt = path.basename(file, ".json");
         return `/${cleanDir}/${nameWithoutExt}`;
       });

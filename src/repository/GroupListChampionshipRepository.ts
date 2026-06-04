@@ -1,7 +1,9 @@
-import { GroupChampionship, GroupListChampionship } from "../entity/Championship";
+import {
+  GroupChampionship,
+  GroupListChampionship,
+} from "../entity/Championship";
 import { TeamRepository } from "./TeamRepository";
 import { JsonFileStorage } from "../infra/JsonFileStorage";
-import path from "path";
 
 export interface GroupChampionshipDao {
   id: string;
@@ -20,11 +22,9 @@ export class GroupListChampionshipRepository {
   private readonly storage: JsonFileStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage?: JsonFileStorage, teamRepository?: TeamRepository) {
-    this.storage =
-      storage ||
-      new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
-    this.teamRepository = teamRepository || new TeamRepository();
+  constructor(storage: JsonFileStorage, teamRepository: TeamRepository) {
+    this.storage = storage;
+    this.teamRepository = teamRepository;
   }
 
   async save(id: string, championship: GroupListChampionship): Promise<void> {

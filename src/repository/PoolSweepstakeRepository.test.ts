@@ -2,7 +2,10 @@ import { PoolSweepstakeRepository } from "./PoolSweepstakeRepository";
 import { PoolSweepstake, GroupListSweepstake } from "../entity/Sweepstake";
 import { GroupListChampionship } from "../entity/Championship";
 import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
-import { InverseProbabilityQualifiedPositionGroupListScorePolicy } from "../entity/ScorePolicy";
+import {
+  InverseProbabilityQualifiedPositionGroupListScorePolicy,
+  WithLogarithm2GroupScorePolicy,
+} from "../entity/ScorePolicy";
 import { JsonFileStorage } from "../infra/JsonFileStorage";
 
 describe("PoolSweepstakeRepository", () => {
@@ -28,8 +31,14 @@ describe("PoolSweepstakeRepository", () => {
 
   describe("save", () => {
     it("should map PoolSweepstake to PoolSweepstakeDao and call save on storage", async () => {
-      const groupChampionship = new GroupListChampionship("2026-world-cup", [], [], 2);
-      const groupScorePolicy = new InverseProbabilityQualifiedPositionGroupListScorePolicy();
+      const groupChampionship = new GroupListChampionship(
+        "2026-world-cup",
+        [],
+        [],
+        2,
+      );
+      const groupScorePolicy =
+        new InverseProbabilityQualifiedPositionGroupListScorePolicy();
       const groupSweepstake = new GroupListSweepstake(
         "2026-world-cup",
         groupChampionship,
@@ -41,7 +50,10 @@ describe("PoolSweepstakeRepository", () => {
         { kind: "group" as const, sweepstake: groupSweepstake, factor: 1 },
       ];
 
-      const poolSweepstake = new PoolSweepstake("2026-world-cup", subSweepstakeList);
+      const poolSweepstake = new PoolSweepstake(
+        "2026-world-cup",
+        subSweepstakeList,
+      );
 
       await poolSweepstakeRepository.save(poolSweepstake);
 
@@ -71,12 +83,21 @@ describe("PoolSweepstakeRepository", () => {
     it("should return null if the id is not 2026-world-cup", async () => {
       const result = await poolSweepstakeRepository.findById("some-other-id");
       expect(result).toBeNull();
-      expect(mockGroupListChampionshipRepository.findById).not.toHaveBeenCalled();
+      expect(
+        mockGroupListChampionshipRepository.findById,
+      ).not.toHaveBeenCalled();
     });
 
     it("should return the default 2026-world-cup pool sweepstake if the id matches", async () => {
-      const groupChampionship = new GroupListChampionship("2026-world-cup", [], [], 2);
-      mockGroupListChampionshipRepository.findById.mockResolvedValueOnce(groupChampionship);
+      const groupChampionship = new GroupListChampionship(
+        "2026-world-cup",
+        [],
+        [],
+        2,
+      );
+      mockGroupListChampionshipRepository.findById.mockResolvedValueOnce(
+        groupChampionship,
+      );
 
       const result = await poolSweepstakeRepository.findById("2026-world-cup");
 
@@ -92,10 +113,19 @@ describe("PoolSweepstakeRepository", () => {
       const groupSweep = item.sweepstake;
       expect(groupSweep.id).toBe("2026-world-cup");
       expect(groupSweep.championship).toBe(groupChampionship);
-      expect(groupSweep.scorePolicy).toBeInstanceOf(InverseProbabilityQualifiedPositionGroupListScorePolicy);
-      expect(groupSweep.startTime).toEqual(new Date("2026-06-11T12:00:00.000Z"));
+      expect(groupSweep.scorePolicy).toBeInstanceOf(
+        WithLogarithm2GroupScorePolicy,
+      );
+      expect(
+        (groupSweep.scorePolicy as WithLogarithm2GroupScorePolicy).scorePolicy,
+      ).toBeInstanceOf(InverseProbabilityQualifiedPositionGroupListScorePolicy);
+      expect(groupSweep.startTime).toEqual(
+        new Date("2026-06-11T12:00:00.000Z"),
+      );
 
-      expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith("2026-world-cup");
+      expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith(
+        "2026-world-cup",
+      );
     });
   });
 });

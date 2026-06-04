@@ -1,6 +1,5 @@
 import { User } from "../entity/User";
 import { JsonFileStorage } from "../infra/JsonFileStorage";
-import path from "path";
 
 export interface UserDao {
   name: string;
@@ -9,8 +8,8 @@ export interface UserDao {
 export class UserRepository {
   private readonly storage: JsonFileStorage;
 
-  constructor(storage?: JsonFileStorage) {
-    this.storage = storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
+  constructor(storage: JsonFileStorage) {
+    this.storage = storage;
   }
 
   async save(user: User): Promise<void> {
