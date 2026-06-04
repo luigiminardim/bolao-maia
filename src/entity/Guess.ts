@@ -1,5 +1,9 @@
 import { BinaryTree } from "../utils/BinaryTree";
-import { CupSweepstake, GroupListSweepstake, PoolSweepstake } from "./Sweepstake";
+import {
+  CupSweepstake,
+  GroupListSweepstake,
+  PoolSweepstake,
+} from "./Sweepstake";
 import { Team } from "./Team";
 import { User } from "./User";
 
@@ -60,21 +64,19 @@ export class GroupListGuess {
   }
 }
 
-export type GuessableGuess =
+export type PoolGuessItem =
   | { kind: "group"; groupGuess: GroupListGuess }
   | { kind: "cup"; cupGuess: CupGuess };
-
-export type GuessbleGuess = GuessableGuess;
 
 export class PoolGuess {
   userId: User["email"];
   sweepstakeId: PoolSweepstake["id"];
-  subGuesses: GuessableGuess[];
+  subGuesses: PoolGuessItem[];
 
   constructor(
     userId: User["email"],
     sweepstakeId: PoolSweepstake["id"],
-    subGuesses: GuessableGuess[],
+    subGuesses: PoolGuessItem[],
   ) {
     this.userId = userId;
     this.sweepstakeId = sweepstakeId;
