@@ -5,16 +5,15 @@ import {
   PoolSweepstake,
 } from "./Sweepstake";
 import { Team } from "./Team";
-import { User } from "./User";
 
 export class CupGuess {
-  userId: User["email"];
+  userId: string;
   sweepstakeId: CupSweepstake["id"];
   root: BinaryTree<Team>;
   thirdPlace: null | Team;
 
   constructor(
-    userId: User["email"],
+    userId: string,
     sweepstakeId: CupSweepstake["id"],
     root: BinaryTree<Team>,
     thirdPlace: null | Team,
@@ -46,13 +45,13 @@ export class GroupGuess {
 }
 
 export class GroupListGuess {
-  userId: User["email"];
+  userId: string;
   sweepstakeId: GroupListSweepstake["id"];
   groupGuesses: GroupGuess[];
   extraQualifiedListGuess: Team[];
 
   constructor(
-    userId: User["email"],
+    userId: string,
     sweepstakeId: GroupListSweepstake["id"],
     groupGuesses: GroupGuess[],
     extraQualifiedListGuess: Team[],
@@ -69,12 +68,12 @@ export type PoolGuessItem =
   | { kind: "cup"; cupGuess: CupGuess };
 
 export class PoolGuess {
-  userId: User["email"];
+  userId: string;
   sweepstakeId: PoolSweepstake["id"];
   subGuesses: PoolGuessItem[];
 
   constructor(
-    userId: User["email"],
+    userId: string,
     sweepstakeId: PoolSweepstake["id"],
     subGuesses: PoolGuessItem[],
   ) {

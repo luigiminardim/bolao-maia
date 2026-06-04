@@ -1,9 +1,15 @@
 export class User {
-  email: string;
-  name: string;
+  private readonly _name: string;
 
-  constructor(email: string, name: string) {
-    this.email = email;
-    this.name = name;
+  constructor(name: string) {
+    this._name = name;
+  }
+
+  id(): string {
+    return encodeURIComponent(this._name);
+  }
+
+  name(): string {
+    return this._name;
   }
 }

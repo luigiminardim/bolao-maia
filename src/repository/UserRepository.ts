@@ -3,7 +3,6 @@ import { JsonFileStorage } from "../infra/JsonFileStorage";
 import path from "path";
 
 export interface UserDao {
-  email: string;
   name: string;
 }
 
@@ -15,22 +14,19 @@ export class UserRepository {
   }
 
   async save(user: User): Promise<void> {
-    const encodedEmail = encodeURIComponent(user.email);
-    const id = `/user/user/${encodedEmail}`;
+    const id = `/user/user/${user.id()}`;
     const data: UserDao = {
-      email: user.email,
-      name: user.name,
+      name: user.name(),
     };
     await this.storage.save<UserDao>(id, data);
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    const encodedEmail = encodeURIComponent(email);
-    const id = `/user/user/${encodedEmail}`;
-    const data = await this.storage.load<UserDao>(id);
+  async findById(id: string): Promise<User | null> {
+    const storageId = `/user/user/${id}`;
+    const data = await this.storage.load<UserDao>(storageId);
     if (!data) {
       return null;
     }
-    return new User(data.email, data.name);
+    return new User(data.name);
   }
 }
