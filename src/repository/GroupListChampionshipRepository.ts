@@ -83,6 +83,7 @@ export class GroupListChampionshipRepository {
     }
 
     return new GroupListChampionship(
+      id,
       groups,
       extraQualifiedList,
       dao.maxRegularQualifiedPosition,

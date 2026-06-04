@@ -21,15 +21,18 @@ export class GroupChampionship {
 }
 
 export class GroupListChampionship {
+  id: string;
   private groups: GroupChampionship[];
   private extraQualifiedList: (null | Team)[];
   readonly maxRegularQualifiedPosition: number;
 
   constructor(
+    id: string,
     groups: GroupChampionship[],
     extraQualifiedList: (null | Team)[],
     maxRegularQualifiedPosition: number,
   ) {
+    this.id = id;
     this.groups = groups;
     this.extraQualifiedList = extraQualifiedList;
     this.maxRegularQualifiedPosition = maxRegularQualifiedPosition;

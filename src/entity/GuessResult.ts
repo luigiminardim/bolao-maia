@@ -135,18 +135,18 @@ export class GroupGuessResult {
 
 export class GroupListGuessResult {
   score: number;
-  groupResults: GroupGuessResult[];
+  groupResultList: GroupGuessResult[];
 
-  constructor(groupResults: GroupGuessResult[]) {
-    this.groupResults = groupResults;
-    this.score = groupResults.reduce((acc, result) => acc + result.score, 0);
+  constructor(groupResultList: GroupGuessResult[]) {
+    this.groupResultList = groupResultList;
+    this.score = groupResultList.reduce((acc, result) => acc + result.score, 0);
   }
 
   static fromGroupListSweepstake(
     sweepstake: GroupListSweepstake,
     guess: GroupListGuess,
   ): GroupListGuessResult {
-    const groupResults = sweepstake.championship
+    const groupResultList = sweepstake.championship
       .getGroups()
       .map((group, idx) =>
         GroupGuessResult.fromGroupListSweepstake(
@@ -156,7 +156,7 @@ export class GroupListGuessResult {
           guess.extraQualifiedListGuess,
         ),
       );
-    return new GroupListGuessResult(groupResults);
+    return new GroupListGuessResult(groupResultList);
   }
 }
 
@@ -166,11 +166,11 @@ export type GuessableGuessResult =
 
 export class PoolGuessResult {
   score: number;
-  subResults: GuessableGuessResult[];
+  subResultList: GuessableGuessResult[];
 
-  constructor(subResults: GuessableGuessResult[]) {
-    this.subResults = subResults;
-    this.score = subResults.reduce((acc, result) => {
+  constructor(subResultList: GuessableGuessResult[]) {
+    this.subResultList = subResultList;
+    this.score = subResultList.reduce((acc, result) => {
       if (result.kind === "group") {
         return acc + result.groupResult.score * result.factor;
       } else {
@@ -183,8 +183,8 @@ export class PoolGuessResult {
     sweepstake: PoolSweepstake,
     guess: PoolGuess,
   ): PoolGuessResult {
-    const subResults: GuessableGuessResult[] = sweepstake.subSweepstakes.map(
-      (item, idx) => {
+    const subResultList: GuessableGuessResult[] =
+      sweepstake.subSweepstakeList.map((item, idx) => {
         const subGuess = guess.subGuesses[idx];
         if (item.kind === "group" && subGuess.kind === "group") {
           return {
@@ -206,8 +206,7 @@ export class PoolGuessResult {
           };
         }
         throw new Error("Mismatch between sweepstake kind and guess kind");
-      },
-    );
-    return new PoolGuessResult(subResults);
+      });
+    return new PoolGuessResult(subResultList);
   }
 }
