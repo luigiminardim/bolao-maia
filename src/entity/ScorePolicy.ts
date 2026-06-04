@@ -1,5 +1,5 @@
-import { CupChampionship, GroupListChampionship } from "./Championship.ts";
-import { Team } from "./Team.ts";
+import { CupChampionship, GroupListChampionship } from "./Championship";
+import { Team } from "./Team";
 
 export interface GroupListScorePolicy {
   groupListTeamScore(
