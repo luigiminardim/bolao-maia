@@ -6,6 +6,7 @@ import {
   PoolSweepstake,
 } from "./Sweepstake";
 import { Team } from "./Team";
+import { User } from "./User";
 
 type CupGuessNodeInfo = {
   team: null | Team;
@@ -165,10 +166,12 @@ export type GuessableGuessResult =
   | { kind: "cup"; cupResult: CupGuessResult; factor: number };
 
 export class PoolGuessResult {
+  user: User;
   score: number;
   subResultList: GuessableGuessResult[];
 
-  constructor(subResultList: GuessableGuessResult[]) {
+  constructor(user: User, subResultList: GuessableGuessResult[]) {
+    this.user = user;
     this.subResultList = subResultList;
     this.score = subResultList.reduce((acc, result) => {
       if (result.kind === "group") {
@@ -182,6 +185,7 @@ export class PoolGuessResult {
   static fromPoolSweepstake(
     sweepstake: PoolSweepstake,
     guess: PoolGuess,
+    user: User,
   ): PoolGuessResult {
     const subResultList: GuessableGuessResult[] =
       sweepstake.subSweepstakeList.map((item, idx) => {
@@ -207,6 +211,6 @@ export class PoolGuessResult {
         }
         throw new Error("Mismatch between sweepstake kind and guess kind");
       });
-    return new PoolGuessResult(subResultList);
+    return new PoolGuessResult(user, subResultList);
   }
 }
