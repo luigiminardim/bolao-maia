@@ -13,7 +13,7 @@ export class UserRepository {
   }
 
   async save(user: User): Promise<void> {
-    const id = `/user/user/${user.id()}`;
+    const id = `/user/User/${user.id()}`;
     const data: UserDao = {
       name: user.name(),
     };
@@ -21,7 +21,7 @@ export class UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    const storageId = `/user/user/${id}`;
+    const storageId = `/user/User/${id}`;
     const data = await this.storage.load<UserDao>(storageId);
     if (!data) {
       return null;

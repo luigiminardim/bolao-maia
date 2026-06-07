@@ -1,4 +1,4 @@
-import { User } from "../entity/User";
+
 import { Team } from "../entity/Team";
 import { PoolGuess, GroupListGuess, GroupGuess } from "../entity/Guess";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";
@@ -24,16 +24,16 @@ export class GuessGroupListFromPoolSweepstake {
   }
 
   async execute(
-    user: User,
+    userId: string,
     params: GuessGroupListFromPoolSweepstakeParam,
   ): Promise<void> {
     let poolGuess = await this.poolGuessRepository.findByUserAndSweepstake(
-      user.id(),
+      userId,
       params.poolSweepstake,
     );
 
     if (!poolGuess) {
-      poolGuess = new PoolGuess(user.id(), params.poolSweepstake, []);
+      poolGuess = new PoolGuess(userId, params.poolSweepstake, []);
     }
 
     const existingGuess = poolGuess.subGuesses.find(
@@ -71,7 +71,7 @@ export class GuessGroupListFromPoolSweepstake {
     }
 
     const groupListGuess = new GroupListGuess(
-      user.id(),
+      userId,
       params.groupListSweepstake,
       groupGuesses,
       extraQualifiedListGuess,

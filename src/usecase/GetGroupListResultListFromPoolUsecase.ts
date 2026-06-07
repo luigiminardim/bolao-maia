@@ -2,6 +2,10 @@ import { PoolGuessRepository } from "../repository/PoolGuessRepository";
 import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
 import { UserRepository } from "../repository/UserRepository";
 import { PoolGuessResult } from "../entity/GuessResult";
+import {
+  PoolGuessResultDto,
+  toPoolGuessResultDto,
+} from "./dto/PoolGuessResultDto";
 
 export class GetGroupListResultListFromPoolUsecase {
   private readonly poolSweepstakeRepository: PoolSweepstakeRepository;
@@ -18,7 +22,7 @@ export class GetGroupListResultListFromPoolUsecase {
     this.userRepository = userRepository;
   }
 
-  async execute(poolId: string): Promise<PoolGuessResult[] | null> {
+  async execute(poolId: string): Promise<PoolGuessResultDto[] | null> {
     const sweepstake = await this.poolSweepstakeRepository.findById(poolId);
     if (!sweepstake) {
       return null;
@@ -36,6 +40,6 @@ export class GetGroupListResultListFromPoolUsecase {
 
     results.sort((a, b) => b.score - a.score);
 
-    return results;
+    return results.map(toPoolGuessResultDto);
   }
 }

@@ -1,7 +1,6 @@
 import { GuessGroupListFromPoolSweepstake } from "./GuessGroupListFromPoolSweepstake";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";
 import { TeamRepository } from "../repository/TeamRepository";
-import { User } from "../entity/User";
 import { Team } from "../entity/Team";
 import { PoolGuess, GroupListGuess } from "../entity/Guess";
 
@@ -9,7 +8,7 @@ describe("GuessGroupListFromPoolSweepstake", () => {
   let poolGuessRepository: jest.Mocked<PoolGuessRepository>;
   let teamRepository: jest.Mocked<TeamRepository>;
   let usecase: GuessGroupListFromPoolSweepstake;
-  let user: User;
+  const userId = "luigi mario";
 
   beforeEach(() => {
     poolGuessRepository = {
@@ -29,8 +28,6 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       poolGuessRepository,
       teamRepository,
     );
-
-    user = new User("luigi mario");
   });
 
   it("should create a new PoolGuess and add GroupListGuess when no existing PoolGuess is found", async () => {
@@ -51,11 +48,11 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       extraQualifiedListGuess: ["br"],
     };
 
-    await usecase.execute(user, params);
+    await usecase.execute(userId, params);
 
     expect(poolGuessRepository.findByUserAndSweepstake).toHaveBeenCalledWith(
       "luigi%20mario",
-      "pool-1"
+      "pool-1",
     );
 
     expect(poolGuessRepository.save).toHaveBeenCalledTimes(1);
@@ -76,7 +73,9 @@ describe("GuessGroupListFromPoolSweepstake", () => {
 
   it("should add to existing PoolGuess when it exists", async () => {
     const existingPoolGuess = new PoolGuess("luigi%20mario", "pool-1", []);
-    poolGuessRepository.findByUserAndSweepstake.mockResolvedValueOnce(existingPoolGuess);
+    poolGuessRepository.findByUserAndSweepstake.mockResolvedValueOnce(
+      existingPoolGuess,
+    );
 
     const teamA = new Team("br", "Brazil");
     teamRepository.findById.mockResolvedValue(teamA);
@@ -88,7 +87,7 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       extraQualifiedListGuess: [],
     };
 
-    await usecase.execute(user, params);
+    await usecase.execute(userId, params);
 
     expect(poolGuessRepository.save).toHaveBeenCalledWith(existingPoolGuess);
     expect(existingPoolGuess.subGuesses.length).toBe(1);
@@ -105,13 +104,15 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       extraQualifiedListGuess: [],
     };
 
-    await expect(usecase.execute(user, params)).rejects.toThrow("Team br not found");
+    await expect(usecase.execute(userId, params)).rejects.toThrow(
+      "Team br not found",
+    );
     expect(poolGuessRepository.save).not.toHaveBeenCalled();
   });
 
   it("should throw an error if extra qualified team is not found", async () => {
     poolGuessRepository.findByUserAndSweepstake.mockResolvedValueOnce(null);
-    
+
     // Team exists for classification, but not for extra qualified
     teamRepository.findById.mockImplementation((id) => {
       if (id === "br") return Promise.resolve(new Team("br", "Brazil"));
@@ -125,17 +126,26 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       extraQualifiedListGuess: ["ar"],
     };
 
-    await expect(usecase.execute(user, params)).rejects.toThrow("Team ar not found");
+    await expect(usecase.execute(userId, params)).rejects.toThrow(
+      "Team ar not found",
+    );
     expect(poolGuessRepository.save).not.toHaveBeenCalled();
   });
 
   it("should throw an error if trying to overwrite an existing group list guess", async () => {
-    const existingGroupListGuess = new GroupListGuess("luigi%20mario", "group-list-1", [], []);
+    const existingGroupListGuess = new GroupListGuess(
+      "luigi%20mario",
+      "group-list-1",
+      [],
+      [],
+    );
     const existingPoolGuess = new PoolGuess("luigi%20mario", "pool-1", [
-      { kind: "group", groupGuess: existingGroupListGuess }
+      { kind: "group", groupGuess: existingGroupListGuess },
     ]);
-    
-    poolGuessRepository.findByUserAndSweepstake.mockResolvedValueOnce(existingPoolGuess);
+
+    poolGuessRepository.findByUserAndSweepstake.mockResolvedValueOnce(
+      existingPoolGuess,
+    );
 
     const params = {
       poolSweepstake: "pool-1",
@@ -144,8 +154,8 @@ describe("GuessGroupListFromPoolSweepstake", () => {
       extraQualifiedListGuess: [],
     };
 
-    await expect(usecase.execute(user, params)).rejects.toThrow(
-      "Guess for group list sweepstake group-list-1 already exists and cannot be overwritten."
+    await expect(usecase.execute(userId, params)).rejects.toThrow(
+      "Guess for group list sweepstake group-list-1 already exists and cannot be overwritten.",
     );
     expect(poolGuessRepository.save).not.toHaveBeenCalled();
   });

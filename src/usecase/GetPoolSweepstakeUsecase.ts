@@ -1,5 +1,8 @@
-import { PoolSweepstake } from "../entity/Sweepstake";
 import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
+import {
+  PoolSweepstakeDto,
+  toPoolSweepstakeDto,
+} from "./dto/SweepstakeDto";
 
 export class GetPoolSweepstakeUsecase {
   private readonly poolSweepstakeRepository: PoolSweepstakeRepository;
@@ -8,7 +11,8 @@ export class GetPoolSweepstakeUsecase {
     this.poolSweepstakeRepository = poolSweepstakeRepository;
   }
 
-  async execute(poolId: string): Promise<PoolSweepstake | null> {
-    return this.poolSweepstakeRepository.findById(poolId);
+  async execute(poolId: string): Promise<PoolSweepstakeDto | null> {
+    const pool = await this.poolSweepstakeRepository.findById(poolId);
+    return pool ? toPoolSweepstakeDto(pool) : null;
   }
 }
