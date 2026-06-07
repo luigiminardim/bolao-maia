@@ -7,11 +7,11 @@ import {
 } from "../entity/Guess";
 import { Team } from "../entity/Team";
 import { BinaryTree } from "../utils/BinaryTree";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 import { TeamRepository } from "./TeamRepository";
 
 describe("PoolGuessRepository", () => {
-  let mockStorage: jest.Mocked<JsonFileStorage>;
+  let mockStorage: jest.Mocked<JsonStorage>;
   let mockTeamRepository: jest.Mocked<TeamRepository>;
   let repository: PoolGuessRepository;
 
@@ -23,7 +23,7 @@ describe("PoolGuessRepository", () => {
       save: jest.fn(),
       load: jest.fn(),
       listIds: jest.fn(),
-    } as unknown as jest.Mocked<JsonFileStorage>;
+    } as unknown as jest.Mocked<JsonStorage>;
 
     mockTeamRepository = {
       findById: jest.fn(),

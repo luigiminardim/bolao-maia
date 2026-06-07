@@ -3,7 +3,7 @@ import {
   GroupListChampionship,
 } from "../entity/Championship";
 import { TeamRepository } from "./TeamRepository";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 
 export interface GroupChampionshipDao {
   id: string;
@@ -19,10 +19,10 @@ export interface GroupListChampionshipDao {
 }
 
 export class GroupListChampionshipRepository {
-  private readonly storage: JsonFileStorage;
+  private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage: JsonFileStorage, teamRepository: TeamRepository) {
+  constructor(storage: JsonStorage, teamRepository: TeamRepository) {
     this.storage = storage;
     this.teamRepository = teamRepository;
   }

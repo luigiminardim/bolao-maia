@@ -1,6 +1,6 @@
 import { CupChampionship } from "../entity/Championship";
 import { TeamRepository } from "./TeamRepository";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage, JsonFileStorage } from "../infra/JsonStorage";
 import { BinaryTree } from "../utils/BinaryTree";
 import { Team } from "../entity/Team";
 import path from "path";
@@ -36,10 +36,10 @@ function mapTreeToDao(
 }
 
 export class CupChampionshipRepository {
-  private readonly storage: JsonFileStorage;
+  private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage?: JsonFileStorage, teamRepository?: TeamRepository) {
+  constructor(storage?: JsonStorage, teamRepository?: TeamRepository) {
     this.storage =
       storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
     this.teamRepository = teamRepository || new TeamRepository();

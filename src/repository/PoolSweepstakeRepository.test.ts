@@ -6,10 +6,10 @@ import {
   InverseProbabilityQualifiedPositionGroupListScorePolicy,
   WithLogarithm2GroupScorePolicy,
 } from "../entity/ScorePolicy";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 
 describe("PoolSweepstakeRepository", () => {
-  let mockStorage: jest.Mocked<JsonFileStorage>;
+  let mockStorage: jest.Mocked<JsonStorage>;
   let mockGroupListChampionshipRepository: jest.Mocked<GroupListChampionshipRepository>;
   let poolSweepstakeRepository: PoolSweepstakeRepository;
 
@@ -17,7 +17,7 @@ describe("PoolSweepstakeRepository", () => {
     mockStorage = {
       save: jest.fn(),
       load: jest.fn(),
-    } as unknown as jest.Mocked<JsonFileStorage>;
+    } as unknown as jest.Mocked<JsonStorage>;
 
     mockGroupListChampionshipRepository = {
       findById: jest.fn(),

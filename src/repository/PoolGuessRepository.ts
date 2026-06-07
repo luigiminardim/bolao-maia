@@ -7,7 +7,7 @@ import {
 } from "../entity/Guess";
 import { Team } from "../entity/Team";
 import { BinaryTree } from "../utils/BinaryTree";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage, JsonFileStorage } from "../infra/JsonStorage";
 import { TeamRepository } from "./TeamRepository";
 import path from "path";
 
@@ -150,10 +150,10 @@ async function deserializeCupGuess(
 }
 
 export class PoolGuessRepository {
-  private readonly storage: JsonFileStorage;
+  private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage?: JsonFileStorage, teamRepository?: TeamRepository) {
+  constructor(storage?: JsonStorage, teamRepository?: TeamRepository) {
     this.storage =
       storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
     this.teamRepository = teamRepository || new TeamRepository();

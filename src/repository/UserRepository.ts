@@ -1,14 +1,14 @@
 import { User } from "../entity/User";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 
 export interface UserDao {
   name: string;
 }
 
 export class UserRepository {
-  private readonly storage: JsonFileStorage;
+  private readonly storage: JsonStorage;
 
-  constructor(storage: JsonFileStorage) {
+  constructor(storage: JsonStorage) {
     this.storage = storage;
   }
 

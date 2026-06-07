@@ -16,7 +16,7 @@ import {
   WithLogarithm2GroupScorePolicy,
   WithLogarithm2CupScorePolicy,
 } from "../entity/ScorePolicy";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 
 export interface CupSweepstakeDao {
   id: string;
@@ -69,12 +69,12 @@ function serializeCupScorePolicy(policy: CupScorePolicy): string {
 }
 
 export class PoolSweepstakeRepository {
-  private readonly storage: JsonFileStorage;
+  private readonly storage: JsonStorage;
   private readonly groupListChampionshipRepository: GroupListChampionshipRepository;
   private readonly cupChampionshipRepository: CupChampionshipRepository;
 
   constructor(
-    storage: JsonFileStorage,
+    storage: JsonStorage,
     groupListChampionshipRepository?: GroupListChampionshipRepository,
     cupChampionshipRepository?: CupChampionshipRepository,
   ) {

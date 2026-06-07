@@ -1,5 +1,5 @@
 import path from "path";
-import { JsonFileStorage } from "../infra/JsonFileStorage";
+import { JsonStorage, JsonFileStorage, JsonAwsS3Storage } from "../infra/JsonStorage";
 import { UserRepository } from "../repository/UserRepository";
 import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";
@@ -11,10 +11,13 @@ import { GetGroupListResultListFromPoolUsecase } from "./GetGroupListResultListF
 import { GuessGroupListFromPoolSweepstake } from "./GuessGroupListFromPoolSweepstake";
 import { GetGroupListGuessFromPoolSweepstakeUsecase } from "./GetGroupListGuessFromPoolSweepstakeUsecase";
 
-// Shared storage instance pointing to .filestorage
-export const storage = new JsonFileStorage(
-  path.join(process.cwd(), ".filestorage"),
-);
+// Shared storage instance
+const storageType = process.env.JSON_STORAGE;
+
+export const storage: JsonStorage =
+  storageType === "AwsS3"
+    ? new JsonAwsS3Storage()
+    : new JsonFileStorage(path.join(process.cwd(), process.env.FILE_STORAGE_PATH || ".filestorage"));
 
 export const teamRepository = new TeamRepository();
 export const userRepository = new UserRepository(storage);
