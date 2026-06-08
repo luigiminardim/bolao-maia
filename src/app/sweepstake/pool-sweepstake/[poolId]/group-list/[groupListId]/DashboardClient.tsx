@@ -40,7 +40,7 @@ export function DashboardClient({
 
   // 1. Time Simulation Sandbox State
   const officialHasStarted = new Date() >= new Date(sweepstake.startTime);
-  const [simulatedStarted, setSimulatedStarted] =
+  const [simulatedStarted, _setSimulatedStarted] =
     useState<boolean>(officialHasStarted);
 
   // 2. Selected participant detail modal state
@@ -67,7 +67,7 @@ export function DashboardClient({
       <Header currentUser={currentUser} />
 
       {/* 2. SIMULATION & DEVELOPER PANEL */}
-      <div className="bg-zinc-900/40 border-b border-zinc-900 p-3">
+      {/* <div className="bg-zinc-900/40 border-b border-zinc-900 p-3">
         <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-zinc-400">
             <span className="text-emerald-500">⚙️</span>
@@ -104,7 +104,7 @@ export function DashboardClient({
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-start max-w-5xl">
         {/* Main Navigation back button */}
