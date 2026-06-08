@@ -386,18 +386,15 @@ export function GuessWizardClient({
             <div className="flex items-center justify-between mt-8 border-t border-zinc-900/60 pt-6">
               <Button
                 variant="outline"
+                isDisabled={currentStep === 0}
                 onPress={() => {
-                  if (currentStep === 0) {
-                    router.push(
-                      `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
-                    );
-                  } else {
+                  if (currentStep > 0) {
                     setCurrentStep(currentStep - 1);
                   }
                 }}
                 className="border-zinc-800 hover:bg-zinc-950 text-zinc-400 font-bold rounded-xl text-xs px-5"
               >
-                {currentStep === 0 ? "Cancelar" : "Anterior"}
+                Anterior
               </Button>
 
               {!isLastStep ? (
@@ -421,6 +418,10 @@ export function GuessWizardClient({
                       <Spinner size="sm" className="text-zinc-950" />
                       <span>Enviando...</span>
                     </div>
+                  ) : extraGuesses.length < sweepstake.extraQualifiedLength ? (
+                    <span>
+                      Falta selecionar {sweepstake.extraQualifiedLength - extraGuesses.length} melhor{sweepstake.extraQualifiedLength - extraGuesses.length > 1 ? "es" : ""} terceiro{sweepstake.extraQualifiedLength - extraGuesses.length > 1 ? "s" : ""}
+                    </span>
                   ) : (
                     "Confirmar e Enviar Palpite"
                   )}
