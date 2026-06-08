@@ -8,7 +8,9 @@ import { loginAction } from "../actions";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/sweepstake/pool-sweepstake/2026-world-cup";
+  const callbackUrl =
+    searchParams.get("callbackUrl") ||
+    "/sweepstake/pool-sweepstake/2026-world-cup";
 
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -19,7 +21,7 @@ function LoginForm() {
     setErrorMessage(null);
 
     if (!username || !username.trim()) {
-      setErrorMessage("Por favor, digite seu nome.");
+      setErrorMessage("Por favor, digite seu nome completo.");
       return;
     }
 
@@ -48,7 +50,8 @@ function LoginForm() {
             Bolão Maia
           </h1>
           <p className="text-zinc-400 text-xs text-center mt-2 leading-relaxed">
-            O bolão definitivo de futebol. Digite seu nome abaixo para entrar ou criar seu cadastro instantaneamente.
+            O bolão definitivo de futebol. Digite seu nome completo abaixo para
+            entrar ou criar seu cadastro instantaneamente.
           </p>
         </div>
 
@@ -63,11 +66,13 @@ function LoginForm() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="flex flex-col gap-1.5 w-full text-left">
-            <label className="text-zinc-300 font-semibold text-xs pl-1">Seu Nome</label>
+            <label className="text-zinc-300 font-semibold text-xs pl-1">
+              Seu Nome Completo
+            </label>
             <Input
               required
               type="text"
-              placeholder="Ex: Luigi Minardi"
+              placeholder="Ex: Maria Luiza Maia"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={isPending}
@@ -103,11 +108,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="relative min-h-screen flex items-center justify-center bg-zinc-950">
-        <Spinner size="lg" className="text-emerald-500" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="relative min-h-screen flex items-center justify-center bg-zinc-950">
+          <Spinner size="lg" className="text-emerald-500" />
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
