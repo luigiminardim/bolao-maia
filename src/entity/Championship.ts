@@ -1,13 +1,19 @@
 import { BinaryTree } from "../utils/BinaryTree.ts";
 import { Team } from "./Team.ts";
 
-export class GroupChampionship {
-  id: string;
-  classification: Team[];
+export type ChampionshipStatus = "draft" | "waiting" | "running";
 
-  constructor(id: string, classification: Team[]) {
+export class GroupChampionship {
+  private id: string;
+  classification: (Team | null)[];
+
+  constructor(id: string, classification: (Team | null)[]) {
     this.id = id;
     this.classification = classification;
+  }
+
+  getId(): string {
+    return this.id;
   }
 
   numTeams() {
@@ -15,27 +21,48 @@ export class GroupChampionship {
   }
 
   teamPosition(team: Team): null | number {
-    const position = this.classification.indexOf(team);
+    const position = this.classification.findIndex((t) => t?.id === team.id);
     return position === -1 ? null : position + 1;
   }
 }
 
 export class GroupListChampionship {
-  id: string;
+  private id: string;
   private groups: GroupChampionship[];
   private extraQualifiedList: (null | Team)[];
   readonly maxRegularQualifiedPosition: number;
+  private startDate: Date;
 
   constructor(
     id: string,
     groups: GroupChampionship[],
     extraQualifiedList: (null | Team)[],
     maxRegularQualifiedPosition: number,
+    startDate: Date,
   ) {
     this.id = id;
     this.groups = groups;
     this.extraQualifiedList = extraQualifiedList;
     this.maxRegularQualifiedPosition = maxRegularQualifiedPosition;
+    this.startDate = startDate;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getStartDate(): Date {
+    return this.startDate;
+  }
+
+  getStatus(): ChampionshipStatus {
+    if (this.groups.some((g) => g.classification.some((t) => t === null))) {
+      return "draft";
+    }
+    if (new Date() < this.startDate) {
+      return "waiting";
+    }
+    return "running";
   }
 
   numTeams(): number {
@@ -65,7 +92,7 @@ export class GroupListChampionship {
   }
 
   getGroup(groupId: string): GroupChampionship | null {
-    return this.groups.find((g) => g.id === groupId) ?? null;
+    return this.groups.find((g) => g.getId() === groupId) ?? null;
   }
 
   positionIsRegularQualified(position: number): boolean {
@@ -95,21 +122,46 @@ export class GroupListChampionship {
 }
 
 export class CupChampionship {
-  id: string;
+  private id: string;
   root: BinaryTree<null | Team>;
   hasThirdPlaceMatch: boolean;
   thirdPlace: null | Team;
+  private startDate: Date;
 
   constructor(
     id: string,
     root: BinaryTree<null | Team>,
     hasThirdPlaceMatch: boolean,
     thirdPlace: null | Team,
+    startDate: Date,
   ) {
     this.id = id;
     this.root = root;
     this.hasThirdPlaceMatch = hasThirdPlaceMatch;
     this.thirdPlace = thirdPlace;
+    this.startDate = startDate;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getStartDate(): Date {
+    return this.startDate;
+  }
+
+  listTeam(): (Team | null)[] {
+    return this.root.listLeaf();
+  }
+
+  getStatus(): ChampionshipStatus {
+    if (this.listTeam().includes(null)) {
+      return "draft";
+    }
+    if (new Date() < this.startDate) {
+      return "waiting";
+    }
+    return "running";
   }
 
   numTeams(): number {

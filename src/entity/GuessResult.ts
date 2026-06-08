@@ -112,6 +112,14 @@ export class GroupGuessResult {
     if (!group) return new GroupGuessResult([]) as never;
     const classificationInfo: GroupGuessNodeInfo[] = group.classification.map(
       (team) => {
+        if (team === null) {
+          return {
+            team: null,
+            positionGuess: null,
+            extraQualifiedGuess: false,
+            score: null,
+          };
+        }
         const guessPosition = groupGuess.teamPosition(team);
         const extraQualifiedGuess = !!extraQualifiedListGuess.find(
           (t) => t.id === team.id,
@@ -152,7 +160,7 @@ export class GroupListGuessResult {
       .map((group, idx) =>
         GroupGuessResult.fromGroupListSweepstake(
           sweepstake,
-          group.id,
+          group.getId(),
           guess.groupGuesses[idx],
           guess.extraQualifiedListGuess,
         ),

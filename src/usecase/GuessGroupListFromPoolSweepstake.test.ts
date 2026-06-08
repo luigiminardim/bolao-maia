@@ -51,14 +51,14 @@ describe("GuessGroupListFromPoolSweepstake", () => {
     await usecase.execute(userId, params);
 
     expect(poolGuessRepository.findByUserAndSweepstake).toHaveBeenCalledWith(
-      "luigi%20mario",
+      "luigi mario",
       "pool-1",
     );
 
     expect(poolGuessRepository.save).toHaveBeenCalledTimes(1);
     const savedPoolGuess = poolGuessRepository.save.mock.calls[0][0];
 
-    expect(savedPoolGuess.userId).toBe("luigi%20mario");
+    expect(savedPoolGuess.userId).toBe("luigi mario");
     expect(savedPoolGuess.sweepstakeId).toBe("pool-1");
     expect(savedPoolGuess.subGuesses.length).toBe(1);
     expect(savedPoolGuess.subGuesses[0].kind).toBe("group");

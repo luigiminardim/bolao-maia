@@ -1,6 +1,7 @@
 import { GetPoolSweepstakeUsecase } from "./GetPoolSweepstakeUsecase";
 import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
 import { PoolSweepstake } from "../entity/Sweepstake";
+import { toPoolSweepstakeDto } from "./dto/SweepstakeDto";
 
 describe("GetPoolSweepstakeUsecase", () => {
   let poolSweepstakeRepository: jest.Mocked<PoolSweepstakeRepository>;
@@ -20,7 +21,7 @@ describe("GetPoolSweepstakeUsecase", () => {
 
     const result = await usecase.execute("2026-world-cup");
 
-    expect(result).toBe(mockPool);
+    expect(result).toEqual(toPoolSweepstakeDto(mockPool));
     expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith("2026-world-cup");
   });
 

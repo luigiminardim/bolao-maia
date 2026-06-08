@@ -46,7 +46,9 @@ export function GuessWizardClient({
         g.classification.map((t) => t.id),
       );
     }
-    return sweepstake.groups.map((g) => g.classification.map((t) => t.id));
+    return sweepstake.groups.map((g) =>
+      g.classification.map((t) => t?.id || ""),
+    );
   });
 
   // 4. User's local extra qualified state
@@ -259,7 +261,7 @@ export function GuessWizardClient({
                 {groupGuesses[currentGroupIndex].map((teamId, idx) => {
                   const teamObj = sweepstake.groups[
                     currentGroupIndex
-                  ].classification.find((t) => t.id === teamId)!;
+                  ].classification.find((t) => t?.id === teamId);
 
                   // Badges classes
                   let positionBadgeColor = "bg-zinc-850 text-zinc-400";
@@ -311,11 +313,11 @@ export function GuessWizardClient({
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={getTeamFlagSvgUrl(teamId)}
-                          alt={teamObj.name}
+                          alt={teamObj?.name || "TBD"}
                           className="w-6 h-4 object-cover rounded-[2px] shadow-sm"
                         />
                         <span className="font-bold text-sm text-zinc-200">
-                          {teamObj.name}
+                          {teamObj?.name || "TBD"}
                         </span>
                       </div>
 
@@ -420,7 +422,16 @@ export function GuessWizardClient({
                     </div>
                   ) : extraGuesses.length < sweepstake.extraQualifiedLength ? (
                     <span>
-                      Falta selecionar {sweepstake.extraQualifiedLength - extraGuesses.length} melhor{sweepstake.extraQualifiedLength - extraGuesses.length > 1 ? "es" : ""} terceiro{sweepstake.extraQualifiedLength - extraGuesses.length > 1 ? "s" : ""}
+                      Falta selecionar{" "}
+                      {sweepstake.extraQualifiedLength - extraGuesses.length}{" "}
+                      melhor
+                      {sweepstake.extraQualifiedLength - extraGuesses.length > 1
+                        ? "es"
+                        : ""}{" "}
+                      terceiro
+                      {sweepstake.extraQualifiedLength - extraGuesses.length > 1
+                        ? "s"
+                        : ""}
                     </span>
                   ) : (
                     "Confirmar e Enviar Palpite"

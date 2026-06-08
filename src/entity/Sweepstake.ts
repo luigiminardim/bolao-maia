@@ -5,18 +5,22 @@ export class GroupListSweepstake {
   id: string;
   championship: GroupListChampionship;
   scorePolicy: GroupListScorePolicy;
-  startTime: Date;
 
   constructor(
     id: string,
     championship: GroupListChampionship,
     scorePolicy: GroupListScorePolicy,
-    startDate: Date,
   ) {
     this.id = id;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
-    this.startTime = startDate;
+  }
+
+  getStatus(): "draft" | "open" | "locked" {
+    const champStatus = this.championship.getStatus();
+    if (champStatus === "draft") return "draft";
+    if (champStatus === "waiting") return "open";
+    return "locked";
   }
 }
 
@@ -24,18 +28,22 @@ export class CupSweepstake {
   id: string;
   championship: CupChampionship;
   scorePolicy: CupScorePolicy;
-  startTime: Date;
 
   constructor(
     id: string,
     championship: CupChampionship,
     scorePolicy: CupScorePolicy,
-    startDate: Date,
   ) {
     this.id = id;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
-    this.startTime = startDate;
+  }
+
+  getStatus(): "draft" | "open" | "locked" {
+    const champStatus = this.championship.getStatus();
+    if (champStatus === "draft") return "draft";
+    if (champStatus === "waiting") return "open";
+    return "locked";
   }
 }
 

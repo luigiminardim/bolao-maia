@@ -1,3 +1,8 @@
+export type BinaryTreeDao<T> = {
+  elem: T;
+  children: [null | BinaryTreeDao<T>, null | BinaryTreeDao<T>];
+};
+
 export class BinaryTree<T> {
   elem: T;
   children: [null | BinaryTree<T>, null | BinaryTree<T>];
@@ -5,6 +10,53 @@ export class BinaryTree<T> {
   constructor(elem: T, children: [null | BinaryTree<T>, null | BinaryTree<T>]) {
     this.elem = elem;
     this.children = children;
+  }
+
+  static toDto<T, U>(
+    tree: BinaryTree<T>,
+    elementToDto: (elem: T) => U,
+  ): BinaryTreeDao<U> {
+    const elemDto = elementToDto(tree.elem);
+    const left = tree.children[0]
+      ? BinaryTree.toDto(tree.children[0], elementToDto)
+      : null;
+    const right = tree.children[1]
+      ? BinaryTree.toDto(tree.children[1], elementToDto)
+      : null;
+    return { elem: elemDto, children: [left, right] };
+  }
+
+  static fromDto<T, U>(
+    dao: BinaryTreeDao<U>,
+    elementFromDao: (elem: U) => T,
+  ): BinaryTree<T> {
+    const elem = elementFromDao(dao.elem);
+    const left = dao.children[0]
+      ? BinaryTree.fromDto(dao.children[0], elementFromDao)
+      : null;
+    const right = dao.children[1]
+      ? BinaryTree.fromDto(dao.children[1], elementFromDao)
+      : null;
+    return new BinaryTree(elem, [left, right]);
+  }
+
+  static async fromDtoAsync<T, U>(
+    dao: BinaryTreeDao<U>,
+    elementFromDao: (elem: U) => Promise<T>,
+  ): Promise<BinaryTree<T>> {
+    const elemPromise = elementFromDao(dao.elem);
+    const leftPromise = dao.children[0]
+      ? BinaryTree.fromDtoAsync(dao.children[0], elementFromDao)
+      : Promise.resolve(null);
+    const rightPromise = dao.children[1]
+      ? BinaryTree.fromDtoAsync(dao.children[1], elementFromDao)
+      : Promise.resolve(null);
+    const [elem, left, right] = await Promise.all([
+      elemPromise,
+      leftPromise,
+      rightPromise,
+    ]);
+    return new BinaryTree(elem, [left, right]);
   }
 
   reduce<A>(fn: (acc: A, elem: T) => A, initialValue: A): A {
@@ -41,6 +93,12 @@ export class BinaryTree<T> {
     const [left, right] = this.children;
     if (left === null && right === null) return 1;
     return (left?.numLeafs() ?? 0) + (right?.numLeafs() ?? 0);
+  }
+
+  listLeaf(): T[] {
+    const [left, right] = this.children;
+    if (left === null && right === null) return [this.elem];
+    return (left?.listLeaf() ?? []).concat(right?.listLeaf() ?? []);
   }
 
   findHeight(findFn: (elem: T) => boolean): number | null {

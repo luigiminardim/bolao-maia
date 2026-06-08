@@ -40,7 +40,7 @@ export default async function GuessWizardPage({ params }: PageProps) {
   const serializedSweepstake = sweepstakeItem.sweepstake;
   
   // If the championship has already started, guessing is not allowed. Redirect back.
-  const officialHasStarted = new Date() >= new Date(serializedSweepstake.startTime);
+  const officialHasStarted = new Date() >= new Date(serializedSweepstake.startDate);
   if (officialHasStarted) {
     redirect(`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`);
   }

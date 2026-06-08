@@ -12,6 +12,7 @@ interface PageProps {
 }
 
 export default async function PoolSweepstakePage({ params }: PageProps) {
+  console.warn("pool", await params);
   const { poolId } = await params;
   const user = await getLoggedInUser();
   const pool = await getPoolSweepstakeUsecase.execute(poolId);
@@ -62,7 +63,7 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {pool.subSweepstakeList.map((item) => {
               const hasStarted =
-                new Date() >= new Date(item.sweepstake.startTime);
+                new Date() >= new Date(item.sweepstake.startDate);
 
               if (item.kind === "group") {
                 const groupSweepstake = item.sweepstake;
@@ -101,7 +102,7 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
                           <span>Início:</span>
                           <span className="text-zinc-400 font-semibold">
                             {new Date(
-                              groupSweepstake.startTime,
+                              groupSweepstake.startDate,
                             ).toLocaleDateString("pt-BR", {
                               day: "2-digit",
                               month: "2-digit",

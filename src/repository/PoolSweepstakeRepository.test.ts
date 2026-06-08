@@ -1,17 +1,19 @@
-import { PoolSweepstakeRepository } from "./PoolSweepstakeRepository";
+import { FilePoolSweepstakeRepository } from "./PoolSweepstakeRepository";
 import { PoolSweepstake, GroupListSweepstake } from "../entity/Sweepstake";
 import { GroupListChampionship } from "../entity/Championship";
 import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
+import { CupChampionshipRepository } from "./CupChampionshipRepository";
 import {
   InverseProbabilityQualifiedPositionGroupListScorePolicy,
   WithLogarithm2GroupScorePolicy,
 } from "../entity/ScorePolicy";
 import { JsonStorage } from "../infra/JsonStorage";
 
-describe("PoolSweepstakeRepository", () => {
+describe("FilePoolSweepstakeRepository", () => {
   let mockStorage: jest.Mocked<JsonStorage>;
   let mockGroupListChampionshipRepository: jest.Mocked<GroupListChampionshipRepository>;
-  let poolSweepstakeRepository: PoolSweepstakeRepository;
+  let mockCupChampionshipRepository: jest.Mocked<CupChampionshipRepository>;
+  let poolSweepstakeRepository: FilePoolSweepstakeRepository;
 
   beforeEach(() => {
     mockStorage = {
@@ -21,11 +23,18 @@ describe("PoolSweepstakeRepository", () => {
 
     mockGroupListChampionshipRepository = {
       findById: jest.fn(),
+      save: jest.fn(),
     } as unknown as jest.Mocked<GroupListChampionshipRepository>;
 
-    poolSweepstakeRepository = new PoolSweepstakeRepository(
+    mockCupChampionshipRepository = {
+      findById: jest.fn(),
+      save: jest.fn(),
+    } as unknown as jest.Mocked<CupChampionshipRepository>;
+
+    poolSweepstakeRepository = new FilePoolSweepstakeRepository(
       mockStorage,
       mockGroupListChampionshipRepository,
+      mockCupChampionshipRepository,
     );
   });
 
@@ -36,6 +45,7 @@ describe("PoolSweepstakeRepository", () => {
         [],
         [],
         2,
+        new Date("2026-06-11T12:00:00.000Z"),
       );
       const groupScorePolicy =
         new InverseProbabilityQualifiedPositionGroupListScorePolicy();
@@ -43,7 +53,6 @@ describe("PoolSweepstakeRepository", () => {
         "2026-world-cup",
         groupChampionship,
         groupScorePolicy,
-        new Date("2026-06-11T12:00:00.000Z"),
       );
 
       const subSweepstakeList = [
@@ -69,7 +78,6 @@ describe("PoolSweepstakeRepository", () => {
                 id: "2026-world-cup",
                 championship: "2026-world-cup",
                 scorePolicy: "inverse-probability-qualified-position",
-                startTime: "2026-06-11T12:00:00.000Z",
               },
               factor: 1,
             },
@@ -80,20 +88,35 @@ describe("PoolSweepstakeRepository", () => {
   });
 
   describe("findById", () => {
-    it("should return null if the id is not 2026-world-cup", async () => {
-      const result = await poolSweepstakeRepository.findById("some-other-id");
+    it("should return null if the storage returns null", async () => {
+      mockStorage.load.mockResolvedValueOnce(null);
+      const result = await poolSweepstakeRepository.findById("some-id");
       expect(result).toBeNull();
-      expect(
-        mockGroupListChampionshipRepository.findById,
-      ).not.toHaveBeenCalled();
     });
 
-    it("should return the default 2026-world-cup pool sweepstake if the id matches", async () => {
+    it("should map dao to entity when loaded from storage", async () => {
+      const mockDao = {
+        id: "2026-world-cup",
+        subSweepstakeList: [
+          {
+            kind: "group",
+            factor: 1,
+            sweepstake: {
+              id: "2026-world-cup",
+              championship: "2026-world-cup",
+              scorePolicy: "with-logarithm-2:inverse-probability-qualified-position",
+            },
+          },
+        ],
+      };
+      mockStorage.load.mockResolvedValueOnce(mockDao);
+
       const groupChampionship = new GroupListChampionship(
         "2026-world-cup",
         [],
         [],
         2,
+        new Date("2026-06-11T12:00:00.000Z"),
       );
       mockGroupListChampionshipRepository.findById.mockResolvedValueOnce(
         groupChampionship,
@@ -110,7 +133,7 @@ describe("PoolSweepstakeRepository", () => {
       expect(item.factor).toBe(1);
       expect(item.sweepstake).toBeInstanceOf(GroupListSweepstake);
 
-      const groupSweep = item.sweepstake;
+      const groupSweep = item.sweepstake as GroupListSweepstake;
       expect(groupSweep.id).toBe("2026-world-cup");
       expect(groupSweep.championship).toBe(groupChampionship);
       expect(groupSweep.scorePolicy).toBeInstanceOf(
@@ -119,9 +142,6 @@ describe("PoolSweepstakeRepository", () => {
       expect(
         (groupSweep.scorePolicy as WithLogarithm2GroupScorePolicy).scorePolicy,
       ).toBeInstanceOf(InverseProbabilityQualifiedPositionGroupListScorePolicy);
-      expect(groupSweep.startTime).toEqual(
-        new Date("2026-06-11T12:00:00.000Z"),
-      );
 
       expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith(
         "2026-world-cup",

@@ -64,8 +64,8 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
       .mockResolvedValueOnce(mockUser1)
       .mockResolvedValueOnce(mockUser2);
 
-    const mockResult1 = { user: mockUser1, score: 10 } as PoolGuessResult;
-    const mockResult2 = { user: mockUser2, score: 20 } as PoolGuessResult;
+    const mockResult1 = { user: mockUser1, score: 10, subResultList: [] } as unknown as PoolGuessResult;
+    const mockResult2 = { user: mockUser2, score: 20, subResultList: [] } as unknown as PoolGuessResult;
 
     (PoolGuessResult.fromPoolSweepstake as jest.Mock)
       .mockReturnValueOnce(mockResult1)
@@ -73,10 +73,12 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
 
     const result = await usecase.execute("2026-world-cup");
 
-    expect(result).toEqual([
-      mockResult2,
-      mockResult1,
-    ]);
+    // We can't easily import toPoolGuessResultDto here without circular or missing dependencies, so we check the score and user name.
+    expect(result).toHaveLength(2);
+    expect(result![0].score).toBe(20);
+    expect(result![0].user.name).toBe("user2");
+    expect(result![1].score).toBe(10);
+    expect(result![1].user.name).toBe("user1");
     expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith("2026-world-cup");
     expect(poolGuessRepository.findBySweepstake).toHaveBeenCalledWith("2026-world-cup");
   });

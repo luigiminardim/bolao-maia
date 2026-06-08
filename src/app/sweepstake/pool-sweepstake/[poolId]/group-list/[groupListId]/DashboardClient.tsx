@@ -39,7 +39,7 @@ export function DashboardClient({
   const router = useRouter();
 
   // 1. Time Simulation Sandbox State
-  const officialHasStarted = new Date() >= new Date(sweepstake.startTime);
+  const officialHasStarted = new Date() >= new Date(sweepstake.startDate);
   const [simulatedStarted, _setSimulatedStarted] =
     useState<boolean>(officialHasStarted);
 
@@ -55,7 +55,7 @@ export function DashboardClient({
   // Derive existing group guesses to display if user has already guessed
   const groupGuesses = existingGuess
     ? existingGuess.groupGuesses.map((g) => g.classification.map((t) => t.id))
-    : sweepstake.groups.map((g) => g.classification.map((t) => t.id));
+    : sweepstake.groups.map((g) => g.classification.map((t) => t?.id || ""));
 
   const extraGuesses = existingGuess
     ? existingGuess.extraQualifiedListGuess.map((t) => t.id)
@@ -203,7 +203,7 @@ export function DashboardClient({
                             <div className="space-y-2">
                               {userClassification.map((teamId, idx) => {
                                 const teamObj = group.classification.find(
-                                  (t) => t.id === teamId,
+                                  (t) => t?.id === teamId,
                                 )!;
                                 let markerColor = "bg-zinc-950 text-zinc-500";
                                 if (
@@ -262,11 +262,11 @@ export function DashboardClient({
                         {extraGuesses.map((teamId) => {
                           const groupLetter =
                             sweepstake.groups.find((g) =>
-                              g.classification.some((t) => t.id === teamId),
+                              g.classification.some((t) => t?.id === teamId),
                             )?.id || "?";
                           const teamObj = sweepstake.groups
                             .flatMap((g) => g.classification)
-                            .find((t) => t.id === teamId)!;
+                            .find((t) => t?.id === teamId)!;
 
                           return (
                             <div
@@ -363,7 +363,7 @@ export function DashboardClient({
                                 idx < sweepstake.maxRegularQualifiedPosition;
                               const isExtra =
                                 sweepstake.extraQualifiedList.some(
-                                  (x) => x?.id === team.id,
+                                  (x) => x?.id === team?.id,
                                 );
 
                               let markerColor = "bg-zinc-950 text-zinc-500";
@@ -377,7 +377,7 @@ export function DashboardClient({
 
                               return (
                                 <div
-                                  key={team.id}
+                                  key={team?.id || `missing-${idx}`}
                                   className="flex items-center justify-between text-xs font-semibold py-1.5 px-2.5 bg-zinc-950/40 border border-zinc-900/60 rounded-xl"
                                 >
                                   <div className="flex items-center gap-2">
@@ -388,12 +388,12 @@ export function DashboardClient({
                                     </span>
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
-                                      src={getTeamFlagSvgUrl(team.id)}
-                                      alt={team.name}
+                                      src={getTeamFlagSvgUrl(team?.id || "")}
+                                      alt={team?.name || "TBD"}
                                       className="w-4 h-3 object-cover rounded-[2px]"
                                     />
                                     <span className="text-zinc-300 font-bold">
-                                      {team.name}
+                                      {team?.name || "TBD"}
                                     </span>
                                   </div>
 
@@ -443,7 +443,7 @@ export function DashboardClient({
                           }
                           const groupLetter =
                             sweepstake.groups.find((g) =>
-                              g.classification.some((t) => t.id === team.id),
+                              g.classification.some((t) => t?.id === team?.id),
                             )?.id || "?";
                           return (
                             <div
@@ -553,12 +553,12 @@ export function DashboardClient({
                             <div className="space-y-3">
                               {userClassification.map((teamId, idx) => {
                                 const teamObj = group.classification.find(
-                                  (t) => t.id === teamId,
+                                  (t) => t?.id === teamId,
                                 )!;
                                 // Find official rank of this team
                                 const officialRank =
                                   group.classification.findIndex(
-                                    (t) => t.id === teamId,
+                                    (t) => t?.id === teamId,
                                   ) + 1;
                                 // Points won for this specific team prediction
                                 const teamPoints =
@@ -814,9 +814,9 @@ export function DashboardClient({
                                   {gr.classification.map((teamGuess, tIdx) => {
                                     if (!teamGuess.team) return null;
                                     const officialRank =
-                                      officialGroup.classification.findIndex(
-                                        (t) => t.id === teamGuess.team?.id,
-                                      ) + 1;
+                                        officialGroup.classification.findIndex(
+                                          (t) => t?.id === teamGuess.team?.id,
+                                        ) + 1;
                                     return (
                                       <div
                                         key={teamGuess.team.id}

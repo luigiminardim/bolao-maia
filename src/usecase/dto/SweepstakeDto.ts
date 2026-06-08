@@ -1,14 +1,20 @@
-import { GroupListSweepstake, PoolSweepstake } from "../../entity/Sweepstake";
+import {
+  CupSweepstake,
+  GroupListSweepstake,
+  PoolSweepstake,
+} from "../../entity/Sweepstake";
 import { TeamDto, toTeamDto } from "./TeamDto";
+import { BinaryTreeDao, BinaryTree } from "../../utils/BinaryTree";
 
 export interface GroupListSweepstakeDto {
   id: string;
-  startTime: string;
+  status: "draft" | "open" | "locked";
+  startDate: string;
   maxRegularQualifiedPosition: number;
   extraQualifiedLength: number;
   groups: {
     id: string;
-    classification: TeamDto[];
+    classification: (TeamDto | null)[];
   }[];
   extraQualifiedList: (TeamDto | null)[];
 }
@@ -19,12 +25,13 @@ export function toGroupListSweepstakeDto(
   const championship = sweepstake.championship;
   return {
     id: sweepstake.id,
-    startTime: sweepstake.startTime.toISOString(),
+    status: sweepstake.getStatus(),
+    startDate: championship.getStartDate().toISOString(),
     maxRegularQualifiedPosition: championship.maxRegularQualifiedPosition,
     extraQualifiedLength: championship.getExtraQualifiedList().length,
     groups: championship.getGroups().map((g) => ({
-      id: g.id,
-      classification: g.classification.map(toTeamDto),
+      id: g.getId(),
+      classification: g.classification.map((t) => (t ? toTeamDto(t) : null)),
     })),
     extraQualifiedList: championship
       .getExtraQualifiedList()
@@ -32,11 +39,46 @@ export function toGroupListSweepstakeDto(
   };
 }
 
-export type PoolSweepstakeItemDto = {
-  kind: "group";
-  sweepstake: GroupListSweepstakeDto;
-  factor: number;
-};
+export interface CupChampionshipDto {
+  id: string;
+  hasThirdPlaceMatch: boolean;
+  thirdPlace: TeamDto | null;
+  startDate: string;
+  root: BinaryTreeDao<TeamDto | null>;
+}
+
+export interface CupSweepstakeDto {
+  id: string;
+  status: "draft" | "open" | "locked";
+  startDate: string;
+  championship: CupChampionshipDto;
+}
+
+export function toCupSweepstakeDto(
+  sweepstake: CupSweepstake,
+): CupSweepstakeDto {
+  const championship = sweepstake.championship;
+  return {
+    id: sweepstake.id,
+    status: sweepstake.getStatus(),
+    startDate: championship.getStartDate().toISOString(),
+    championship: {
+      id: championship.getId(),
+      hasThirdPlaceMatch: championship.hasThirdPlaceMatch,
+      thirdPlace: championship.thirdPlace
+        ? toTeamDto(championship.thirdPlace)
+        : null,
+      startDate: championship.getStartDate().toISOString(),
+      root: BinaryTree.toDto(championship.root, (t) =>
+        t ? toTeamDto(t) : null,
+      ),
+    },
+  };
+}
+
+export type PoolSweepstakeItemDto =
+  | { kind: "group"; sweepstake: GroupListSweepstakeDto; factor: number }
+  | { kind: "cup"; sweepstake: CupSweepstakeDto; factor: number };
 
 export interface PoolSweepstakeDto {
   id: string;
@@ -46,18 +88,25 @@ export interface PoolSweepstakeDto {
 export function toPoolSweepstakeDto(pool: PoolSweepstake): PoolSweepstakeDto {
   return {
     id: pool.id,
-    subSweepstakeList: pool.subSweepstakeList.flatMap((item) => {
+    subSweepstakeList: pool.subSweepstakeList.map((item) => {
       if (item.kind === "group") {
-        return [
-          {
-            kind: "group",
-            factor: item.factor,
-            sweepstake: toGroupListSweepstakeDto(item.sweepstake),
-          },
-        ];
+        return {
+          kind: "group",
+          factor: item.factor,
+          sweepstake: toGroupListSweepstakeDto(item.sweepstake),
+        };
       } else {
-        return [];
+        return {
+          kind: "cup",
+          factor: item.factor,
+          sweepstake: toCupSweepstakeDto(item.sweepstake),
+        };
       }
     }),
   };
 }
+
+export type SweepstakeDto =
+  | { kind: "pool"; pool: PoolSweepstakeDto }
+  | { kind: "cup"; cup: CupSweepstakeDto }
+  | { kind: "groupList"; groupList: GroupListSweepstakeDto };

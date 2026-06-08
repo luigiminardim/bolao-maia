@@ -1,6 +1,7 @@
 import { GetUserUsecase } from "./GetUserUsecase";
 import { UserRepository } from "../repository/UserRepository";
 import { User } from "../entity/User";
+import { toUserDto } from "./dto/UserDto";
 
 describe("GetUserUsecase", () => {
   let userRepository: jest.Mocked<UserRepository>;
@@ -20,7 +21,7 @@ describe("GetUserUsecase", () => {
 
     const result = await usecase.execute("luigi%20mario");
 
-    expect(result).toBe(mockUser);
+    expect(result).toEqual(toUserDto(mockUser));
     expect(userRepository.findById).toHaveBeenCalledWith("luigi%20mario");
   });
 

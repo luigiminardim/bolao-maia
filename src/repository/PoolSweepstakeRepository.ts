@@ -4,8 +4,14 @@ import {
   GroupListSweepstake,
   CupSweepstake,
 } from "../entity/Sweepstake";
-import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
-import { CupChampionshipRepository } from "./CupChampionshipRepository";
+import {
+  GroupListChampionshipRepository,
+  FileGroupListChampionshipRepository,
+} from "./GroupListChampionshipRepository";
+import {
+  CupChampionshipRepository,
+  FileCupChampionshipRepository,
+} from "./CupChampionshipRepository";
 import { TeamRepository } from "./TeamRepository";
 import {
   ScorePolicyBuilder,
@@ -22,14 +28,12 @@ export interface CupSweepstakeDao {
   id: string;
   championship: string; // championship id
   scorePolicy: string; // score policy id
-  startTime: string; // ISO
 }
 
 export interface GroupListSweepstakeDao {
   id: string;
   championship: string; // championship id
   scorePolicy: string; // score policy id
-  startTime: string; // ISO
 }
 
 export type SweepstakeItemDao =
@@ -39,6 +43,12 @@ export type SweepstakeItemDao =
 export interface PoolSweepstakeDao {
   id: string;
   subSweepstakeList: SweepstakeItemDao[];
+}
+
+export interface PoolSweepstakeRepository {
+  save(poolSweepstake: PoolSweepstake): Promise<void>;
+  findById(id: string): Promise<PoolSweepstake | null>;
+  findAll(): Promise<PoolSweepstake[]>;
 }
 
 function serializeGroupListScorePolicy(policy: GroupListScorePolicy): string {
@@ -68,7 +78,7 @@ function serializeCupScorePolicy(policy: CupScorePolicy): string {
   throw new Error(`Unknown CupScorePolicy type: ${policy.constructor.name}`);
 }
 
-export class PoolSweepstakeRepository {
+export class FilePoolSweepstakeRepository implements PoolSweepstakeRepository {
   private readonly storage: JsonStorage;
   private readonly groupListChampionshipRepository: GroupListChampionshipRepository;
   private readonly cupChampionshipRepository: CupChampionshipRepository;
@@ -81,9 +91,13 @@ export class PoolSweepstakeRepository {
     this.storage = storage;
     this.groupListChampionshipRepository =
       groupListChampionshipRepository ||
-      new GroupListChampionshipRepository(this.storage, new TeamRepository());
+      new FileGroupListChampionshipRepository(
+        this.storage,
+        new TeamRepository(),
+      );
     this.cupChampionshipRepository =
-      cupChampionshipRepository || new CupChampionshipRepository(this.storage);
+      cupChampionshipRepository ||
+      new FileCupChampionshipRepository(this.storage);
   }
 
   async save(poolSweepstake: PoolSweepstake): Promise<void> {
@@ -94,9 +108,8 @@ export class PoolSweepstakeRepository {
         const sweepstake = item.sweepstake;
         const groupDao: GroupListSweepstakeDao = {
           id: sweepstake.id,
-          championship: sweepstake.championship.id,
+          championship: sweepstake.championship.getId(),
           scorePolicy: serializeGroupListScorePolicy(sweepstake.scorePolicy),
-          startTime: sweepstake.startTime.toISOString(),
         };
         subSweepstakeDaoList.push({
           kind: "group",
@@ -107,9 +120,8 @@ export class PoolSweepstakeRepository {
         const sweepstake = item.sweepstake;
         const cupDao: CupSweepstakeDao = {
           id: sweepstake.id,
-          championship: sweepstake.championship.id,
+          championship: sweepstake.championship.getId(),
           scorePolicy: serializeCupScorePolicy(sweepstake.scorePolicy),
-          startTime: sweepstake.startTime.toISOString(),
         };
         subSweepstakeDaoList.push({
           kind: "cup",
@@ -144,7 +156,6 @@ export class PoolSweepstakeRepository {
             id: "2026-world-cup",
             championship: "2026-world-cup",
             scorePolicy: "log2(inverse-probability-qualified-position)",
-            startTime: "2026-06-11T12:00:00.000Z",
           },
           factor: 1,
         },
@@ -172,7 +183,6 @@ export class PoolSweepstakeRepository {
           groupDao.id,
           championship,
           scorePolicy,
-          new Date(groupDao.startTime),
         );
         subSweepstakeList.push({
           kind: "group",
@@ -194,7 +204,6 @@ export class PoolSweepstakeRepository {
           cupDao.id,
           championship,
           scorePolicy,
-          new Date(cupDao.startTime),
         );
         subSweepstakeList.push({
           kind: "cup",
@@ -205,5 +214,78 @@ export class PoolSweepstakeRepository {
     }
 
     return new PoolSweepstake(dao.id, subSweepstakeList);
+  }
+
+  async findAll(): Promise<PoolSweepstake[]> {
+    const pool = await this.findById("2026-world-cup");
+    return pool ? [pool] : [];
+  }
+}
+
+export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
+  private readonly groupListChampionshipRepository: GroupListChampionshipRepository;
+  private readonly cupChampionshipRepository: CupChampionshipRepository;
+
+  constructor(
+    groupListChampionshipRepository: GroupListChampionshipRepository,
+    cupChampionshipRepository: CupChampionshipRepository,
+  ) {
+    this.groupListChampionshipRepository = groupListChampionshipRepository;
+    this.cupChampionshipRepository = cupChampionshipRepository;
+  }
+
+  async save(_poolSweepstake: PoolSweepstake): Promise<void> {}
+
+  async findById(id: string): Promise<PoolSweepstake | null> {
+    if (id !== "test-subsweepstakes-all-status") return null;
+
+    const subSweepstakeList: SweepstakeItem[] = [];
+    const statuses = [
+      "test-status-draft",
+      "test-status-waiting",
+      "test-status-running",
+    ];
+
+    for (const status of statuses) {
+      // Group
+      const groupChamp =
+        await this.groupListChampionshipRepository.findById(status);
+      if (groupChamp) {
+        subSweepstakeList.push({
+          kind: "group",
+          sweepstake: new GroupListSweepstake(
+            `group-${status}`,
+            groupChamp,
+            ScorePolicyBuilder.buildGroupListScorePolicyFromId(
+              "log2(inverse-probability-qualified-position)",
+            ),
+          ),
+          factor: 1,
+        });
+      }
+
+      // Cup
+      const cupChamp = await this.cupChampionshipRepository.findById(status);
+      if (cupChamp) {
+        subSweepstakeList.push({
+          kind: "cup",
+          sweepstake: new CupSweepstake(
+            `cup-${status}`,
+            cupChamp,
+            ScorePolicyBuilder.buildCupScorePolicyFromId(
+              "inverse-probability-position",
+            ),
+          ),
+          factor: 1,
+        });
+      }
+    }
+
+    return new PoolSweepstake(id, subSweepstakeList);
+  }
+
+  async findAll(): Promise<PoolSweepstake[]> {
+    const pool = await this.findById("test-subsweepstakes-all-status");
+    return pool ? [pool] : [];
   }
 }
