@@ -256,19 +256,6 @@ export default async function ScorePolicyPage() {
         <section className="mb-14">
           <SectionHeader emoji="⚽" title="Fase de Grupos" />
 
-          <FormulaBlock>
-            <span className="text-zinc-500">{"// k = 1 (fase de grupos)"}</span>
-            <br />
-            <span className="text-zinc-400">pontos = </span>
-            <span className="text-emerald-300">scaled</span>
-            <span className="text-zinc-300">(10, </span>
-            <span className="text-teal-300">log₂</span>
-            <span className="text-zinc-300">(</span>
-            <span className="text-amber-300">
-              inverse-probability-qualified-position
-            </span>
-            <span className="text-zinc-300">))</span>
-          </FormulaBlock>
 
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
             Cada grupo tem <strong className="text-zinc-200">4 times</strong>.
@@ -379,20 +366,6 @@ export default async function ScorePolicyPage() {
         <section className="mb-14">
           <SectionHeader emoji="🏆" title="Fase de Mata-Mata" />
 
-          <FormulaBlock>
-            <span className="text-zinc-500">
-              {"// k = 3 (fase de mata-mata)"}
-            </span>
-            <br />
-            <span className="text-zinc-400">pontos = </span>
-            <span className="text-zinc-300">3 × </span>
-            <span className="text-emerald-300">scaled</span>
-            <span className="text-zinc-300">(10, </span>
-            <span className="text-teal-300">log₂</span>
-            <span className="text-zinc-300">(</span>
-            <span className="text-amber-300">inverse-probability-position</span>
-            <span className="text-zinc-300">))</span>
-          </FormulaBlock>
 
           <p className="text-zinc-400 text-sm leading-relaxed mb-6">
             A fase de mata-mata conta com os{" "}
