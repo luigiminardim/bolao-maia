@@ -34,11 +34,22 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
               Bolão Ativo
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-              Copa do Mundo <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Fifa World Cup 2026</span>
+              Copa do Mundo{" "}
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
+                Fifa World Cup 2026
+              </span>
             </h1>
             <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
-              Dê seus palpites para o maior torneio de futebol do planeta. Complete a fase de grupos, ordene as classificações, defina os melhores terceiros colocados e dispute a liderança geral!
+              Dê seus palpites para o maior torneio de futebol do planeta.
+              Complete a fase de grupos, ordene as classificações, defina os
+              melhores terceiros colocados e dispute a liderança geral!
             </p>
+            <Link
+              href={`/sweepstake/pool-sweepstake/${poolId}/score-policy`}
+              className="inline-flex items-center gap-1.5 mt-4 text-md text-zinc-500 hover:text-emerald-400 transition-colors"
+            >
+              📋 Ver regras de pontuação
+            </Link>
           </div>
         </div>
 
@@ -50,7 +61,8 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {pool.subSweepstakeList.map((item) => {
-              const hasStarted = new Date() >= new Date(item.sweepstake.startTime);
+              const hasStarted =
+                new Date() >= new Date(item.sweepstake.startTime);
 
               if (item.kind === "group") {
                 const groupSweepstake = item.sweepstake;
@@ -79,14 +91,18 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
                         Fase de Grupos
                       </h3>
                       <p className="text-zinc-400 text-xs mt-1 leading-relaxed">
-                        Ordene as posições dos times dos grupos A a L e selecione os 8 melhores terceiros colocados que avançam de fase.
+                        Ordene as posições dos times dos grupos A a L e
+                        selecione os 8 melhores terceiros colocados que avançam
+                        de fase.
                       </p>
 
                       <div className="mt-6 space-y-2 text-xs text-zinc-500 border-t border-zinc-900/60 pt-4">
                         <div className="flex justify-between">
                           <span>Início:</span>
                           <span className="text-zinc-400 font-semibold">
-                            {new Date(groupSweepstake.startTime).toLocaleDateString("pt-BR", {
+                            {new Date(
+                              groupSweepstake.startTime,
+                            ).toLocaleDateString("pt-BR", {
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
@@ -97,24 +113,28 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
                         </div>
                         <div className="flex justify-between">
                           <span>Grupos:</span>
-                          <span className="text-zinc-400 font-semibold">12 grupos (A ao L)</span>
+                          <span className="text-zinc-400 font-semibold">
+                            12 grupos (A ao L)
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Multiplicador de Pontos:</span>
-                          <span className="text-emerald-400 font-bold">x{item.factor}</span>
+                          <span className="text-emerald-400 font-bold">
+                            x{item.factor}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-6 pt-2">
+                    <div className="mt-6 pt-2 space-y-2">
                       <Link
                         href={`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupSweepstake.id}`}
                         className="block w-full"
                       >
-                        <Button
-                          className="w-full bg-zinc-900 hover:bg-zinc-850 text-zinc-200 font-bold text-xs py-3 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all"
-                        >
-                          {hasStarted ? "Ver Resultados e Classificação" : "Palpitar e Participar"}
+                        <Button className="w-full bg-zinc-900 hover:bg-zinc-850 text-zinc-200 font-bold text-xs py-3 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all">
+                          {hasStarted
+                            ? "Ver Resultados e Classificação"
+                            : "Palpitar e Participar"}
                         </Button>
                       </Link>
                     </div>
@@ -131,17 +151,27 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-3xl">🏆</span>
-                      <Chip color="default" size="sm" className="text-[10px] uppercase font-bold">
+                      <Chip
+                        color="default"
+                        size="sm"
+                        className="text-[10px] uppercase font-bold"
+                      >
                         Em breve
                       </Chip>
                     </div>
-                    <h3 className="text-lg font-bold text-zinc-400">Mata-Mata (Copa)</h3>
+                    <h3 className="text-lg font-bold text-zinc-400">
+                      Mata-Mata (Copa)
+                    </h3>
                     <p className="text-zinc-500 text-xs mt-1">
-                      Monte sua chave de mata-mata até a grande final e palpite no campeão.
+                      Monte sua chave de mata-mata até a grande final e palpite
+                      no campeão.
                     </p>
                   </div>
                   <div className="mt-6 pt-2">
-                    <Button isDisabled className="w-full bg-zinc-950 text-zinc-600 text-xs py-3 rounded-xl cursor-not-allowed">
+                    <Button
+                      isDisabled
+                      className="w-full bg-zinc-950 text-zinc-600 text-xs py-3 rounded-xl cursor-not-allowed"
+                    >
                       Indisponível no momento
                     </Button>
                   </div>
