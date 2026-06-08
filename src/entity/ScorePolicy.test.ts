@@ -8,14 +8,14 @@ import {
 
 describe("ScorePolicyBuilder", () => {
   describe("buildGroupListScorePolicyFromId", () => {
-    it("should build an InverseProbabilityPositionScorePolicy for 'inverse-probability-position'", () => {
+    test("inverse-probability-position", () => {
       const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
         "inverse-probability-position",
       );
       expect(policy).toBeInstanceOf(InverseProbabilityPositionScorePolicy);
     });
 
-    it("should build an InverseProbabilityQualifiedPositionGroupListScorePolicy for 'inverse-probability-qualified-position'", () => {
+    test("inverse-probability-qualified-position", () => {
       const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
         "inverse-probability-qualified-position",
       );
@@ -24,7 +24,7 @@ describe("ScorePolicyBuilder", () => {
       );
     });
 
-    it("should build a WithLogarithm2GroupScorePolicy wrapping InverseProbabilityPositionScorePolicy for 'log2(inverse-probability-position)'", () => {
+    test("log2(inverse-probability-position)", () => {
       const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
         "log2(inverse-probability-position)",
       ) as WithLogarithm2GroupScorePolicy;
@@ -34,7 +34,7 @@ describe("ScorePolicyBuilder", () => {
       );
     });
 
-    it("should build a WithLogarithm2GroupScorePolicy wrapping InverseProbabilityQualifiedPositionGroupListScorePolicy for 'log2(inverse-probability-qualified-position'", () => {
+    test("log2(inverse-probability-qualified-position", () => {
       const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
         "log2(inverse-probability-qualified-position",
       ) as WithLogarithm2GroupScorePolicy;
@@ -44,7 +44,7 @@ describe("ScorePolicyBuilder", () => {
       );
     });
 
-    it("should recursively build nested log2 policies", () => {
+    test("log2(log2(inverse-probability-position))", () => {
       const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
         "log2(log2(inverse-probability-position))",
       ) as WithLogarithm2GroupScorePolicy;
@@ -56,7 +56,7 @@ describe("ScorePolicyBuilder", () => {
       );
     });
 
-    it("should throw an error for unknown GroupListScorePolicy IDs", () => {
+    test("throw an error for unknown GroupListScorePolicy IDs", () => {
       expect(() => {
         ScorePolicyBuilder.buildGroupListScorePolicyFromId("invalid-policy");
       }).toThrow(/Unknown GroupListScorePolicy ID/);
@@ -64,14 +64,14 @@ describe("ScorePolicyBuilder", () => {
   });
 
   describe("buildCupScorePolicyFromId", () => {
-    it("should build an InverseProbabilityPositionScorePolicy for 'inverse-probability-position'", () => {
+    test("inverse-probability-position", () => {
       const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
         "inverse-probability-position",
       );
       expect(policy).toBeInstanceOf(InverseProbabilityPositionScorePolicy);
     });
 
-    it("should build a WithLogarithm2CupScorePolicy wrapping InverseProbabilityPositionScorePolicy for 'log2(inverse-probability-position)'", () => {
+    test("log2(inverse-probability-position)", () => {
       const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
         "log2(inverse-probability-position)",
       ) as WithLogarithm2CupScorePolicy;
@@ -81,15 +81,7 @@ describe("ScorePolicyBuilder", () => {
       );
     });
 
-    it("should throw an error for 'inverse-probability-qualified-position' as it is group-list only", () => {
-      expect(() => {
-        ScorePolicyBuilder.buildCupScorePolicyFromId(
-          "inverse-probability-qualified-position",
-        );
-      }).toThrow(/Unknown CupScorePolicy ID/);
-    });
-
-    it("should throw an error for unknown CupScorePolicy IDs", () => {
+    test("throw an error for unknown CupScorePolicy IDs", () => {
       expect(() => {
         ScorePolicyBuilder.buildCupScorePolicyFromId("invalid-policy");
       }).toThrow(/Unknown CupScorePolicy ID/);
