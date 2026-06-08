@@ -19,6 +19,66 @@ export interface GroupListChampionshipDao {
 }
 
 export class GroupListChampionshipRepository {
+  private static GROUP_LIST_MOCK: GroupListChampionshipDao = {
+    groups: [
+      {
+        id: "A",
+        classification: ["mexico", "south-africa", "south-korea", "czechia"],
+      },
+      {
+        id: "B",
+        classification: [
+          "canada",
+          "bosnia-herzegovina",
+          "qatar",
+          "switzerland",
+        ],
+      },
+      {
+        id: "C",
+        classification: ["brazil", "morocco", "haiti", "scotland"],
+      },
+      {
+        id: "D",
+        classification: ["usa", "paraguay", "australia", "turkiye"],
+      },
+      {
+        id: "E",
+        classification: ["germany", "curacao", "ivory-coast", "ecuador"],
+      },
+      {
+        id: "F",
+        classification: ["netherlands", "japan", "tunisia", "sweden"],
+      },
+      {
+        id: "G",
+        classification: ["belgium", "egypt", "iran", "new-zealand"],
+      },
+      {
+        id: "H",
+        classification: ["spain", "cape-verde", "saudi-arabia", "uruguay"],
+      },
+      {
+        id: "I",
+        classification: ["france", "senegal", "iraq", "norway"],
+      },
+      {
+        id: "J",
+        classification: ["argentina", "algeria", "austria", "jordan"],
+      },
+      {
+        id: "K",
+        classification: ["portugal", "dr-congo", "uzbekistan", "colombia"],
+      },
+      {
+        id: "L",
+        classification: ["england", "croatia", "ghana", "panama"],
+      },
+    ],
+    extraqualifiedList: Array(8).fill(null),
+    maxRegularQualifiedPosition: 2,
+  };
+
   private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
@@ -45,16 +105,10 @@ export class GroupListChampionshipRepository {
   }
 
   async findById(id: string): Promise<GroupListChampionship | null> {
-    let dao = await this.storage.load<GroupListChampionshipDao>(
-      `/sweepstake/GroupListChampionship/${id}`,
-    );
-    if (!dao) {
-      if (id === "2026-world-cup") {
-        dao = this.getMockedWorldCup2026();
-      } else {
-        return null;
-      }
+    if (id !== "2026-world-cup") {
+      return null;
     }
+    const dao = GroupListChampionshipRepository.GROUP_LIST_MOCK;
 
     const groups: GroupChampionship[] = [];
     for (const groupDao of dao.groups) {
@@ -88,59 +142,5 @@ export class GroupListChampionshipRepository {
       extraQualifiedList,
       dao.maxRegularQualifiedPosition,
     );
-  }
-
-  private getMockedWorldCup2026(): GroupListChampionshipDao {
-    return {
-      groups: [
-        {
-          id: "A",
-          classification: ["united-states", "morocco", "japan", "wales"],
-        },
-        {
-          id: "B",
-          classification: ["canada", "switzerland", "qatar", "jamaica"],
-        },
-        {
-          id: "C",
-          classification: ["mexico", "senegal", "south-korea", "panama"],
-        },
-        {
-          id: "D",
-          classification: ["argentina", "denmark", "iran", "costa-rica"],
-        },
-        {
-          id: "E",
-          classification: ["brazil", "croatia", "australia", "cape-verde"],
-        },
-        {
-          id: "F",
-          classification: ["france", "poland", "saudi-arabia", "curacao"],
-        },
-        {
-          id: "G",
-          classification: ["spain", "austria", "uzbekistan", "new-zealand"],
-        },
-        { id: "H", classification: ["england", "sweden", "jordan", "ecuador"] },
-        {
-          id: "I",
-          classification: ["portugal", "scotland", "egypt", "paraguay"],
-        },
-        {
-          id: "J",
-          classification: ["germany", "belgium", "nigeria", "colombia"],
-        },
-        {
-          id: "K",
-          classification: ["netherlands", "italy", "cameroon", "tunisia"],
-        },
-        {
-          id: "L",
-          classification: ["algeria", "ghana", "ivory-coast", "uruguay"],
-        },
-      ],
-      extraqualifiedList: Array(8).fill(null),
-      maxRegularQualifiedPosition: 2,
-    };
   }
 }

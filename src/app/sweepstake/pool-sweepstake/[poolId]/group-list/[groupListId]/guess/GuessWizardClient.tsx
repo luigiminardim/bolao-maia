@@ -17,61 +17,7 @@ import { UserDto } from "../../../../../../../usecase/dto/UserDto";
 import { GroupListSweepstakeDto } from "../../../../../../../usecase/dto/SweepstakeDto";
 import { GroupListGuessDto } from "../../../../../../../usecase/dto/GuessDto";
 
-// Emojis for country flags
-const FLAG_MAP: Record<string, string> = {
-  "united-states": "🇺🇸",
-  "mexico": "🇲🇽",
-  "canada": "🇨🇦",
-  "england": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
-  "france": "🇫🇷",
-  "germany": "🇩🇪",
-  "spain": "🇪🇸",
-  "portugal": "🇵🇹",
-  "netherlands": "🇳🇱",
-  "italy": "🇮🇹",
-  "belgium": "🇧🇪",
-  "croatia": "🇭🇷",
-  "denmark": "🇩🇰",
-  "switzerland": "🇨🇭",
-  "poland": "🇵🇱",
-  "austria": "🇦🇹",
-  "sweden": "🇸🇪",
-  "scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  "wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-  "argentina": "🇦🇷",
-  "brazil": "🇧🇷",
-  "uruguay": "🇺🇾",
-  "colombia": "🇨🇴",
-  "ecuador": "🇪🇨",
-  "paraguay": "🇵🇾",
-  "morocco": "🇲🇦",
-  "senegal": "🇸🇳",
-  "egypt": "🇪🇬",
-  "nigeria": "🇳🇬",
-  "cameroon": "🇨🇲",
-  "tunisia": "🇹🇳",
-  "algeria": "🇩🇿",
-  "ghana": "🇬🇭",
-  "ivory-coast": "🇨🇮",
-  "japan": "🇯🇵",
-  "south-korea": "🇰🇷",
-  "iran": "🇮🇷",
-  "australia": "🇦🇺",
-  "saudi-arabia": "🇸🇦",
-  "qatar": "🇶🇦",
-  "uzbekistan": "🇺🇿",
-  "jordan": "🇯🇴",
-  "costa-rica": "🇨🇷",
-  "jamaica": "🇯🇲",
-  "panama": "🇵🇦",
-  "new-zealand": "🇳🇿",
-  "curacao": "🇨🇼",
-  "cape-verde": "🇨🇻",
-};
-
-export function getFlag(teamId: string): string {
-  return FLAG_MAP[teamId.toLowerCase()] || "⚽";
-}
+import { getTeamFlagSvgUrl } from "../../../../../../utils/getTeamFlagSvgUrl";
 
 interface GuessWizardClientProps {
   poolId: string;
@@ -96,7 +42,9 @@ export function GuessWizardClient({
   // 3. User's local reordering state
   const [groupGuesses, setGroupGuesses] = useState<string[][]>(() => {
     if (existingGuess) {
-      return existingGuess.groupGuesses.map((g) => g.classification.map((t) => t.id));
+      return existingGuess.groupGuesses.map((g) =>
+        g.classification.map((t) => t.id),
+      );
     }
     return sweepstake.groups.map((g) => g.classification.map((t) => t.id));
   });
@@ -116,7 +64,7 @@ export function GuessWizardClient({
   const validateExtraGuesses = (newGroupGuesses: string[][]) => {
     // If an extra qualified team is no longer in maxRegularQualifiedPosition, remove it
     let changed = false;
-    const newExtraGuesses = extraGuesses.filter(teamId => {
+    const newExtraGuesses = extraGuesses.filter((teamId) => {
       // Find which group this team is in
       let groupIdx = -1;
       let posInGroup = -1;
@@ -128,8 +76,11 @@ export function GuessWizardClient({
           break;
         }
       }
-      
-      if (groupIdx !== -1 && posInGroup !== sweepstake.maxRegularQualifiedPosition) {
+
+      if (
+        groupIdx !== -1 &&
+        posInGroup !== sweepstake.maxRegularQualifiedPosition
+      ) {
         changed = true;
         return false; // Remove it
       }
@@ -196,14 +147,18 @@ export function GuessWizardClient({
       const params = {
         poolSweepstake: poolId,
         groupListSweepstake: groupListId,
-        groupGuesses: groupGuesses.map((classification) => ({ classification })),
+        groupGuesses: groupGuesses.map((classification) => ({
+          classification,
+        })),
         extraQualifiedListGuess: extraGuesses,
       };
 
       const result = await submitGuessAction(params);
       if (result.success) {
         // Redirect back to dashboard
-        router.push(`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`);
+        router.push(
+          `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
+        );
       } else {
         alert("Erro ao enviar: " + result.error);
       }
@@ -224,7 +179,11 @@ export function GuessWizardClient({
           <Button
             size="sm"
             variant="ghost"
-            onPress={() => router.push(`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`)}
+            onPress={() =>
+              router.push(
+                `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
+              )
+            }
             className="text-zinc-400 hover:text-zinc-100 rounded-xl text-xs pl-0"
           >
             ← Voltar para o Ranking
@@ -236,13 +195,21 @@ export function GuessWizardClient({
           <div className="mb-6">
             <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-2">
               <span>
-                Grupo {sweepstake.groups[currentGroupIndex].id} (Etapa {currentGroupIndex + 1} de {sweepstake.groups.length})
+                Grupo {sweepstake.groups[currentGroupIndex].id} (Etapa{" "}
+                {currentGroupIndex + 1} de {sweepstake.groups.length})
               </span>
-              <span>{Math.round(((currentStep + 1) / sweepstake.groups.length) * 100)}% concluído</span>
+              <span>
+                {Math.round(
+                  ((currentStep + 1) / sweepstake.groups.length) * 100,
+                )}
+                % concluído
+              </span>
             </div>
             <ProgressBar
               aria-label="Progresso do palpite"
-              value={Math.round(((currentStep + 1) / sweepstake.groups.length) * 100)}
+              value={Math.round(
+                ((currentStep + 1) / sweepstake.groups.length) * 100,
+              )}
             >
               <ProgressBar.Track className="bg-zinc-900 h-2 rounded-full overflow-hidden">
                 <ProgressBar.Fill className="bg-emerald-500 h-full rounded-full transition-all duration-300" />
@@ -253,15 +220,24 @@ export function GuessWizardClient({
           {/* Sticky Counter for Extra Qualified */}
           <div className="mb-6 bg-zinc-900/40 p-4 border border-zinc-900 rounded-2xl flex items-center justify-between sticky top-4 z-10 backdrop-blur-md shadow-md">
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-zinc-200">Seleção de Melhores Terceiros</span>
-              <span className="text-[10px] text-zinc-500">Marque as equipes na 3ª posição que irão avançar</span>
+              <span className="text-sm font-bold text-zinc-200">
+                Seleção de Melhores Terceiros
+              </span>
+              <span className="text-[10px] text-zinc-500">
+                Marque as equipes na 3ª posição que irão avançar
+              </span>
             </div>
             <Chip
-              color={extraGuesses.length === sweepstake.extraQualifiedLength ? "success" : "warning"}
+              color={
+                extraGuesses.length === sweepstake.extraQualifiedLength
+                  ? "success"
+                  : "warning"
+              }
               className="font-bold text-xs"
               variant="soft"
             >
-              {extraGuesses.length} de {sweepstake.extraQualifiedLength} selecionados
+              {extraGuesses.length} de {sweepstake.extraQualifiedLength}{" "}
+              selecionados
             </Chip>
           </div>
 
@@ -281,29 +257,34 @@ export function GuessWizardClient({
               {/* List of teams in the group */}
               <div className="space-y-3 mt-6">
                 {groupGuesses[currentGroupIndex].map((teamId, idx) => {
-                  const teamObj = sweepstake.groups[currentGroupIndex].classification.find(
-                    (t) => t.id === teamId
-                  )!;
+                  const teamObj = sweepstake.groups[
+                    currentGroupIndex
+                  ].classification.find((t) => t.id === teamId)!;
 
                   // Badges classes
                   let positionBadgeColor = "bg-zinc-850 text-zinc-400";
                   let positionLabel = `${idx + 1}º`;
-                  
-                  const isExtraEligiblePosition = idx === sweepstake.maxRegularQualifiedPosition;
-                  
+
+                  const isExtraEligiblePosition =
+                    idx === sweepstake.maxRegularQualifiedPosition;
+
                   if (idx < sweepstake.maxRegularQualifiedPosition) {
-                    positionBadgeColor = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
+                    positionBadgeColor =
+                      "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
                     positionLabel += " - Classificado";
                   } else if (isExtraEligiblePosition) {
-                    positionBadgeColor = "bg-blue-500/10 text-blue-400 border border-blue-500/25";
+                    positionBadgeColor =
+                      "bg-blue-500/10 text-blue-400 border border-blue-500/25";
                     positionLabel += " - Terceiro lugar";
                   } else {
-                    positionBadgeColor = "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
+                    positionBadgeColor =
+                      "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
                     positionLabel += " - Eliminado";
                   }
 
                   const isChecked = extraGuesses.includes(teamId);
-                  const canCheckMore = extraGuesses.length < sweepstake.extraQualifiedLength;
+                  const canCheckMore =
+                    extraGuesses.length < sweepstake.extraQualifiedLength;
 
                   return (
                     <div
@@ -313,35 +294,53 @@ export function GuessWizardClient({
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(currentGroupIndex, idx)}
                       className={`flex items-center justify-between p-4 bg-zinc-950/60 border hover:border-zinc-800 rounded-2xl cursor-grab active:cursor-grabbing group transition-all ${
-                        isChecked ? "border-blue-500/50 shadow-md shadow-blue-500/5" : "border-zinc-900"
+                        isChecked
+                          ? "border-blue-500/50 shadow-md shadow-blue-500/5"
+                          : "border-zinc-900"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         {/* Position pill */}
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-xl uppercase ${positionBadgeColor}`}>
+                        <span
+                          className={`text-[10px] font-bold px-2.5 py-1 rounded-xl uppercase ${positionBadgeColor}`}
+                        >
                           {positionLabel}
                         </span>
 
                         {/* Team detail */}
-                        <span className="text-xl">{getFlag(teamId)}</span>
-                        <span className="font-bold text-sm text-zinc-200">{teamObj.name}</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getTeamFlagSvgUrl(teamId)}
+                          alt={teamObj.name}
+                          className="w-6 h-4 object-cover rounded-[2px] shadow-sm"
+                        />
+                        <span className="font-bold text-sm text-zinc-200">
+                          {teamObj.name}
+                        </span>
                       </div>
 
                       {/* Controls */}
                       <div className="flex items-center gap-3">
                         {/* Checkbox for extra qualified */}
                         {isExtraEligiblePosition && (
-                          <div className="flex items-center" onPointerDown={(e) => e.stopPropagation()}>
-                            <Switch 
+                          <div
+                            className="flex items-center"
+                            onPointerDown={(e) => e.stopPropagation()}
+                          >
+                            <Switch
                               isSelected={isChecked}
-                              onChange={(isSelected: boolean) => handleToggleExtraQualified(teamId, isSelected)}
+                              onChange={(isSelected: boolean) =>
+                                handleToggleExtraQualified(teamId, isSelected)
+                              }
                               isDisabled={!isChecked && !canCheckMore}
                               size="sm"
                               className="mr-2"
                               aria-label="Avança de fase"
                             >
                               <Switch.Content>
-                                <Label className="text-[14px] font-bold text-zinc-400 cursor-pointer">Classificado</Label>
+                                <Label className="text-[14px] font-bold text-zinc-400 cursor-pointer">
+                                  Classificado
+                                </Label>
                               </Switch.Content>
                               <Switch.Control>
                                 <Switch.Thumb />
@@ -365,8 +364,12 @@ export function GuessWizardClient({
                             size="sm"
                             variant="ghost"
                             isIconOnly
-                            isDisabled={idx === groupGuesses[currentGroupIndex].length - 1}
-                            onPress={() => handleMoveDown(currentGroupIndex, idx)}
+                            isDisabled={
+                              idx === groupGuesses[currentGroupIndex].length - 1
+                            }
+                            onPress={() =>
+                              handleMoveDown(currentGroupIndex, idx)
+                            }
                             className="text-zinc-500 hover:text-zinc-100 disabled:opacity-30 rounded-xl"
                           >
                             ▼
@@ -385,7 +388,9 @@ export function GuessWizardClient({
                 variant="outline"
                 onPress={() => {
                   if (currentStep === 0) {
-                    router.push(`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`);
+                    router.push(
+                      `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
+                    );
                   } else {
                     setCurrentStep(currentStep - 1);
                   }
@@ -405,7 +410,10 @@ export function GuessWizardClient({
               ) : (
                 <Button
                   onPress={handleSubmitGuess}
-                  isDisabled={isPending || extraGuesses.length !== sweepstake.extraQualifiedLength}
+                  isDisabled={
+                    isPending ||
+                    extraGuesses.length !== sweepstake.extraQualifiedLength
+                  }
                   className="bg-emerald-500 text-zinc-950 font-bold rounded-xl text-xs px-6 hover:bg-emerald-400 disabled:opacity-40"
                 >
                   {isPending ? (
