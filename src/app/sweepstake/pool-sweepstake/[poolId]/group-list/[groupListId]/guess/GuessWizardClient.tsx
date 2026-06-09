@@ -11,9 +11,7 @@ import {
   Chip,
   Label,
 } from "@heroui/react";
-import { Header } from "../../../../../../components/Header";
 import { submitGuessAction } from "../../../../../../actions";
-import { UserDto } from "../../../../../../../usecase/dto/UserDto";
 import { GroupListSweepstakeDto } from "../../../../../../../usecase/dto/SweepstakeDto";
 import { GroupListGuessDto } from "../../../../../../../usecase/dto/GuessDto";
 
@@ -22,7 +20,6 @@ import { getTeamFlagSvgUrl } from "../../../../../../utils/getTeamFlagSvgUrl";
 interface GuessWizardClientProps {
   poolId: string;
   groupListId: string;
-  currentUser: UserDto | null;
   sweepstake: GroupListSweepstakeDto;
   existingGuess: GroupListGuessDto | null;
 }
@@ -30,7 +27,6 @@ interface GuessWizardClientProps {
 export function GuessWizardClient({
   poolId,
   groupListId,
-  currentUser,
   sweepstake,
   existingGuess,
 }: GuessWizardClientProps) {
@@ -171,277 +167,267 @@ export function GuessWizardClient({
   const isLastStep = currentStep === sweepstake.groups.length - 1;
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 font-sans antialiased">
-      {/* HEADER */}
-      <Header currentUser={currentUser} />
+    <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-start max-w-5xl">
+      <div className="mb-6">
+        <Button
+          size="sm"
+          variant="ghost"
+          onPress={() =>
+            router.push(
+              `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
+            )
+          }
+          className="text-zinc-400 hover:text-zinc-100 rounded-xl text-xs pl-0"
+        >
+          ← Voltar para o Ranking
+        </Button>
+      </div>
 
-      {/* Main Container */}
-      <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-start max-w-5xl">
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
+        {/* Steps indicator */}
         <div className="mb-6">
-          <Button
-            size="sm"
-            variant="ghost"
-            onPress={() =>
-              router.push(
-                `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`,
-              )
-            }
-            className="text-zinc-400 hover:text-zinc-100 rounded-xl text-xs pl-0"
+          <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-2">
+            <span>
+              Grupo {sweepstake.groups[currentGroupIndex].id} (Etapa{" "}
+              {currentGroupIndex + 1} de {sweepstake.groups.length})
+            </span>
+            <span>
+              {Math.round(((currentStep + 1) / sweepstake.groups.length) * 100)}
+              % concluído
+            </span>
+          </div>
+          <ProgressBar
+            aria-label="Progresso do palpite"
+            value={Math.round(
+              ((currentStep + 1) / sweepstake.groups.length) * 100,
+            )}
           >
-            ← Voltar para o Ranking
-          </Button>
+            <ProgressBar.Track className="bg-zinc-900 h-2 rounded-full overflow-hidden">
+              <ProgressBar.Fill className="bg-emerald-500 h-full rounded-full transition-all duration-300" />
+            </ProgressBar.Track>
+          </ProgressBar>
         </div>
 
-        <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
-          {/* Steps indicator */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-2">
-              <span>
-                Grupo {sweepstake.groups[currentGroupIndex].id} (Etapa{" "}
-                {currentGroupIndex + 1} de {sweepstake.groups.length})
-              </span>
-              <span>
-                {Math.round(
-                  ((currentStep + 1) / sweepstake.groups.length) * 100,
-                )}
-                % concluído
-              </span>
-            </div>
-            <ProgressBar
-              aria-label="Progresso do palpite"
-              value={Math.round(
-                ((currentStep + 1) / sweepstake.groups.length) * 100,
-              )}
-            >
-              <ProgressBar.Track className="bg-zinc-900 h-2 rounded-full overflow-hidden">
-                <ProgressBar.Fill className="bg-emerald-500 h-full rounded-full transition-all duration-300" />
-              </ProgressBar.Track>
-            </ProgressBar>
+        {/* Sticky Counter for Extra Qualified */}
+        <div className="mb-6 bg-zinc-900/40 p-4 border border-zinc-900 rounded-2xl flex items-center justify-between sticky top-4 z-10 backdrop-blur-md shadow-md">
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-zinc-200">
+              Seleção de Melhores Terceiros
+            </span>
+            <span className="text-[10px] text-zinc-500">
+              Marque as equipes na 3ª posição que irão avançar
+            </span>
           </div>
+          <Chip
+            color={
+              extraGuesses.length === sweepstake.extraQualifiedLength
+                ? "success"
+                : "warning"
+            }
+            className="font-bold text-xs"
+            variant="soft"
+          >
+            {extraGuesses.length} de {sweepstake.extraQualifiedLength}{" "}
+            selecionados
+          </Chip>
+        </div>
 
-          {/* Sticky Counter for Extra Qualified */}
-          <div className="mb-6 bg-zinc-900/40 p-4 border border-zinc-900 rounded-2xl flex items-center justify-between sticky top-4 z-10 backdrop-blur-md shadow-md">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-zinc-200">
-                Seleção de Melhores Terceiros
-              </span>
-              <span className="text-[10px] text-zinc-500">
-                Marque as equipes na 3ª posição que irão avançar
-              </span>
+        {/* Wizard Panel Content */}
+        <Card className="bg-zinc-900/40 border border-zinc-900 backdrop-blur-md rounded-3xl p-6 shadow-xl flex-1 flex flex-col justify-between">
+          <div>
+            {/* STEP: GROUP REORDERING */}
+            <div className="mb-4">
+              <h2 className="text-xl font-black text-white">
+                Ordenar Grupo {sweepstake.groups[currentGroupIndex].id}
+              </h2>
+              <p className="text-zinc-500 text-xs mt-1">
+                Arraste os times para a posição correta ou use as setas.
+              </p>
             </div>
-            <Chip
-              color={
-                extraGuesses.length === sweepstake.extraQualifiedLength
-                  ? "success"
-                  : "warning"
-              }
-              className="font-bold text-xs"
-              variant="soft"
-            >
-              {extraGuesses.length} de {sweepstake.extraQualifiedLength}{" "}
-              selecionados
-            </Chip>
-          </div>
 
-          {/* Wizard Panel Content */}
-          <Card className="bg-zinc-900/40 border border-zinc-900 backdrop-blur-md rounded-3xl p-6 shadow-xl flex-1 flex flex-col justify-between">
-            <div>
-              {/* STEP: GROUP REORDERING */}
-              <div className="mb-4">
-                <h2 className="text-xl font-black text-white">
-                  Ordenar Grupo {sweepstake.groups[currentGroupIndex].id}
-                </h2>
-                <p className="text-zinc-500 text-xs mt-1">
-                  Arraste os times para a posição correta ou use as setas.
-                </p>
-              </div>
+            {/* List of teams in the group */}
+            <div className="space-y-3 mt-6">
+              {groupGuesses[currentGroupIndex].map((teamId, idx) => {
+                const teamObj = sweepstake.groups[
+                  currentGroupIndex
+                ].classification.find((t) => t?.id === teamId);
 
-              {/* List of teams in the group */}
-              <div className="space-y-3 mt-6">
-                {groupGuesses[currentGroupIndex].map((teamId, idx) => {
-                  const teamObj = sweepstake.groups[
-                    currentGroupIndex
-                  ].classification.find((t) => t?.id === teamId);
+                // Badges classes
+                let positionBadgeColor = "bg-zinc-850 text-zinc-400";
+                let positionLabel = `${idx + 1}º`;
 
-                  // Badges classes
-                  let positionBadgeColor = "bg-zinc-850 text-zinc-400";
-                  let positionLabel = `${idx + 1}º`;
+                const isExtraEligiblePosition =
+                  idx === sweepstake.maxRegularQualifiedPosition;
 
-                  const isExtraEligiblePosition =
-                    idx === sweepstake.maxRegularQualifiedPosition;
+                if (idx < sweepstake.maxRegularQualifiedPosition) {
+                  positionBadgeColor =
+                    "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
+                  positionLabel += " - Classificado";
+                } else if (isExtraEligiblePosition) {
+                  positionBadgeColor =
+                    "bg-blue-500/10 text-blue-400 border border-blue-500/25";
+                  positionLabel += " - Terceiro lugar";
+                } else {
+                  positionBadgeColor =
+                    "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
+                  positionLabel += " - Eliminado";
+                }
 
-                  if (idx < sweepstake.maxRegularQualifiedPosition) {
-                    positionBadgeColor =
-                      "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25";
-                    positionLabel += " - Classificado";
-                  } else if (isExtraEligiblePosition) {
-                    positionBadgeColor =
-                      "bg-blue-500/10 text-blue-400 border border-blue-500/25";
-                    positionLabel += " - Terceiro lugar";
-                  } else {
-                    positionBadgeColor =
-                      "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
-                    positionLabel += " - Eliminado";
-                  }
+                const isChecked = extraGuesses.includes(teamId);
+                const canCheckMore =
+                  extraGuesses.length < sweepstake.extraQualifiedLength;
 
-                  const isChecked = extraGuesses.includes(teamId);
-                  const canCheckMore =
-                    extraGuesses.length < sweepstake.extraQualifiedLength;
+                return (
+                  <div
+                    key={teamId}
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(currentGroupIndex, idx)}
+                    className={`flex items-center justify-between p-4 bg-zinc-950/60 border hover:border-zinc-800 rounded-2xl cursor-grab active:cursor-grabbing group transition-all ${
+                      isChecked
+                        ? "border-blue-500/50 shadow-md shadow-blue-500/5"
+                        : "border-zinc-900"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Position pill */}
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-xl uppercase ${positionBadgeColor}`}
+                      >
+                        {positionLabel}
+                      </span>
 
-                  return (
-                    <div
-                      key={teamId}
-                      draggable
-                      onDragStart={() => handleDragStart(idx)}
-                      onDragOver={handleDragOver}
-                      onDrop={() => handleDrop(currentGroupIndex, idx)}
-                      className={`flex items-center justify-between p-4 bg-zinc-950/60 border hover:border-zinc-800 rounded-2xl cursor-grab active:cursor-grabbing group transition-all ${
-                        isChecked
-                          ? "border-blue-500/50 shadow-md shadow-blue-500/5"
-                          : "border-zinc-900"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Position pill */}
-                        <span
-                          className={`text-[10px] font-bold px-2.5 py-1 rounded-xl uppercase ${positionBadgeColor}`}
+                      {/* Team detail */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getTeamFlagSvgUrl(teamId)}
+                        alt={teamObj?.name || "TBD"}
+                        className="w-6 h-4 object-cover rounded-[2px] shadow-sm"
+                      />
+                      <span className="font-bold text-sm text-zinc-200">
+                        {teamObj?.name || "TBD"}
+                      </span>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex items-center gap-3">
+                      {/* Checkbox for extra qualified */}
+                      {isExtraEligiblePosition && (
+                        <div
+                          className="flex items-center"
+                          onPointerDown={(e) => e.stopPropagation()}
                         >
-                          {positionLabel}
-                        </span>
-
-                        {/* Team detail */}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={getTeamFlagSvgUrl(teamId)}
-                          alt={teamObj?.name || "TBD"}
-                          className="w-6 h-4 object-cover rounded-[2px] shadow-sm"
-                        />
-                        <span className="font-bold text-sm text-zinc-200">
-                          {teamObj?.name || "TBD"}
-                        </span>
-                      </div>
-
-                      {/* Controls */}
-                      <div className="flex items-center gap-3">
-                        {/* Checkbox for extra qualified */}
-                        {isExtraEligiblePosition && (
-                          <div
-                            className="flex items-center"
-                            onPointerDown={(e) => e.stopPropagation()}
-                          >
-                            <Switch
-                              isSelected={isChecked}
-                              onChange={(isSelected: boolean) =>
-                                handleToggleExtraQualified(teamId, isSelected)
-                              }
-                              isDisabled={!isChecked && !canCheckMore}
-                              size="sm"
-                              className="mr-2"
-                              aria-label="Avança de fase"
-                            >
-                              <Switch.Content>
-                                <Label className="text-[14px] font-bold text-zinc-400 cursor-pointer">
-                                  Classificado
-                                </Label>
-                              </Switch.Content>
-                              <Switch.Control>
-                                <Switch.Thumb />
-                              </Switch.Control>
-                            </Switch>
-                          </div>
-                        )}
-
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            isIconOnly
-                            isDisabled={idx === 0}
-                            onPress={() => handleMoveUp(currentGroupIndex, idx)}
-                            className="text-zinc-500 hover:text-zinc-100 disabled:opacity-30 rounded-xl"
-                          >
-                            ▲
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            isIconOnly
-                            isDisabled={
-                              idx === groupGuesses[currentGroupIndex].length - 1
+                          <Switch
+                            isSelected={isChecked}
+                            onChange={(isSelected: boolean) =>
+                              handleToggleExtraQualified(teamId, isSelected)
                             }
-                            onPress={() =>
-                              handleMoveDown(currentGroupIndex, idx)
-                            }
-                            className="text-zinc-500 hover:text-zinc-100 disabled:opacity-30 rounded-xl"
+                            isDisabled={!isChecked && !canCheckMore}
+                            size="sm"
+                            className="mr-2"
+                            aria-label="Avança de fase"
                           >
-                            ▼
-                          </Button>
+                            <Switch.Content>
+                              <Label className="text-[14px] font-bold text-zinc-400 cursor-pointer">
+                                Classificado
+                              </Label>
+                            </Switch.Content>
+                            <Switch.Control>
+                              <Switch.Thumb />
+                            </Switch.Control>
+                          </Switch>
                         </div>
+                      )}
+
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          isIconOnly
+                          isDisabled={idx === 0}
+                          onPress={() => handleMoveUp(currentGroupIndex, idx)}
+                          className="text-zinc-500 hover:text-zinc-100 disabled:opacity-30 rounded-xl"
+                        >
+                          ▲
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          isIconOnly
+                          isDisabled={
+                            idx === groupGuesses[currentGroupIndex].length - 1
+                          }
+                          onPress={() => handleMoveDown(currentGroupIndex, idx)}
+                          className="text-zinc-500 hover:text-zinc-100 disabled:opacity-30 rounded-xl"
+                        >
+                          ▼
+                        </Button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Wizard actions */}
-            <div className="flex items-center justify-between mt-8 border-t border-zinc-900/60 pt-6">
+          {/* Wizard actions */}
+          <div className="flex items-center justify-between mt-8 border-t border-zinc-900/60 pt-6">
+            <Button
+              variant="outline"
+              isDisabled={currentStep === 0}
+              onPress={() => {
+                if (currentStep > 0) {
+                  setCurrentStep(currentStep - 1);
+                }
+              }}
+              className="border-zinc-800 hover:bg-zinc-950 text-zinc-400 font-bold rounded-xl text-xs px-5"
+            >
+              Anterior
+            </Button>
+
+            {!isLastStep ? (
               <Button
-                variant="outline"
-                isDisabled={currentStep === 0}
-                onPress={() => {
-                  if (currentStep > 0) {
-                    setCurrentStep(currentStep - 1);
-                  }
-                }}
-                className="border-zinc-800 hover:bg-zinc-950 text-zinc-400 font-bold rounded-xl text-xs px-5"
+                onPress={() => setCurrentStep(currentStep + 1)}
+                className="bg-emerald-500 text-zinc-950 font-bold rounded-xl text-xs px-6 hover:bg-emerald-400"
               >
-                Anterior
+                Próximo
               </Button>
-
-              {!isLastStep ? (
-                <Button
-                  onPress={() => setCurrentStep(currentStep + 1)}
-                  className="bg-emerald-500 text-zinc-950 font-bold rounded-xl text-xs px-6 hover:bg-emerald-400"
-                >
-                  Próximo
-                </Button>
-              ) : (
-                <Button
-                  onPress={handleSubmitGuess}
-                  isDisabled={
-                    isPending ||
-                    extraGuesses.length !== sweepstake.extraQualifiedLength
-                  }
-                  className="bg-emerald-500 text-zinc-950 font-bold rounded-xl text-xs px-6 hover:bg-emerald-400 disabled:opacity-40"
-                >
-                  {isPending ? (
-                    <div className="flex items-center gap-2">
-                      <Spinner size="sm" className="text-zinc-950" />
-                      <span>Enviando...</span>
-                    </div>
-                  ) : extraGuesses.length < sweepstake.extraQualifiedLength ? (
-                    <span>
-                      Falta selecionar{" "}
-                      {sweepstake.extraQualifiedLength - extraGuesses.length}{" "}
-                      melhor
-                      {sweepstake.extraQualifiedLength - extraGuesses.length > 1
-                        ? "es"
-                        : ""}{" "}
-                      terceiro
-                      {sweepstake.extraQualifiedLength - extraGuesses.length > 1
-                        ? "s"
-                        : ""}
-                    </span>
-                  ) : (
-                    "Confirmar e Enviar Palpite"
-                  )}
-                </Button>
-              )}
-            </div>
-          </Card>
-        </div>
-      </main>
-    </div>
+            ) : (
+              <Button
+                onPress={handleSubmitGuess}
+                isDisabled={
+                  isPending ||
+                  extraGuesses.length !== sweepstake.extraQualifiedLength
+                }
+                className="bg-emerald-500 text-zinc-950 font-bold rounded-xl text-xs px-6 hover:bg-emerald-400 disabled:opacity-40"
+              >
+                {isPending ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner size="sm" className="text-zinc-950" />
+                    <span>Enviando...</span>
+                  </div>
+                ) : extraGuesses.length < sweepstake.extraQualifiedLength ? (
+                  <span>
+                    Falta selecionar{" "}
+                    {sweepstake.extraQualifiedLength - extraGuesses.length}{" "}
+                    melhor
+                    {sweepstake.extraQualifiedLength - extraGuesses.length > 1
+                      ? "es"
+                      : ""}{" "}
+                    terceiro
+                    {sweepstake.extraQualifiedLength - extraGuesses.length > 1
+                      ? "s"
+                      : ""}
+                  </span>
+                ) : (
+                  "Confirmar e Enviar Palpite"
+                )}
+              </Button>
+            )}
+          </div>
+        </Card>
+      </div>
+    </main>
   );
 }

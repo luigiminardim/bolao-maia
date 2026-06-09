@@ -12,7 +12,6 @@ import {
   Alert,
   Avatar,
 } from "@heroui/react";
-import { Header } from "../../../../../components/Header";
 import { UserDto } from "../../../../../../usecase/dto/UserDto";
 import { GroupListSweepstakeDto } from "../../../../../../usecase/dto/SweepstakeDto";
 import { GroupListGuessDto } from "../../../../../../usecase/dto/GuessDto";
@@ -62,10 +61,7 @@ export function DashboardClient({
     : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-950 text-zinc-100 font-sans antialiased">
-      {/* 1. HEADER */}
-      <Header currentUser={currentUser} />
-
+    <>
       {/* 2. SIMULATION & DEVELOPER PANEL */}
       {/* <div className="bg-zinc-900/40 border-b border-zinc-900 p-3">
         <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
@@ -814,9 +810,9 @@ export function DashboardClient({
                                   {gr.classification.map((teamGuess, tIdx) => {
                                     if (!teamGuess.team) return null;
                                     const officialRank =
-                                        officialGroup.classification.findIndex(
-                                          (t) => t?.id === teamGuess.team?.id,
-                                        ) + 1;
+                                      officialGroup.classification.findIndex(
+                                        (t) => t?.id === teamGuess.team?.id,
+                                      ) + 1;
                                     return (
                                       <div
                                         key={teamGuess.team.id}
@@ -868,6 +864,6 @@ export function DashboardClient({
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
-    </div>
+    </>
   );
 }

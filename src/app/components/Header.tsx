@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Avatar, Chip } from "@heroui/react";
+import { Button, Avatar } from "@heroui/react";
 import { logoutAction } from "../actions";
 
 interface HeaderProps {
@@ -30,18 +30,13 @@ export function Header({ currentUser }: HeaderProps) {
         {/* Brand/Logo */}
         <div className="flex items-center gap-3">
           <span
-            onClick={() => router.push("/sweepstake/pool-sweepstake/2026-world-cup")}
+            onClick={() =>
+              router.push("/sweepstake/pool-sweepstake/2026-world-cup")
+            }
             className="text-2xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent tracking-tight cursor-pointer"
           >
             Bolão Maia
           </span>
-          <Chip
-            size="sm"
-            color="success"
-            className="text-[10px] h-5 px-1.5 font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-          >
-            Copa 2026
-          </Chip>
         </div>
 
         {/* User Info & Navigation Actions */}
