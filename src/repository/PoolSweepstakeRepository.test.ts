@@ -104,7 +104,8 @@ describe("FilePoolSweepstakeRepository", () => {
             sweepstake: {
               id: "2026-world-cup",
               championship: "2026-world-cup",
-              scorePolicy: "with-logarithm-2:inverse-probability-qualified-position",
+              scorePolicy:
+                "with-logarithm-2:inverse-probability-qualified-position",
             },
           },
         ],

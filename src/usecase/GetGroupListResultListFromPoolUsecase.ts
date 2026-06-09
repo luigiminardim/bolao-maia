@@ -29,12 +29,14 @@ export class GetGroupListResultListFromPoolUsecase {
     }
 
     const guesses = await this.poolGuessRepository.findBySweepstake(poolId);
-    
+
     const results: PoolGuessResult[] = [];
     for (const guess of guesses) {
       const user = await this.userRepository.findById(guess.userId);
       if (user) {
-        results.push(PoolGuessResult.fromPoolSweepstake(sweepstake, guess, user));
+        results.push(
+          PoolGuessResult.fromPoolSweepstake(sweepstake, guess, user),
+        );
       }
     }
 

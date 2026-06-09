@@ -26,7 +26,7 @@ export default async function GroupListSweepstakePage({ params }: PageProps) {
 
   // Find the specific group list sweepstake
   const sweepstakeItem = pool.subSweepstakeList.find(
-    item => item.kind === "group" && item.sweepstake.id === groupListId
+    (item) => item.kind === "group" && item.sweepstake.id === groupListId,
   );
 
   if (!sweepstakeItem || sweepstakeItem.kind !== "group") {
@@ -42,11 +42,16 @@ export default async function GroupListSweepstakePage({ params }: PageProps) {
   // 3. Serialize Existing Guess for current user
   let serializedGuess = null;
   if (user) {
-    serializedGuess = await getGroupListGuessFromPoolUsecase.execute(user.id, poolId, groupListId);
+    serializedGuess = await getGroupListGuessFromPoolUsecase.execute(
+      user.id,
+      poolId,
+      groupListId,
+    );
   }
 
   // 4. Serialize Leaderboard Scores & Participant Guess Details
-  const serializedLeaderboard = await getGroupListResultListFromPoolUsecase.execute(poolId) || [];
+  const serializedLeaderboard =
+    (await getGroupListResultListFromPoolUsecase.execute(poolId)) || [];
 
   return (
     <DashboardClient

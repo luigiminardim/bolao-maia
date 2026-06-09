@@ -22,7 +22,9 @@ describe("GetPoolSweepstakeUsecase", () => {
     const result = await usecase.execute("2026-world-cup");
 
     expect(result).toEqual(toPoolSweepstakeDto(mockPool));
-    expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith("2026-world-cup");
+    expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith(
+      "2026-world-cup",
+    );
   });
 
   it("should return null if not found", async () => {

@@ -11,12 +11,13 @@ export interface GroupListGuessDto {
 }
 
 export function toGroupListGuessDto(
-  groupListGuess: GroupListGuess
+  groupListGuess: GroupListGuess,
 ): GroupListGuessDto {
   return {
     groupGuesses: groupListGuess.groupGuesses.map((g) => ({
       classification: g.classification.map(toTeamDto),
     })),
-    extraQualifiedListGuess: groupListGuess.extraQualifiedListGuess.map(toTeamDto),
+    extraQualifiedListGuess:
+      groupListGuess.extraQualifiedListGuess.map(toTeamDto),
   };
 }

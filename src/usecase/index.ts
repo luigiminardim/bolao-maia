@@ -1,11 +1,27 @@
 import path from "path";
-import { JsonStorage, JsonFileStorage, JsonAwsS3Storage } from "../infra/JsonStorage";
+import {
+  JsonStorage,
+  JsonFileStorage,
+  JsonAwsS3Storage,
+} from "../infra/JsonStorage";
 import { UserRepository } from "../repository/UserRepository";
-import { PoolSweepstakeRepository, FilePoolSweepstakeRepository, MockPoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
+import {
+  PoolSweepstakeRepository,
+  FilePoolSweepstakeRepository,
+  MockPoolSweepstakeRepository,
+} from "../repository/PoolSweepstakeRepository";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";
 import { TeamRepository } from "../repository/TeamRepository";
-import { GroupListChampionshipRepository, FileGroupListChampionshipRepository, MockGroupListChampionshipRepository } from "../repository/GroupListChampionshipRepository";
-import { CupChampionshipRepository, FileCupChampionshipRepository, MockCupChampionshipRepository } from "../repository/CupChampionshipRepository";
+import {
+  GroupListChampionshipRepository,
+  FileGroupListChampionshipRepository,
+  MockGroupListChampionshipRepository,
+} from "../repository/GroupListChampionshipRepository";
+import {
+  CupChampionshipRepository,
+  FileCupChampionshipRepository,
+  MockCupChampionshipRepository,
+} from "../repository/CupChampionshipRepository";
 import { GetUserUsecase } from "./GetUserUsecase";
 import { GetPoolSweepstakeUsecase } from "./GetPoolSweepstakeUsecase";
 import { GetGroupListResultListFromPoolUsecase } from "./GetGroupListResultListFromPoolUsecase";
@@ -19,7 +35,12 @@ const storageType = process.env.JSON_STORAGE;
 export const storage: JsonStorage =
   storageType === "AwsS3"
     ? new JsonAwsS3Storage()
-    : new JsonFileStorage(path.join(process.cwd(), process.env.FILE_STORAGE_PATH || ".filestorage"));
+    : new JsonFileStorage(
+        path.join(
+          process.cwd(),
+          process.env.FILE_STORAGE_PATH || ".filestorage",
+        ),
+      );
 
 export const teamRepository = new TeamRepository();
 export const userRepository = new UserRepository(storage);
@@ -36,8 +57,15 @@ export const groupListChampionshipRepository: GroupListChampionshipRepository =
 
 export const poolSweepstakeRepository: PoolSweepstakeRepository =
   storageType === "MOCK"
-    ? new MockPoolSweepstakeRepository(groupListChampionshipRepository, cupChampionshipRepository)
-    : new FilePoolSweepstakeRepository(storage, groupListChampionshipRepository, cupChampionshipRepository);
+    ? new MockPoolSweepstakeRepository(
+        groupListChampionshipRepository,
+        cupChampionshipRepository,
+      )
+    : new FilePoolSweepstakeRepository(
+        storage,
+        groupListChampionshipRepository,
+        cupChampionshipRepository,
+      );
 
 export const poolGuessRepository = new PoolGuessRepository(
   storage,
@@ -61,4 +89,3 @@ export const guessGroupListFromPoolSweepstake =
   new GuessGroupListFromPoolSweepstake(poolGuessRepository, teamRepository);
 export const getGroupListGuessFromPoolUsecase =
   new GetGroupListGuessFromPoolSweepstakeUsecase(poolGuessRepository);
-

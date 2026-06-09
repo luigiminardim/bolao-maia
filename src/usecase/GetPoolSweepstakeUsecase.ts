@@ -1,8 +1,5 @@
 import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository";
-import {
-  PoolSweepstakeDto,
-  toPoolSweepstakeDto,
-} from "./dto/SweepstakeDto";
+import { PoolSweepstakeDto, toPoolSweepstakeDto } from "./dto/SweepstakeDto";
 
 export class GetPoolSweepstakeUsecase {
   private readonly poolSweepstakeRepository: PoolSweepstakeRepository;

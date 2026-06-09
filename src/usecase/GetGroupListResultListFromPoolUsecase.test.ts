@@ -20,7 +20,7 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
       save: jest.fn(),
       findById: jest.fn(),
     } as unknown as jest.Mocked<PoolSweepstakeRepository>;
-    
+
     poolGuessRepository = {
       save: jest.fn(),
       findByUserAndSweepstake: jest.fn(),
@@ -56,7 +56,10 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
 
     const mockGuess1 = new PoolGuess("user1", "2026-world-cup", []);
     const mockGuess2 = new PoolGuess("user2", "2026-world-cup", []);
-    poolGuessRepository.findBySweepstake.mockResolvedValueOnce([mockGuess1, mockGuess2]);
+    poolGuessRepository.findBySweepstake.mockResolvedValueOnce([
+      mockGuess1,
+      mockGuess2,
+    ]);
 
     const mockUser1 = new User("user1");
     const mockUser2 = new User("user2");
@@ -64,8 +67,16 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
       .mockResolvedValueOnce(mockUser1)
       .mockResolvedValueOnce(mockUser2);
 
-    const mockResult1 = { user: mockUser1, score: 10, subResultList: [] } as unknown as PoolGuessResult;
-    const mockResult2 = { user: mockUser2, score: 20, subResultList: [] } as unknown as PoolGuessResult;
+    const mockResult1 = {
+      user: mockUser1,
+      score: 10,
+      subResultList: [],
+    } as unknown as PoolGuessResult;
+    const mockResult2 = {
+      user: mockUser2,
+      score: 20,
+      subResultList: [],
+    } as unknown as PoolGuessResult;
 
     (PoolGuessResult.fromPoolSweepstake as jest.Mock)
       .mockReturnValueOnce(mockResult1)
@@ -79,7 +90,11 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
     expect(result![0].user.name).toBe("user2");
     expect(result![1].score).toBe(10);
     expect(result![1].user.name).toBe("user1");
-    expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith("2026-world-cup");
-    expect(poolGuessRepository.findBySweepstake).toHaveBeenCalledWith("2026-world-cup");
+    expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith(
+      "2026-world-cup",
+    );
+    expect(poolGuessRepository.findBySweepstake).toHaveBeenCalledWith(
+      "2026-world-cup",
+    );
   });
 });

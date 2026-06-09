@@ -1,4 +1,3 @@
-
 import { Team } from "../entity/Team";
 import { PoolGuess, GroupListGuess, GroupGuess } from "../entity/Guess";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";

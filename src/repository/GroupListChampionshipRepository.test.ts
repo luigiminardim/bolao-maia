@@ -1,5 +1,8 @@
 import { FileGroupListChampionshipRepository } from "./GroupListChampionshipRepository";
-import { GroupListChampionship, GroupChampionship } from "../entity/Championship";
+import {
+  GroupListChampionship,
+  GroupChampionship,
+} from "../entity/Championship";
 import { Team } from "../entity/Team";
 import { TeamRepository } from "./TeamRepository";
 import { JsonStorage } from "../infra/JsonStorage";
@@ -41,9 +44,7 @@ describe("FileGroupListChampionshipRepository", () => {
       expect(mockStorage.save).toHaveBeenCalledWith(
         "/sweepstake/GroupListChampionship/2026-world-cup",
         {
-          groups: [
-            { id: "group-a", classification: ["brazil", null] },
-          ],
+          groups: [{ id: "group-a", classification: ["brazil", null] }],
           extraQualifiedList: ["brazil"],
           maxRegularQualifiedPosition: 2,
           startDate: "2026-06-11T12:00:00.000Z",
@@ -65,11 +66,13 @@ describe("FileGroupListChampionshipRepository", () => {
       expect(result).not.toBeNull();
       expect(result!.getId()).toBe("2026-world-cup");
       expect(result!.maxRegularQualifiedPosition).toBe(2);
-      expect(result!.getStartDate()).toEqual(new Date("2026-06-11T19:00:00.000Z"));
-      
+      expect(result!.getStartDate()).toEqual(
+        new Date("2026-06-11T19:00:00.000Z"),
+      );
+
       const groups = result!.getGroups();
       expect(groups).toHaveLength(12); // A to L
-      
+
       const groupA = groups[0];
       expect(groupA.getId()).toBe("A");
       expect(groupA.classification).toHaveLength(4);

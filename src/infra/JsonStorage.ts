@@ -4,13 +4,16 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
-  ListObjectsV2Command
+  ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 
 export interface JsonStorage {
   save<T>(id: string, data: T): Promise<void>;
   load<T>(id: string): Promise<T | null>;
-  listIds(dir: string, filter?: (filename: string) => boolean): Promise<string[]>;
+  listIds(
+    dir: string,
+    filter?: (filename: string) => boolean,
+  ): Promise<string[]>;
 }
 
 export class JsonFileStorage implements JsonStorage {
@@ -78,12 +81,16 @@ export class JsonAwsS3Storage implements JsonStorage {
   constructor(bucket?: string, prefix?: string, region?: string) {
     this.bucket = bucket || process.env.AWS_S3_BUCKET || "my-default-bucket";
     this.prefix = prefix || "";
-    this.client = new S3Client({ region: region || process.env.AWS_REGION || "us-east-1" });
+    this.client = new S3Client({
+      region: region || process.env.AWS_REGION || "us-east-1",
+    });
   }
 
   private getKey(id: string): string {
     const cleanId = id.replace(/^\/+|\/+$/g, "");
-    const fullPath = this.prefix ? `${this.prefix}/${cleanId}.json` : `${cleanId}.json`;
+    const fullPath = this.prefix
+      ? `${this.prefix}/${cleanId}.json`
+      : `${cleanId}.json`;
     return fullPath;
   }
 
@@ -110,39 +117,58 @@ export class JsonAwsS3Storage implements JsonStorage {
       const content = await response.Body.transformToString();
       return JSON.parse(content) as T;
     } catch (err) {
-      const error = err as { name?: string; $metadata?: { httpStatusCode?: number } };
-      if (error.name === "NoSuchKey" || error.$metadata?.httpStatusCode === 404) {
+      const error = err as {
+        name?: string;
+        $metadata?: { httpStatusCode?: number };
+      };
+      if (
+        error.name === "NoSuchKey" ||
+        error.$metadata?.httpStatusCode === 404
+      ) {
         return null;
       }
       throw error;
     }
   }
 
-  async listIds(dir: string, filter?: (filename: string) => boolean): Promise<string[]> {
+  async listIds(
+    dir: string,
+    filter?: (filename: string) => boolean,
+  ): Promise<string[]> {
     const cleanDir = dir.replace(/^\/+|\/+$/g, "");
-    const directoryPrefix = this.prefix ? `${this.prefix}/${cleanDir}/` : `${cleanDir}/`;
-    
+    const directoryPrefix = this.prefix
+      ? `${this.prefix}/${cleanDir}/`
+      : `${cleanDir}/`;
+
     const command = new ListObjectsV2Command({
       Bucket: this.bucket,
       Prefix: directoryPrefix,
     });
-    
+
     try {
       const response = await this.client.send(command);
       if (!response.Contents) return [];
-      
-      const files = response.Contents.map(obj => obj.Key || "").filter(key => key.endsWith(".json"));
+
+      const files = response.Contents.map((obj) => obj.Key || "").filter(
+        (key) => key.endsWith(".json"),
+      );
       const filtered = filter ? files.filter(filter) : files;
-      
-      return filtered.map(file => {
+
+      return filtered.map((file) => {
         // Remove prefix and directory from the key to just get the filename
         const filename = file.replace(directoryPrefix, "");
         const nameWithoutExt = path.basename(filename, ".json");
         return `/${cleanDir}/${nameWithoutExt}`;
       });
     } catch (err) {
-      const error = err as { name?: string; $metadata?: { httpStatusCode?: number } };
-      if (error.name === "NoSuchBucket" || error.$metadata?.httpStatusCode === 404) {
+      const error = err as {
+        name?: string;
+        $metadata?: { httpStatusCode?: number };
+      };
+      if (
+        error.name === "NoSuchBucket" ||
+        error.$metadata?.httpStatusCode === 404
+      ) {
         return [];
       }
       throw error;
