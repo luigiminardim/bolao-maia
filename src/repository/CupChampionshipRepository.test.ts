@@ -33,6 +33,7 @@ describe("FileCupChampionshipRepository", () => {
       const root = new BinaryTree<Team | null>(brazil, [null, null]);
       const cup = new CupChampionship(
         "2026-world-cup",
+        "Test Cup",
         root,
         true,
         null,
@@ -46,6 +47,7 @@ describe("FileCupChampionshipRepository", () => {
         "/sweepstake/CupChampionship/2026-world-cup",
         {
           id: "2026-world-cup",
+          name: "Test Cup",
           root: { elem: "brazil", children: [null, null] },
           hasThirdPlaceMatch: true,
           thirdPlace: null,

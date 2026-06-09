@@ -6,6 +6,7 @@ import path from "path";
 
 export interface CupChampionshipDao {
   id: string;
+  name: string;
   root: BinaryTreeDao<null | string>; // tree of team ids
   hasThirdPlaceMatch: boolean;
   thirdPlace: null | string;
@@ -19,6 +20,7 @@ export interface CupChampionshipRepository {
 
 export const CUP_CHAMPIONSHIP_MOCK_DAO: CupChampionshipDao = {
   id: "2026-world-cup",
+  name: "Copa do Mundo FIFA 2026",
   hasThirdPlaceMatch: true,
   thirdPlace: null,
   root: (function createEmptyTree(
@@ -47,6 +49,7 @@ export class FileCupChampionshipRepository implements CupChampionshipRepository 
   async save(championship: CupChampionship): Promise<void> {
     const dao: CupChampionshipDao = {
       id: championship.getId(),
+      name: championship.getName(),
       root: BinaryTree.toDto(championship.root, (t) => (t ? t.id : null)),
       hasThirdPlaceMatch: championship.hasThirdPlaceMatch,
       thirdPlace: championship.thirdPlace ? championship.thirdPlace.id : null,
@@ -73,6 +76,7 @@ export class FileCupChampionshipRepository implements CupChampionshipRepository 
 
     return new CupChampionship(
       dao.id,
+      dao.name,
       root,
       dao.hasThirdPlaceMatch,
       thirdPlace,
@@ -109,12 +113,15 @@ export class MockCupChampionshipRepository implements CupChampionshipRepository 
 
     if (id === "test-status-draft") {
       dao.startDate = new Date(Date.now() + 1000000000).toISOString();
+      dao.name = "Test Draft Status of Cup";
       // Leaves empty (null) so it returns draft status
     } else if (id === "test-status-waiting") {
       dao.startDate = new Date(Date.now() + 1000000000).toISOString();
+      dao.name = "Test Waiting Status of Cup";
       fillTree(dao.root);
     } else if (id === "test-status-running") {
       dao.startDate = new Date(Date.now() - 1000000000).toISOString();
+      dao.name = "Test Running Status of Cup";
       fillTree(dao.root);
     } else {
       return null;
@@ -131,6 +138,7 @@ export class MockCupChampionshipRepository implements CupChampionshipRepository 
 
     return new CupChampionship(
       id,
+      dao.name,
       root,
       dao.hasThirdPlaceMatch,
       thirdPlace,

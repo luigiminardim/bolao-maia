@@ -3,15 +3,21 @@ import { CupScorePolicy, GroupListScorePolicy } from "./ScorePolicy";
 
 export class GroupListSweepstake {
   id: string;
+  name: string;
+  description: string;
   championship: GroupListChampionship;
   scorePolicy: GroupListScorePolicy;
 
   constructor(
     id: string,
+    name: string,
+    description: string,
     championship: GroupListChampionship,
     scorePolicy: GroupListScorePolicy,
   ) {
     this.id = id;
+    this.name = name;
+    this.description = description;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
   }
@@ -21,20 +27,30 @@ export class GroupListSweepstake {
     if (champStatus === "draft") return "draft";
     if (champStatus === "waiting") return "open";
     return "locked";
+  }
+
+  getSubtitle(): string {
+    return this.championship.getName();
   }
 }
 
 export class CupSweepstake {
   id: string;
+  name: string;
+  description: string;
   championship: CupChampionship;
   scorePolicy: CupScorePolicy;
 
   constructor(
     id: string,
+    name: string,
+    description: string,
     championship: CupChampionship,
     scorePolicy: CupScorePolicy,
   ) {
     this.id = id;
+    this.name = name;
+    this.description = description;
     this.championship = championship;
     this.scorePolicy = scorePolicy;
   }
@@ -44,6 +60,10 @@ export class CupSweepstake {
     if (champStatus === "draft") return "draft";
     if (champStatus === "waiting") return "open";
     return "locked";
+  }
+
+  getSubtitle(): string {
+    return this.championship.getName();
   }
 }
 
@@ -53,10 +73,26 @@ export type SweepstakeItem =
 
 export class PoolSweepstake {
   id: string;
+  name: string;
+  private subtitle: string;
+  description: string;
   subSweepstakeList: SweepstakeItem[];
 
-  constructor(id: string, subSweepstakeList: SweepstakeItem[]) {
+  constructor(
+    id: string,
+    name: string,
+    subtitle: string,
+    description: string,
+    subSweepstakeList: SweepstakeItem[],
+  ) {
     this.id = id;
+    this.name = name;
+    this.subtitle = subtitle;
+    this.description = description;
     this.subSweepstakeList = subSweepstakeList;
+  }
+
+  getSubtitle(): string {
+    return this.subtitle;
   }
 }

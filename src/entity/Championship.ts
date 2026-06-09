@@ -28,6 +28,7 @@ export class GroupChampionship {
 
 export class GroupListChampionship {
   private id: string;
+  private name: string;
   private groups: GroupChampionship[];
   private extraQualifiedList: (null | Team)[];
   readonly maxRegularQualifiedPosition: number;
@@ -35,12 +36,14 @@ export class GroupListChampionship {
 
   constructor(
     id: string,
+    name: string,
     groups: GroupChampionship[],
     extraQualifiedList: (null | Team)[],
     maxRegularQualifiedPosition: number,
     startDate: Date,
   ) {
     this.id = id;
+    this.name = name;
     this.groups = groups;
     this.extraQualifiedList = extraQualifiedList;
     this.maxRegularQualifiedPosition = maxRegularQualifiedPosition;
@@ -49,6 +52,10 @@ export class GroupListChampionship {
 
   getId(): string {
     return this.id;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   getStartDate(): Date {
@@ -123,6 +130,7 @@ export class GroupListChampionship {
 
 export class CupChampionship {
   private id: string;
+  private name: string;
   root: BinaryTree<null | Team>;
   hasThirdPlaceMatch: boolean;
   thirdPlace: null | Team;
@@ -130,12 +138,14 @@ export class CupChampionship {
 
   constructor(
     id: string,
+    name: string,
     root: BinaryTree<null | Team>,
     hasThirdPlaceMatch: boolean,
     thirdPlace: null | Team,
     startDate: Date,
   ) {
     this.id = id;
+    this.name = name;
     this.root = root;
     this.hasThirdPlaceMatch = hasThirdPlaceMatch;
     this.thirdPlace = thirdPlace;
@@ -144,6 +154,10 @@ export class CupChampionship {
 
   getId(): string {
     return this.id;
+  }
+
+  getName(): string {
+    return this.name;
   }
 
   getStartDate(): Date {

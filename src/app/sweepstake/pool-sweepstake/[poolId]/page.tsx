@@ -6,6 +6,7 @@ import React from "react";
 import {
   GroupListSweepstakeDto,
   PoolSweepstakeItemDto,
+  PoolSweepstakeDto,
 } from "../../../../usecase/dto/SweepstakeDto";
 
 interface PageProps {
@@ -24,7 +25,7 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
 
   return (
     <main className="container mx-auto px-4 py-10 flex-1 flex flex-col justify-start max-w-5xl">
-      <BannerSection poolId={poolId} />
+      <BannerSection pool={pool} />
 
       <div>
         <h2 className="text-xl font-extrabold text-zinc-200 mb-6 tracking-tight">
@@ -46,10 +47,10 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
 }
 
 interface BannerSectionProps {
-  poolId: string;
+  pool: PoolSweepstakeDto;
 }
 
-function BannerSection({ poolId }: BannerSectionProps) {
+function BannerSection({ pool }: BannerSectionProps) {
   return (
     <div className="relative overflow-hidden bg-zinc-900/30 border border-zinc-900 rounded-3xl p-8 md:p-12 mb-10 shadow-2xl">
       <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -59,18 +60,16 @@ function BannerSection({ poolId }: BannerSectionProps) {
           Bolão Ativo
         </span>
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-          Copa do Mundo{" "}
+          {pool.name}{" "}
           <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
-            Fifa World Cup 2026
+            {pool.subtitle}
           </span>
         </h1>
         <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
-          Dê seus palpites para o maior torneio de futebol do planeta. Complete
-          a fase de grupos, ordene as classificações, defina os melhores
-          terceiros colocados e dispute a liderança geral!
+          {pool.description}
         </p>
         <Link
-          href={`/sweepstake/pool-sweepstake/${poolId}/score-policy`}
+          href={`/sweepstake/pool-sweepstake/${pool.id}/score-policy`}
           className="inline-flex items-center gap-1.5 mt-4 text-md text-zinc-500 hover:text-emerald-400 transition-colors"
         >
           📋 Ver regras de pontuação
@@ -96,7 +95,7 @@ function SweepstakeCard({ poolId, item }: SweepstakeCardProps) {
     );
   }
 
-  return <KnockoutSweepstakeCard />;
+  return <KnockoutSweepstakeCard item={item} />;
 }
 
 interface GroupSweepstakeCardProps {
@@ -121,11 +120,10 @@ function GroupSweepstakeCard({
         </div>
 
         <h3 className="text-lg font-bold text-zinc-100 group-hover:text-emerald-400 transition-colors">
-          Fase de Grupos
+          {sweepstake.name}
         </h3>
         <p className="text-zinc-400 text-xs mt-1 leading-relaxed">
-          Ordene as posições dos times dos grupos A a L e selecione os 8
-          melhores terceiros colocados que avançam de fase.
+          {sweepstake.description}
         </p>
 
         <div className="mt-6 space-y-2 text-xs text-zinc-500 border-t border-zinc-900/60 pt-4">
@@ -139,7 +137,10 @@ function GroupSweepstakeCard({
               minute: "2-digit",
             })}
           />
-          <SweepstakeInfoRow label="Grupos:" value="12 grupos (A ao L)" />
+          <SweepstakeInfoRow
+            label="Grupos:"
+            value={`${sweepstake.groups.length} grupos`}
+          />
           <SweepstakeInfoRow
             label="Multiplicador de Pontos:"
             value={`x${factor}`}
@@ -199,7 +200,12 @@ function SweepstakeInfoRow({
   );
 }
 
-function KnockoutSweepstakeCard() {
+interface KnockoutSweepstakeCardProps {
+  item: Extract<PoolSweepstakeItemDto, { kind: "cup" }>;
+}
+
+function KnockoutSweepstakeCard({ item }: KnockoutSweepstakeCardProps) {
+  const sweepstake = item.sweepstake;
   return (
     <Card className="bg-zinc-900/20 border border-zinc-900/40 opacity-60 flex flex-col justify-between overflow-hidden p-6 rounded-2xl">
       <div>
@@ -213,10 +219,8 @@ function KnockoutSweepstakeCard() {
             Em breve
           </Chip>
         </div>
-        <h3 className="text-lg font-bold text-zinc-400">Mata-Mata (Copa)</h3>
-        <p className="text-zinc-500 text-xs mt-1">
-          Monte sua chave de mata-mata até a grande final e palpite no campeão.
-        </p>
+        <h3 className="text-lg font-bold text-zinc-400">{sweepstake.name}</h3>
+        <p className="text-zinc-500 text-xs mt-1">{sweepstake.description}</p>
       </div>
       <div className="mt-6 pt-2">
         <Button

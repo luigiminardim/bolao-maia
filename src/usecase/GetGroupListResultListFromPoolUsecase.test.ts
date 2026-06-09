@@ -51,7 +51,13 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
   });
 
   it("should calculate and return sorted scores for all user guesses", async () => {
-    const mockPool = new PoolSweepstake("2026-world-cup", []);
+    const mockPool = new PoolSweepstake(
+      "2026-world-cup",
+      "Test Pool Name",
+      "Test Pool Subtitle",
+      "Test Pool Description",
+      [],
+    );
     poolSweepstakeRepository.findById.mockResolvedValueOnce(mockPool);
 
     const mockGuess1 = new PoolGuess("user1", "2026-world-cup", []);

@@ -32,6 +32,7 @@ describe("FileGroupListChampionshipRepository", () => {
       const groupA = new GroupChampionship("group-a", [brazil, null]);
       const groupList = new GroupListChampionship(
         "2026-world-cup",
+        "Test Group List",
         [groupA],
         [brazil],
         2,
@@ -44,6 +45,7 @@ describe("FileGroupListChampionshipRepository", () => {
       expect(mockStorage.save).toHaveBeenCalledWith(
         "/sweepstake/GroupListChampionship/2026-world-cup",
         {
+          name: "Test Group List",
           groups: [{ id: "group-a", classification: ["brazil", null] }],
           extraQualifiedList: ["brazil"],
           maxRegularQualifiedPosition: 2,

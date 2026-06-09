@@ -16,7 +16,13 @@ describe("GetPoolSweepstakeUsecase", () => {
   });
 
   it("should return the pool sweepstake if found", async () => {
-    const mockPool = new PoolSweepstake("2026-world-cup", []);
+    const mockPool = new PoolSweepstake(
+      "2026-world-cup",
+      "Test Pool Name",
+      "Test Pool Subtitle",
+      "Test Pool Description",
+      [],
+    );
     poolSweepstakeRepository.findById.mockResolvedValueOnce(mockPool);
 
     const result = await usecase.execute("2026-world-cup");

@@ -13,6 +13,7 @@ export interface GroupChampionshipDao {
 export type GroupDao = GroupChampionshipDao;
 
 export interface GroupListChampionshipDao {
+  name: string;
   groups: GroupDao[];
   extraQualifiedList: (null | string)[]; // team IDs
   maxRegularQualifiedPosition: number;
@@ -25,6 +26,7 @@ export interface GroupListChampionshipRepository {
 }
 
 export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
+  name: "Copa do Mundo FIFA 2026",
   groups: [
     {
       id: "A",
@@ -91,6 +93,7 @@ export class FileGroupListChampionshipRepository implements GroupListChampionshi
 
   async save(id: string, championship: GroupListChampionship): Promise<void> {
     const dao: GroupListChampionshipDao = {
+      name: championship.getName(),
       groups: championship.getGroups().map((group) => ({
         id: group.getId(),
         classification: group.classification.map((team) =>
@@ -141,10 +144,13 @@ export class MockGroupListChampionshipRepository implements GroupListChampionshi
     if (id === "test-status-draft") {
       dao.groups[0].classification[0] = null; // simulate missing team
       dao.startDate = new Date(Date.now() + 1000000000).toISOString();
+      dao.name = "Test Draft Status of Group List";
     } else if (id === "test-status-waiting") {
       dao.startDate = new Date(Date.now() + 1000000000).toISOString();
+      dao.name = "Test Waiting Status of Group List";
     } else if (id === "test-status-running") {
       dao.startDate = new Date(Date.now() - 1000000000).toISOString();
+      dao.name = "Test Running Status of Group List";
     } else {
       return null;
     }
@@ -194,6 +200,7 @@ async function mapGroupListChampionshipDaoToEntity(
 
   return new GroupListChampionship(
     id,
+    dao.name,
     groups,
     extraQualifiedList,
     dao.maxRegularQualifiedPosition,

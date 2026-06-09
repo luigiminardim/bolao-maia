@@ -2,6 +2,7 @@ import { CupChampionship, GroupListChampionship } from "./Championship";
 import { Team } from "./Team";
 
 export interface GroupListScorePolicy {
+  getId(): string;
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
@@ -11,6 +12,7 @@ export interface GroupListScorePolicy {
 }
 
 export interface CupScorePolicy {
+  getId(): string;
   cupTeamScore(
     team: Team,
     championship: CupChampionship,
@@ -35,6 +37,10 @@ export class InverseProbabilityPositionScorePolicy
   ): number {
     const worstPostion = Math.max(position, positionGuess);
     return numTeams / worstPostion;
+  }
+
+  getId(): string {
+    return InverseProbabilityPositionScorePolicy.idPrefix;
   }
 
   groupListTeamScore(
@@ -68,6 +74,10 @@ export class InverseProbabilityQualifiedPositionGroupListScorePolicy implements 
 
   private inverseProbabilityScorePolicy: InverseProbabilityPositionScorePolicy =
     new InverseProbabilityPositionScorePolicy();
+
+  getId(): string {
+    return InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix;
+  }
 
   groupListTeamScore(
     team: Team,
@@ -106,6 +116,10 @@ export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
     this.scorePolicy = scorePolicy;
   }
 
+  getId(): string {
+    return `log2(${this.scorePolicy.getId()})`;
+  }
+
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
@@ -128,6 +142,10 @@ export class WithLogarithm2CupScorePolicy implements CupScorePolicy {
 
   constructor(scorePolicy: CupScorePolicy) {
     this.scorePolicy = scorePolicy;
+  }
+
+  getId(): string {
+    return `log2(${this.scorePolicy.getId()})`;
   }
 
   cupTeamScore(

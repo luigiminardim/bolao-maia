@@ -8,6 +8,9 @@ import { BinaryTreeDao, BinaryTree } from "../../utils/BinaryTree";
 
 export interface GroupListSweepstakeDto {
   id: string;
+  name: string;
+  subtitle: string;
+  description: string;
   status: "draft" | "open" | "locked";
   startDate: string;
   maxRegularQualifiedPosition: number;
@@ -25,6 +28,9 @@ export function toGroupListSweepstakeDto(
   const championship = sweepstake.championship;
   return {
     id: sweepstake.id,
+    name: sweepstake.name,
+    subtitle: sweepstake.getSubtitle(),
+    description: sweepstake.description,
     status: sweepstake.getStatus(),
     startDate: championship.getStartDate().toISOString(),
     maxRegularQualifiedPosition: championship.maxRegularQualifiedPosition,
@@ -49,6 +55,9 @@ export interface CupChampionshipDto {
 
 export interface CupSweepstakeDto {
   id: string;
+  name: string;
+  subtitle: string;
+  description: string;
   status: "draft" | "open" | "locked";
   startDate: string;
   championship: CupChampionshipDto;
@@ -60,6 +69,9 @@ export function toCupSweepstakeDto(
   const championship = sweepstake.championship;
   return {
     id: sweepstake.id,
+    name: sweepstake.name,
+    subtitle: sweepstake.getSubtitle(),
+    description: sweepstake.description,
     status: sweepstake.getStatus(),
     startDate: championship.getStartDate().toISOString(),
     championship: {
@@ -82,12 +94,18 @@ export type PoolSweepstakeItemDto =
 
 export interface PoolSweepstakeDto {
   id: string;
+  name: string;
+  subtitle: string;
+  description: string;
   subSweepstakeList: PoolSweepstakeItemDto[];
 }
 
 export function toPoolSweepstakeDto(pool: PoolSweepstake): PoolSweepstakeDto {
   return {
     id: pool.id,
+    name: pool.name,
+    subtitle: pool.getSubtitle(),
+    description: pool.description,
     subSweepstakeList: pool.subSweepstakeList.map((item) => {
       if (item.kind === "group") {
         return {

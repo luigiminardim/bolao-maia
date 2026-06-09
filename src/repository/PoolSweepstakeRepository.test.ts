@@ -42,6 +42,7 @@ describe("FilePoolSweepstakeRepository", () => {
     it("should map PoolSweepstake to PoolSweepstakeDao and call save on storage", async () => {
       const groupChampionship = new GroupListChampionship(
         "2026-world-cup",
+        "Test Group List",
         [],
         [],
         2,
@@ -51,6 +52,8 @@ describe("FilePoolSweepstakeRepository", () => {
         new InverseProbabilityQualifiedPositionGroupListScorePolicy();
       const groupSweepstake = new GroupListSweepstake(
         "2026-world-cup",
+        "Test Group Sweepstake",
+        "Test Description",
         groupChampionship,
         groupScorePolicy,
       );
@@ -61,6 +64,9 @@ describe("FilePoolSweepstakeRepository", () => {
 
       const poolSweepstake = new PoolSweepstake(
         "2026-world-cup",
+        "Test Pool",
+        "Test Subtitle",
+        "Test Description",
         subSweepstakeList,
       );
 
@@ -71,11 +77,16 @@ describe("FilePoolSweepstakeRepository", () => {
         "/sweepstake/PoolSweepstake/2026-world-cup",
         {
           id: "2026-world-cup",
+          name: "Test Pool",
+          subtitle: "Test Subtitle",
+          description: "Test Description",
           subSweepstakeList: [
             {
               kind: "group",
               sweepstake: {
                 id: "2026-world-cup",
+                name: "Test Group Sweepstake",
+                description: "Test Description",
                 championship: "2026-world-cup",
                 scorePolicy: "inverse-probability-qualified-position",
               },
@@ -114,6 +125,7 @@ describe("FilePoolSweepstakeRepository", () => {
 
       const groupChampionship = new GroupListChampionship(
         "2026-world-cup",
+        "Test Group List",
         [],
         [],
         2,
