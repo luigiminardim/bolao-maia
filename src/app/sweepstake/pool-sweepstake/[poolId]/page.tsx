@@ -35,7 +35,7 @@ export default async function PoolSweepstakePage({ params }: PageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {pool.subSweepstakeList.map((item) => (
             <SweepstakeCard
-              key={item.sweepstake.id}
+              key={`${item.kind} ${item.sweepstake.id}`}
               poolId={poolId}
               item={item}
             />
@@ -79,6 +79,55 @@ function BannerSection({ pool }: BannerSectionProps) {
   );
 }
 
+type SweepstakeStatus = "draft" | "open" | "locked";
+
+interface StatusConfig {
+  cardClass: string;
+  badgeText: React.ReactNode;
+  badgeClass: string;
+  buttonText: string;
+  buttonClass: string;
+  isDisabled: boolean;
+}
+
+function getSweepstakeStatusConfig(status: SweepstakeStatus): StatusConfig {
+  switch (status) {
+    case "draft":
+      return {
+        cardClass: "bg-zinc-900/20 border-zinc-900/40 opacity-60",
+        badgeText: "Em Breve",
+        badgeClass: "bg-zinc-800/80 text-zinc-400 border-zinc-700",
+        buttonText: "Indisponível no momento",
+        buttonClass: "bg-zinc-950 text-zinc-600 cursor-not-allowed",
+        isDisabled: true,
+      };
+    case "open":
+      return {
+        cardClass: "bg-zinc-900/40 border-zinc-900/80 hover:border-zinc-800",
+        badgeText: (
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Aberto para Palpites
+          </span>
+        ),
+        badgeClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        buttonText: "Palpitar e Participar",
+        buttonClass: "bg-emerald-600 hover:bg-emerald-500 text-white font-bold",
+        isDisabled: false,
+      };
+    case "locked":
+      return {
+        cardClass: "bg-zinc-900/40 border-zinc-900/80 hover:border-zinc-800",
+        badgeText: "Em Andamento",
+        badgeClass: "bg-zinc-800/80 text-zinc-400 border-zinc-700",
+        buttonText: "Ver Resultados e Classificação",
+        buttonClass:
+          "bg-zinc-900 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 hover:border-zinc-700 font-bold",
+        isDisabled: false,
+      };
+  }
+}
+
 interface SweepstakeCardProps {
   poolId: string;
   item: PoolSweepstakeItemDto;
@@ -95,7 +144,7 @@ function SweepstakeCard({ poolId, item }: SweepstakeCardProps) {
     );
   }
 
-  return <KnockoutSweepstakeCard item={item} />;
+  return <KnockoutSweepstakeCard poolId={poolId} item={item} />;
 }
 
 interface GroupSweepstakeCardProps {
@@ -109,17 +158,24 @@ function GroupSweepstakeCard({
   sweepstake,
   factor,
 }: GroupSweepstakeCardProps) {
-  const hasStarted = new Date() >= new Date(sweepstake.startDate);
+  const config = getSweepstakeStatusConfig(sweepstake.status);
 
   return (
-    <Card className="bg-zinc-900/40 border border-zinc-900/80 hover:border-zinc-800 transition-all flex flex-col justify-between overflow-hidden group p-6 rounded-2xl shadow-xl">
+    <Card
+      className={`transition-all flex flex-col justify-between overflow-hidden group p-6 rounded-2xl shadow-xl border ${config.cardClass}`}
+    >
       <div>
         <div className="flex items-center justify-between mb-4">
           <span className="text-3xl">⚽</span>
-          <SweepstakeStatusChip hasStarted={hasStarted} />
+          <Chip
+            size="sm"
+            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border ${config.badgeClass}`}
+          >
+            {config.badgeText}
+          </Chip>
         </div>
 
-        <h3 className="text-lg font-bold text-zinc-100 group-hover:text-emerald-400 transition-colors">
+        <h3 className="text-lg font-bold text-zinc-100 transition-colors">
           {sweepstake.name}
         </h3>
         <p className="text-zinc-400 text-xs mt-1 leading-relaxed">
@@ -150,34 +206,100 @@ function GroupSweepstakeCard({
       </div>
 
       <div className="mt-6 pt-2 space-y-2">
-        <Link
-          href={`/sweepstake/pool-sweepstake/${poolId}/group-list/${sweepstake.id}`}
-          className="block w-full"
-        >
-          <Button className="w-full bg-zinc-900 hover:bg-zinc-850 text-zinc-200 font-bold text-xs py-3 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-all">
-            {hasStarted
-              ? "Ver Resultados e Classificação"
-              : "Palpitar e Participar"}
+        {config.isDisabled ? (
+          <Button
+            isDisabled
+            className={`w-full text-xs py-3 rounded-xl border transition-all ${config.buttonClass}`}
+          >
+            {config.buttonText}
           </Button>
-        </Link>
+        ) : (
+          <Link
+            href={`/sweepstake/pool-sweepstake/${poolId}/group-list/${sweepstake.id}`}
+            className="block w-full"
+          >
+            <Button
+              className={`w-full text-xs py-3 rounded-xl border transition-all ${config.buttonClass}`}
+            >
+              {config.buttonText}
+            </Button>
+          </Link>
+        )}
       </div>
     </Card>
   );
 }
 
-function SweepstakeStatusChip({ hasStarted }: { hasStarted: boolean }) {
+interface KnockoutSweepstakeCardProps {
+  poolId: string;
+  item: Extract<PoolSweepstakeItemDto, { kind: "cup" }>;
+}
+
+function KnockoutSweepstakeCard({ poolId, item }: KnockoutSweepstakeCardProps) {
+  const sweepstake = item.sweepstake;
+  const config = getSweepstakeStatusConfig(sweepstake.status);
+
   return (
-    <Chip
-      color={hasStarted ? "default" : "success"}
-      size="sm"
-      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border ${
-        hasStarted
-          ? "bg-zinc-800/80 text-zinc-400 border-zinc-700"
-          : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-      }`}
+    <Card
+      className={`transition-all flex flex-col justify-between overflow-hidden group p-6 rounded-2xl shadow-xl border ${config.cardClass}`}
     >
-      {hasStarted ? "Em Andamento" : "Aberto para Palpites"}
-    </Chip>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-3xl">🏆</span>
+          <Chip
+            size="sm"
+            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border ${config.badgeClass}`}
+          >
+            {config.badgeText}
+          </Chip>
+        </div>
+        <h3 className="text-lg font-bold text-zinc-100 transition-colors">
+          {sweepstake.name}
+        </h3>
+        <p className="text-zinc-500 text-xs mt-1 leading-relaxed">
+          {sweepstake.description}
+        </p>
+
+        <div className="mt-6 space-y-2 text-xs text-zinc-500 border-t border-zinc-900/60 pt-4">
+          <SweepstakeInfoRow
+            label="Início:"
+            value={new Date(sweepstake.startDate).toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          />
+          <SweepstakeInfoRow
+            label="Multiplicador de Pontos:"
+            value={`x${item.factor}`}
+            valueClassName="text-emerald-400 font-bold"
+          />
+        </div>
+      </div>
+      <div className="mt-6 pt-2 space-y-2">
+        {config.isDisabled ? (
+          <Button
+            isDisabled
+            className={`w-full text-xs py-3 rounded-xl border transition-all ${config.buttonClass}`}
+          >
+            {config.buttonText}
+          </Button>
+        ) : (
+          <Link
+            href={`/sweepstake/pool-sweepstake/${poolId}/cup/${sweepstake.id}`}
+            className="block w-full"
+          >
+            <Button
+              className={`w-full text-xs py-3 rounded-xl border transition-all ${config.buttonClass}`}
+            >
+              {config.buttonText}
+            </Button>
+          </Link>
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -197,39 +319,5 @@ function SweepstakeInfoRow({
       <span>{label}</span>
       <span className={valueClassName}>{value}</span>
     </div>
-  );
-}
-
-interface KnockoutSweepstakeCardProps {
-  item: Extract<PoolSweepstakeItemDto, { kind: "cup" }>;
-}
-
-function KnockoutSweepstakeCard({ item }: KnockoutSweepstakeCardProps) {
-  const sweepstake = item.sweepstake;
-  return (
-    <Card className="bg-zinc-900/20 border border-zinc-900/40 opacity-60 flex flex-col justify-between overflow-hidden p-6 rounded-2xl">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-3xl">🏆</span>
-          <Chip
-            color="default"
-            size="sm"
-            className="text-[10px] uppercase font-bold"
-          >
-            Em breve
-          </Chip>
-        </div>
-        <h3 className="text-lg font-bold text-zinc-400">{sweepstake.name}</h3>
-        <p className="text-zinc-500 text-xs mt-1">{sweepstake.description}</p>
-      </div>
-      <div className="mt-6 pt-2">
-        <Button
-          isDisabled
-          className="w-full bg-zinc-950 text-zinc-600 text-xs py-3 rounded-xl cursor-not-allowed"
-        >
-          Indisponível no momento
-        </Button>
-      </div>
-    </Card>
   );
 }

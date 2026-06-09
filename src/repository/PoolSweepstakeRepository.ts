@@ -1,13 +1,6 @@
 import { PoolSweepstake } from "../entity/Sweepstake";
-import {
-  GroupListChampionshipRepository,
-  FileGroupListChampionshipRepository,
-} from "./GroupListChampionshipRepository";
-import {
-  CupChampionshipRepository,
-  FileCupChampionshipRepository,
-} from "./CupChampionshipRepository";
-import { TeamRepository } from "./TeamRepository";
+import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
+import { CupChampionshipRepository } from "./CupChampionshipRepository";
 import { JsonStorage } from "../infra/JsonStorage";
 
 import { PoolSweepstakeDao, SweepstakeDaoBuilder } from "./dao/SweepstakeDao";
@@ -49,19 +42,12 @@ export class FilePoolSweepstakeRepository implements PoolSweepstakeRepository {
 
   constructor(
     storage: JsonStorage,
-    groupListChampionshipRepository?: GroupListChampionshipRepository,
-    cupChampionshipRepository?: CupChampionshipRepository,
+    groupListChampionshipRepository: GroupListChampionshipRepository,
+    cupChampionshipRepository: CupChampionshipRepository,
   ) {
     this.storage = storage;
-    this.groupListChampionshipRepository =
-      groupListChampionshipRepository ||
-      new FileGroupListChampionshipRepository(
-        this.storage,
-        new TeamRepository(),
-      );
-    this.cupChampionshipRepository =
-      cupChampionshipRepository ||
-      new FileCupChampionshipRepository(this.storage);
+    this.groupListChampionshipRepository = groupListChampionshipRepository;
+    this.cupChampionshipRepository = cupChampionshipRepository;
   }
 
   async save(poolSweepstake: PoolSweepstake): Promise<void> {

@@ -1,60 +1,321 @@
 import { CupChampionship } from "../entity/Championship";
 import { TeamRepository } from "./TeamRepository";
-import { JsonStorage, JsonFileStorage } from "../infra/JsonStorage";
-import { BinaryTree, BinaryTreeDao } from "../utils/BinaryTree";
-import path from "path";
-
-export interface CupChampionshipDao {
-  id: string;
-  name: string;
-  root: BinaryTreeDao<null | string>; // tree of team ids
-  hasThirdPlaceMatch: boolean;
-  thirdPlace: null | string;
-  startDate: string; // ISO
-}
+import { JsonStorage } from "../infra/JsonStorage";
+import {
+  CupChampionshipDao,
+  CupChampionshipDaoBuilder,
+} from "./dao/CupChampionshipDao";
 
 export interface CupChampionshipRepository {
   save(championship: CupChampionship): Promise<void>;
   findById(id: string): Promise<CupChampionship | null>;
 }
 
-export const CUP_CHAMPIONSHIP_MOCK_DAO: CupChampionshipDao = {
-  id: "2026-world-cup",
-  name: "Copa do Mundo FIFA 2026",
-  hasThirdPlaceMatch: true,
-  thirdPlace: null,
-  root: (function createEmptyTree(
-    height: number,
-  ): BinaryTreeDao<null | string> {
-    if (height === 0) {
-      return { elem: null, children: [null, null] };
-    }
-    const left = createEmptyTree(height - 1);
-    const right = createEmptyTree(height - 1);
-    return { elem: null, children: [left, right] };
-  })(5), // Height 5 results in exactly 2^5 = 32 leaf nodes
-  startDate: "2026-06-11T12:00:00.000Z",
-};
-
 export class FileCupChampionshipRepository implements CupChampionshipRepository {
+  private static readonly CUP_CHAMPIONSHIP_MOCK_DAO_LIST: CupChampionshipDao[] =
+    [
+      {
+        id: "2026-world-cup",
+        name: "Copa do Mundo FIFA 2026",
+        startDate: "2026-06-28T19:00:00Z",
+        hasThirdPlaceMatch: true,
+        thirdPlace: null,
+        root: {
+          elem: null,
+          children: [
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ];
+
   private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage?: JsonStorage, teamRepository?: TeamRepository) {
-    this.storage =
-      storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
-    this.teamRepository = teamRepository || new TeamRepository();
+  constructor(storage: JsonStorage, teamRepository: TeamRepository) {
+    this.storage = storage;
+    this.teamRepository = teamRepository;
   }
 
   async save(championship: CupChampionship): Promise<void> {
-    const dao: CupChampionshipDao = {
-      id: championship.getId(),
-      name: championship.getName(),
-      root: BinaryTree.toDto(championship.root, (t) => (t ? t.id : null)),
-      hasThirdPlaceMatch: championship.hasThirdPlaceMatch,
-      thirdPlace: championship.thirdPlace ? championship.thirdPlace.id : null,
-      startDate: championship.getStartDate().toISOString(),
-    };
+    const dao = new CupChampionshipDaoBuilder().toDao(championship);
     await this.storage.save<CupChampionshipDao>(
       `/sweepstake/CupChampionship/${championship.getId()}`,
       dao,
@@ -62,30 +323,898 @@ export class FileCupChampionshipRepository implements CupChampionshipRepository 
   }
 
   async findById(id: string): Promise<CupChampionship | null> {
-    if (id !== "2026-world-cup") {
+    const dao =
+      FileCupChampionshipRepository.CUP_CHAMPIONSHIP_MOCK_DAO_LIST.find(
+        (d) => d.id === id,
+      );
+    if (!dao) {
       return null;
     }
-    const dao = CUP_CHAMPIONSHIP_MOCK_DAO;
 
-    const root = await BinaryTree.fromDtoAsync(dao.root, async (teamId) =>
-      teamId ? await this.teamRepository.findById(teamId) : null,
-    );
-    const thirdPlace = dao.thirdPlace
-      ? await this.teamRepository.findById(dao.thirdPlace)
-      : null;
-
-    return new CupChampionship(
-      dao.id,
-      dao.name,
-      root,
-      dao.hasThirdPlaceMatch,
-      thirdPlace,
-      new Date(dao.startDate),
+    return new CupChampionshipDaoBuilder().toCupChampionship(
+      dao,
+      this.teamRepository,
     );
   }
 }
 
+const _1MonthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
+
 export class MockCupChampionshipRepository implements CupChampionshipRepository {
+  private static readonly CUP_CHAMPIONSHIP_MOCK_DAO_LIST: CupChampionshipDao[] =
+    [
+      {
+        id: "test-status-draft",
+        name: "Copa do Mundo FIFA 2026",
+        startDate: new Date(Date.now() + _1MonthInMilliseconds).toISOString(),
+        hasThirdPlaceMatch: true,
+        thirdPlace: null,
+        root: {
+          elem: null,
+          children: [
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                            {
+                              elem: null,
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        id: "test-status-waiting",
+        name: "Copa do Mundo FIFA 2026",
+        startDate: new Date(Date.now() + _1MonthInMilliseconds).toISOString(),
+        hasThirdPlaceMatch: true,
+        thirdPlace: null,
+        root: {
+          elem: null,
+          children: [
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "mexico",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "south-korea",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "canada",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "switzerland",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "brazil",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "morocco",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "usa",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "australia",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "germany",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "ecuador",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "netherlands",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "japan",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "belgium",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "egypt",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "spain",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "uruguay",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "south-africa",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "czechia",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "qatar",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "bosnia-herzegovina",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "scotland",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "haiti",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "paraguay",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "turkiye",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "ivory-coast",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "curacao",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "tunisia",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "sweden",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "iran",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "new-zealand",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "saudi-arabia",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "cape-verde",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        id: "test-status-running",
+        name: "Copa do Mundo FIFA 2026",
+        startDate: new Date(Date.now() - _1MonthInMilliseconds).toISOString(),
+        hasThirdPlaceMatch: true,
+        thirdPlace: null,
+        root: {
+          elem: null,
+          children: [
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "mexico",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "south-korea",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "canada",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "switzerland",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "brazil",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "morocco",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "usa",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "australia",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "germany",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "ecuador",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "netherlands",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "japan",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "belgium",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "egypt",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "spain",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "uruguay",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "south-africa",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "czechia",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "qatar",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "bosnia-herzegovina",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "scotland",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "haiti",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "paraguay",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "turkiye",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "ivory-coast",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "curacao",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "tunisia",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "sweden",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "iran",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "new-zealand",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                        {
+                          elem: null,
+                          children: [
+                            {
+                              elem: "saudi-arabia",
+                              children: [null, null],
+                            },
+                            {
+                              elem: "cape-verde",
+                              children: [null, null],
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ];
+
   private readonly teamRepository: TeamRepository;
 
   constructor(teamRepository?: TeamRepository) {
@@ -97,52 +1226,16 @@ export class MockCupChampionshipRepository implements CupChampionshipRepository 
   }
 
   async findById(id: string): Promise<CupChampionship | null> {
-    const dao = CUP_CHAMPIONSHIP_MOCK_DAO;
-
-    function fillTree(node: BinaryTreeDao<null | string>) {
-      if (
-        !node.children ||
-        (node.children[0] === null && node.children[1] === null)
-      ) {
-        node.elem = "brazil";
-        return;
-      }
-      if (node.children[0]) fillTree(node.children[0]);
-      if (node.children[1]) fillTree(node.children[1]);
-    }
-
-    if (id === "test-status-draft") {
-      dao.startDate = new Date(Date.now() + 1000000000).toISOString();
-      dao.name = "Test Draft Status of Cup";
-      // Leaves empty (null) so it returns draft status
-    } else if (id === "test-status-waiting") {
-      dao.startDate = new Date(Date.now() + 1000000000).toISOString();
-      dao.name = "Test Waiting Status of Cup";
-      fillTree(dao.root);
-    } else if (id === "test-status-running") {
-      dao.startDate = new Date(Date.now() - 1000000000).toISOString();
-      dao.name = "Test Running Status of Cup";
-      fillTree(dao.root);
-    } else {
+    const dao =
+      MockCupChampionshipRepository.CUP_CHAMPIONSHIP_MOCK_DAO_LIST.find(
+        (c) => c.id === id,
+      );
+    if (!dao) {
       return null;
     }
-
-    const root = await BinaryTree.fromDtoAsync(
-      dao.root as BinaryTreeDao<null | string>,
-      async (teamId) =>
-        teamId ? await this.teamRepository.findById(teamId) : null,
-    );
-    const thirdPlace = dao.thirdPlace
-      ? await this.teamRepository.findById(dao.thirdPlace)
-      : null;
-
-    return new CupChampionship(
-      id,
-      dao.name,
-      root,
-      dao.hasThirdPlaceMatch,
-      thirdPlace,
-      new Date(dao.startDate),
+    return new CupChampionshipDaoBuilder().toCupChampionship(
+      dao,
+      this.teamRepository,
     );
   }
 }

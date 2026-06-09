@@ -72,12 +72,12 @@ describe("FileCupChampionshipRepository", () => {
       expect(result!.hasThirdPlaceMatch).toBe(true);
       expect(result!.thirdPlace).toBeNull();
       expect(result!.getStartDate()).toEqual(
-        new Date("2026-06-11T12:00:00.000Z"),
+        new Date("2026-06-28T19:00:00.000Z"),
       );
       expect(result!.root).toBeInstanceOf(BinaryTree);
 
-      // Check that it's an empty tree of height 5 with exactly 32 null leaves
-      expect(result!.root.numLeafs()).toBe(32);
+      // Check that it's an empty tree of height 5 with exactly 16 null leaves
+      expect(result!.root.numLeafs()).toBe(16);
       expect(result!.root.listLeaf().every((l) => l === null)).toBe(true);
     });
   });
