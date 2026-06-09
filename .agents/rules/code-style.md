@@ -38,8 +38,7 @@ description: You MUST read this file every time you are about to write or modify
 
 ## 3. Formatting
 
-- **Consistency:** Use a consistent indentation and style across the team.
-- **Automate:** Rely on Prettier, ESLint, or language-specific formatters to handle structure automatically. Do not manually format if tools are available.
+- **Consistency:** Rely on Prettier and ESLint formatters to handle structure automatically.
 
 ## 4. Error Handling
 
@@ -47,7 +46,16 @@ description: You MUST read this file every time you are about to write or modify
 - **Clean Blocks:** Extract `try/catch` blocks into separate functions to keep the main logic clean.
 - **Provide Context:** Throw errors with meaningful messages that provide context on what went wrong.
 
-## 5. React & Next.js Specific (If applicable)
+## 5. Style Preferences
+
+- **Static Methods:** Prefer NOT using `static` methods. Instantiate classes or use standalone functions instead.
+- **Null Coalescing:** Prefer `??` (nullish coalescing) over `||` (logical OR) for setting defaults or handling fallbacks, to avoid unintended behavior with falsy values like `0` or `""`.
+
+## 6. Testing
+
+- **Core Business Objects:** Always write tests, especially when dealing with core business objects such as entities, DAOs, builders, policies, and usecases.
+
+## 7. React & Next.js Specific (If applicable)
 
 - **Component Size:** Keep components small and focused. Extract sub-components if a file exceeds 200-300 lines.
 - **Hooks:** Extract complex state logic into custom hooks.
