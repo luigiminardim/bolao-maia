@@ -7,7 +7,10 @@ export class BinaryTree<T> {
   elem: T;
   children: [null | BinaryTree<T>, null | BinaryTree<T>];
 
-  constructor(elem: T, children: [null | BinaryTree<T>, null | BinaryTree<T>]) {
+  constructor(
+    elem: T,
+    children: [null | BinaryTree<T>, null | BinaryTree<T>] = [null, null],
+  ) {
     this.elem = elem;
     this.children = children;
   }

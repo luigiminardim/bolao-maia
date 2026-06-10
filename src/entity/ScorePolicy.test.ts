@@ -219,22 +219,22 @@ describe("ScaledScorePolicy", () => {
     const cupRoot = new BinaryTree<Team | null>(team1A, [
       new BinaryTree<Team | null>(team1A, [
         new BinaryTree<Team | null>(team1A, [
-          new BinaryTree<Team | null>(team1A, [null, null]),
-          new BinaryTree<Team | null>(team1B, [null, null]),
+          new BinaryTree(team1A),
+          new BinaryTree(team1B),
         ]),
         new BinaryTree<Team | null>(team3A, [
-          new BinaryTree<Team | null>(team3A, [null, null]),
-          new BinaryTree<Team | null>(team2B, [null, null]),
+          new BinaryTree(team3A),
+          new BinaryTree(team2B),
         ]),
       ]),
       new BinaryTree<Team | null>(team2A, [
         new BinaryTree<Team | null>(team2A, [
-          new BinaryTree<Team | null>(team2A, [null, null]),
-          new BinaryTree<Team | null>(team3B, [null, null]),
+          new BinaryTree(team2A),
+          new BinaryTree(team3B),
         ]),
         new BinaryTree<Team | null>(team4A, [
-          new BinaryTree<Team | null>(team4A, [null, null]),
-          new BinaryTree<Team | null>(team4B, [null, null]),
+          new BinaryTree(team4A),
+          new BinaryTree(team4B),
         ]),
       ]),
     ]);
@@ -282,22 +282,22 @@ describe("ScaledScorePolicy", () => {
       const notStartedRoot = new BinaryTree<Team | null>(null, [
         new BinaryTree<Team | null>(null, [
           new BinaryTree<Team | null>(null, [
-            new BinaryTree<Team | null>(team1A, [null, null]),
-            new BinaryTree<Team | null>(team1B, [null, null]),
+            new BinaryTree(team1A),
+            new BinaryTree(team1B),
           ]),
           new BinaryTree<Team | null>(null, [
-            new BinaryTree<Team | null>(team3A, [null, null]),
-            new BinaryTree<Team | null>(team2B, [null, null]),
+            new BinaryTree(team3A),
+            new BinaryTree(team2B),
           ]),
         ]),
         new BinaryTree<Team | null>(null, [
           new BinaryTree<Team | null>(null, [
-            new BinaryTree<Team | null>(team2A, [null, null]),
-            new BinaryTree<Team | null>(team3B, [null, null]),
+            new BinaryTree(team2A),
+            new BinaryTree(team3B),
           ]),
           new BinaryTree<Team | null>(null, [
-            new BinaryTree<Team | null>(team4A, [null, null]),
-            new BinaryTree<Team | null>(team4B, [null, null]),
+            new BinaryTree(team4A),
+            new BinaryTree(team4B),
           ]),
         ]),
       ]);
