@@ -6,7 +6,7 @@ export interface GroupListScorePolicy {
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
-    positionGuess: number | null,
+    positionGuess: number,
     extraQualifiedListGuess: Team[],
   ): number;
 }
@@ -46,11 +46,11 @@ export class InverseProbabilityPositionScorePolicy
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
-    positionGuess: number | null,
+    positionGuess: number,
     _extraQualifiedListGuess: Team[],
   ): number {
     const position = championship.teamPosition(team);
-    if (position === null || positionGuess === null) {
+    if (position === null) {
       return 0;
     }
     return this.score(position, positionGuess, championship.numTeams());
@@ -123,7 +123,7 @@ export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
-    positionGuess: number | null,
+    positionGuess: number,
     extraQualifiedListGuess: Team[],
   ): number {
     const score = this.scorePolicy.groupListTeamScore(
@@ -182,7 +182,7 @@ export class ScaledScorePolicy implements GroupListScorePolicy, CupScorePolicy {
   groupListTeamScore(
     team: Team,
     championship: GroupListChampionship,
-    positionGuess: number | null,
+    positionGuess: number,
     extraQualifiedListGuess: Team[],
   ): number {
     if (!("groupListTeamScore" in this.scorePolicy)) {

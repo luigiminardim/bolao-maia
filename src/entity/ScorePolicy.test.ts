@@ -202,15 +202,6 @@ describe("ScaledScorePolicy", () => {
       expect(
         policy.groupListTeamScore(team1A, notStartedChampionship, 1, []),
       ).toBe(0);
-
-      // Guess is null
-      // guessQualified is true (because null <= 2 is true in JS).
-      // worstPosition = max(1, null) = 1. useRegular is true.
-      // inverseProbabilityScorePolicy.groupListTeamScore returns 0 because positionGuess is null.
-      // log2(0) = -Infinity. scaled(10) = -Infinity.
-      expect(policy.groupListTeamScore(team1A, championship, null, [])).toBe(
-        -Infinity,
-      );
     });
   });
 

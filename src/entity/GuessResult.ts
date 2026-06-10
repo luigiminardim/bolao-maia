@@ -120,7 +120,7 @@ export class GroupGuessResult {
             score: null,
           };
         }
-        const guessPosition = groupGuess.teamPosition(team);
+        const guessPosition = groupGuess.teamPosition(team) ?? (-1 as never);
         const extraQualifiedGuess = !!extraQualifiedListGuess.find(
           (t) => t.id === team.id,
         );
