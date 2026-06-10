@@ -32,7 +32,8 @@ export class FilePoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Ordene as posições dos times dos grupos A a L e selecione os 8 melhores terceiros colocados que avançam de fase.",
             championship: "2026-world-cup",
-            scorePolicy: "log2(inverse-probability-qualified-position)",
+            scorePolicy:
+              "scaled(10, log2(inverse-probability-qualified-position))",
           },
           factor: 1,
         },
@@ -103,7 +104,8 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Order the positions of the teams in the groups A to L and select the 8 best third placed teams that advance to the next round.",
             championship: "test-status-draft",
-            scorePolicy: "log2(inverse-probability-qualified-position)",
+            scorePolicy:
+              "scaled(10, log2(inverse-probability-qualified-position))",
           },
           factor: 1,
         },
@@ -115,7 +117,8 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Order the positions of the teams in the groups A to L and select the 8 best third placed teams that advance to the next round.",
             championship: "test-status-waiting",
-            scorePolicy: "log2(inverse-probability-qualified-position)",
+            scorePolicy:
+              "scaled(10, log2(inverse-probability-qualified-position))",
           },
           factor: 1,
         },
@@ -127,7 +130,8 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Order the positions of the teams in the groups A to L and select the 8 best third placed teams that advance to the next round.",
             championship: "test-status-running",
-            scorePolicy: "log2(inverse-probability-qualified-position)",
+            scorePolicy:
+              "scaled(10, log2(inverse-probability-qualified-position))",
           },
           factor: 1,
         },
@@ -139,7 +143,7 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Define the path of the teams in the cup to the final. Guess the third place.",
             championship: "test-status-draft",
-            scorePolicy: "log2(inverse-probability-position)",
+            scorePolicy: "inverse-probability-position",
           },
           factor: 1,
         },
@@ -151,7 +155,7 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Define the path of the teams in the cup to the final. Guess the third place.",
             championship: "test-status-waiting",
-            scorePolicy: "log2(inverse-probability-position)",
+            scorePolicy: "inverse-probability-position",
           },
           factor: 1,
         },
@@ -163,7 +167,7 @@ export class MockPoolSweepstakeRepository implements PoolSweepstakeRepository {
             description:
               "Define the path of the teams in the cup to the final. Guess the third place.",
             championship: "test-status-running",
-            scorePolicy: "log2(inverse-probability-position)",
+            scorePolicy: "inverse-probability-position",
           },
           factor: 1,
         },

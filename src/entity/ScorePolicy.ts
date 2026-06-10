@@ -162,42 +162,154 @@ export class WithLogarithm2CupScorePolicy implements CupScorePolicy {
   }
 }
 
+export class ScaledScorePolicy implements GroupListScorePolicy, CupScorePolicy {
+  static readonly idPrefix: string = "scaled";
+  readonly scale: number;
+  readonly scorePolicy: GroupListScorePolicy | CupScorePolicy;
+
+  constructor(
+    scale: number,
+    scorePolicy: GroupListScorePolicy | CupScorePolicy,
+  ) {
+    this.scale = scale;
+    this.scorePolicy = scorePolicy;
+  }
+
+  getId(): string {
+    return `scaled(${this.scale}, ${this.scorePolicy.getId()})`;
+  }
+
+  groupListTeamScore(
+    team: Team,
+    championship: GroupListChampionship,
+    positionGuess: number | null,
+    extraQualifiedListGuess: Team[],
+  ): number {
+    if (!("groupListTeamScore" in this.scorePolicy)) {
+      throw new Error("Wrapped policy does not implement GroupListScorePolicy");
+    }
+    const score = this.scorePolicy.groupListTeamScore(
+      team,
+      championship,
+      positionGuess,
+      extraQualifiedListGuess,
+    );
+    return Math.floor(score * this.scale);
+  }
+
+  cupTeamScore(
+    team: Team,
+    championship: CupChampionship,
+    positionGuess: number,
+  ): number {
+    if (!("cupTeamScore" in this.scorePolicy)) {
+      throw new Error("Wrapped policy does not implement CupScorePolicy");
+    }
+    const score = this.scorePolicy.cupTeamScore(
+      team,
+      championship,
+      positionGuess,
+    );
+    return Math.floor(score * this.scale);
+  }
+}
+
 export class ScorePolicyBuilder {
+  private static parseScorePolicyId(id: string): {
+    prefix: string;
+    params: string[];
+  } {
+    const match = id.trim().match(/^([a-zA-Z0-9-]+)(?:\((.*)\))?$/);
+    if (!match) throw new Error(`Invalid ScorePolicy ID format: ${id}`);
+    const prefix = match[1];
+    if (prefix === undefined)
+      throw new Error(`Invalid ScorePolicy ID format: ${id}`);
+    const paramsStr = match[2];
+
+    if (!paramsStr) {
+      return { prefix, params: [] };
+    }
+
+    const params: string[] = [];
+    let currentParam = "";
+    let depth = 0;
+    for (let i = 0; i < paramsStr.length; i++) {
+      const char = paramsStr[i];
+      if (char === "(") depth++;
+      if (char === ")") depth--;
+
+      if (char === "," && depth === 0) {
+        params.push(currentParam.trim());
+        currentParam = "";
+      } else {
+        currentParam += char;
+      }
+    }
+    params.push(currentParam.trim());
+    return { prefix, params };
+  }
+
   static buildGroupListScorePolicyFromId(id: string): GroupListScorePolicy {
-    const trimmedId = id.trim();
-    if (trimmedId === InverseProbabilityPositionScorePolicy.idPrefix) {
-      return new InverseProbabilityPositionScorePolicy();
+    const { prefix, params } = this.parseScorePolicyId(id);
+
+    switch (prefix) {
+      case InverseProbabilityPositionScorePolicy.idPrefix:
+        return new InverseProbabilityPositionScorePolicy();
+      case InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix:
+        return new InverseProbabilityQualifiedPositionGroupListScorePolicy();
+      case WithLogarithm2GroupScorePolicy.idPrefix: {
+        const param0 = params[0];
+        if (param0 === undefined)
+          throw new Error(`Invalid params for log2: ${id}`);
+        return new WithLogarithm2GroupScorePolicy(
+          this.buildGroupListScorePolicyFromId(param0),
+        );
+      }
+      case ScaledScorePolicy.idPrefix: {
+        const param0 = params[0];
+        const param1 = params[1];
+        if (param0 === undefined || param1 === undefined)
+          throw new Error(`Invalid params for scaled: ${id}`);
+        const scale = Number(param0);
+        if (isNaN(scale)) throw new Error(`Invalid scale for scaled: ${id}`);
+        return new ScaledScorePolicy(
+          scale,
+          this.buildGroupListScorePolicyFromId(param1),
+        );
+      }
+      default:
+        throw new Error(`Unknown GroupListScorePolicy ID: ${id}`);
     }
-    if (
-      trimmedId ===
-      InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix
-    ) {
-      return new InverseProbabilityQualifiedPositionGroupListScorePolicy();
-    }
-    const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
-    if (log2Match) {
-      const innerPolicyId = log2Match[1];
-      if (!innerPolicyId) throw new Error(`Invalid ScorePolicy ID: ${id}`);
-      return new WithLogarithm2GroupScorePolicy(
-        this.buildGroupListScorePolicyFromId(innerPolicyId),
-      );
-    }
-    throw new Error(`Unknown GroupListScorePolicy ID: ${id}`);
   }
 
   static buildCupScorePolicyFromId(id: string): CupScorePolicy {
-    const trimmedId = id.trim();
-    if (trimmedId === InverseProbabilityPositionScorePolicy.idPrefix) {
-      return new InverseProbabilityPositionScorePolicy();
+    const { prefix, params } = this.parseScorePolicyId(id);
+
+    switch (prefix) {
+      case InverseProbabilityPositionScorePolicy.idPrefix:
+        return new InverseProbabilityPositionScorePolicy();
+      case WithLogarithm2CupScorePolicy.idPrefix: {
+        const param0 = params[0];
+        if (param0 === undefined)
+          throw new Error(`Invalid params for log2: ${id}`);
+        return new WithLogarithm2CupScorePolicy(
+          this.buildCupScorePolicyFromId(param0),
+        );
+      }
+      case ScaledScorePolicy.idPrefix: {
+        const param0 = params[0];
+        const param1 = params[1];
+        if (param0 === undefined || param1 === undefined)
+          throw new Error(`Invalid params for scaled: ${id}`);
+        const scale = Number(param0);
+        if (isNaN(scale)) throw new Error(`Invalid scale for scaled: ${id}`);
+        return new ScaledScorePolicy(
+          scale,
+          this.buildCupScorePolicyFromId(param1),
+        );
+      }
+      default:
+        throw new Error(`Unknown CupScorePolicy ID: ${id}`);
     }
-    const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
-    if (log2Match) {
-      const innerPolicyId = log2Match[1];
-      if (!innerPolicyId) throw new Error(`Invalid CupScorePolicy ID: ${id}`);
-      return new WithLogarithm2CupScorePolicy(
-        this.buildCupScorePolicyFromId(innerPolicyId),
-      );
-    }
-    throw new Error(`Unknown CupScorePolicy ID: ${id}`);
   }
 }

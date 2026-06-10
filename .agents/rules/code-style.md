@@ -51,6 +51,7 @@ description: You MUST read this file every time you are about to write or modify
 - **Static Methods:** Prefer NOT using `static` methods. Instantiate classes or use standalone functions instead.
 - **Null Coalescing:** Prefer `??` (nullish coalescing) over `||` (logical OR) for setting defaults or handling fallbacks, to avoid unintended behavior with falsy values like `0` or `""`.
 - **Non-Null Assertions:** Never use the Non-Null Assertion Operator (`!`) outside tests. For production code, use proper type narrowing, explicit null checks, or throw detailed error messages if an invariant is violated.
+- **Type Assertions:** Avoid using the `as` keyword for type assertions. Prefer proper type narrowing with explicit checks (e.g., `if (x === undefined) return`, `if (x === null) return`). When converting types, use explicit conversion functions like `String(x)` or `Number(x)`.
 
 ## 6. Testing
 

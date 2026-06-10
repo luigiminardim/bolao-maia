@@ -5,6 +5,7 @@ import { GroupListChampionshipRepository } from "./GroupListChampionshipReposito
 import { CupChampionshipRepository } from "./CupChampionshipRepository";
 import {
   InverseProbabilityQualifiedPositionGroupListScorePolicy,
+  ScaledScorePolicy,
   WithLogarithm2GroupScorePolicy,
 } from "../entity/ScorePolicy";
 import { JsonStorage } from "../infra/JsonStorage";
@@ -149,12 +150,10 @@ describe("FilePoolSweepstakeRepository", () => {
       const groupSweep = item.sweepstake as GroupListSweepstake;
       expect(groupSweep.id).toBe("2026-world-cup");
       expect(groupSweep.championship).toBe(groupChampionship);
-      expect(groupSweep.scorePolicy).toBeInstanceOf(
-        WithLogarithm2GroupScorePolicy,
-      );
+      expect(groupSweep.scorePolicy).toBeInstanceOf(ScaledScorePolicy);
       expect(
-        (groupSweep.scorePolicy as WithLogarithm2GroupScorePolicy).scorePolicy,
-      ).toBeInstanceOf(InverseProbabilityQualifiedPositionGroupListScorePolicy);
+        (groupSweep.scorePolicy as ScaledScorePolicy).scorePolicy,
+      ).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
 
       expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith(
         "2026-world-cup",
