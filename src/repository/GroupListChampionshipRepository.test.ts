@@ -75,7 +75,7 @@ describe("FileGroupListChampionshipRepository", () => {
       const groups = result!.getGroups();
       expect(groups).toHaveLength(12); // A to L
 
-      const groupA = groups[0];
+      const groupA = groups[0]!;
       expect(groupA.getId()).toBe("A");
       expect(groupA.classification).toHaveLength(4);
       expect(groupA.classification.every((t) => t !== null)).toBe(true);

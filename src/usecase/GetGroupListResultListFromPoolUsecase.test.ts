@@ -92,10 +92,10 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
 
     // We can't easily import toPoolGuessResultDto here without circular or missing dependencies, so we check the score and user name.
     expect(result).toHaveLength(2);
-    expect(result![0].score).toBe(20);
-    expect(result![0].user.name).toBe("user2");
-    expect(result![1].score).toBe(10);
-    expect(result![1].user.name).toBe("user1");
+    expect(result![0]!.score).toBe(20);
+    expect(result![0]!.user.name).toBe("user2");
+    expect(result![1]!.score).toBe(10);
+    expect(result![1]!.user.name).toBe("user1");
     expect(poolSweepstakeRepository.findById).toHaveBeenCalledWith(
       "2026-world-cup",
     );

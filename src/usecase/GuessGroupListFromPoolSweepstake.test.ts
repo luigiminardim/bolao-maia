@@ -56,17 +56,20 @@ describe("GuessGroupListFromPoolSweepstake", () => {
     );
 
     expect(poolGuessRepository.save).toHaveBeenCalledTimes(1);
-    const savedPoolGuess = poolGuessRepository.save.mock.calls[0][0];
+    const savedPoolGuess = poolGuessRepository.save.mock.calls[0]![0]!;
 
     expect(savedPoolGuess.userId).toBe("luigi mario");
     expect(savedPoolGuess.sweepstakeId).toBe("pool-1");
     expect(savedPoolGuess.subGuesses.length).toBe(1);
-    expect(savedPoolGuess.subGuesses[0].kind).toBe("group");
+    expect(savedPoolGuess.subGuesses[0]!.kind).toBe("group");
 
-    if (savedPoolGuess.subGuesses[0].kind === "group") {
-      const groupGuess = savedPoolGuess.subGuesses[0].groupGuess;
+    if (savedPoolGuess.subGuesses[0]!.kind === "group") {
+      const groupGuess = savedPoolGuess.subGuesses[0]!.groupGuess;
       expect(groupGuess.sweepstakeId).toBe("group-list-1");
-      expect(groupGuess.groupGuesses[0].classification).toEqual([teamA, teamB]);
+      expect(groupGuess.groupGuesses[0]!.classification).toEqual([
+        teamA,
+        teamB,
+      ]);
       expect(groupGuess.extraQualifiedListGuess).toEqual([teamA]);
     }
   });

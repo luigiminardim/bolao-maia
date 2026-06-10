@@ -157,14 +157,16 @@ export class GroupListGuessResult {
   ): GroupListGuessResult {
     const groupResultList = sweepstake.championship
       .getGroups()
-      .map((group, idx) =>
-        GroupGuessResult.fromGroupListSweepstake(
+      .map((group, idx) => {
+        const groupGuess = guess.groupGuesses[idx];
+        if (!groupGuess) throw new Error(`Missing group guess at index ${idx}`);
+        return GroupGuessResult.fromGroupListSweepstake(
           sweepstake,
           group.getId(),
-          guess.groupGuesses[idx],
+          groupGuess,
           guess.extraQualifiedListGuess,
-        ),
-      );
+        );
+      });
     return new GroupListGuessResult(groupResultList);
   }
 }
@@ -195,31 +197,45 @@ export class PoolGuessResult {
     guess: PoolGuess,
     user: User,
   ): PoolGuessResult {
-    const subResultList: PoolItemResult[] = sweepstake.subSweepstakeList.map(
-      (item, idx) => {
-        const subGuess = guess.subGuesses[idx];
+    const subResultList: PoolItemResult[] =
+      sweepstake.subSweepstakeList.flatMap((item): PoolItemResult[] => {
+        const subGuess = guess.subGuesses.find(
+          (g) =>
+            (item.kind === "group" &&
+              g.kind === "group" &&
+              g.groupGuess.sweepstakeId === item.sweepstake.id) ||
+            (item.kind === "cup" &&
+              g.kind === "cup" &&
+              g.cupGuess.sweepstakeId === item.sweepstake.id),
+        );
+
+        if (!subGuess) return [];
+
         if (item.kind === "group" && subGuess.kind === "group") {
-          return {
-            kind: "group",
-            groupResult: GroupListGuessResult.fromGroupListSweepstake(
-              item.sweepstake,
-              subGuess.groupGuess,
-            ),
-            factor: item.factor,
-          };
+          return [
+            {
+              kind: "group",
+              groupResult: GroupListGuessResult.fromGroupListSweepstake(
+                item.sweepstake,
+                subGuess.groupGuess,
+              ),
+              factor: item.factor,
+            },
+          ];
         } else if (item.kind === "cup" && subGuess.kind === "cup") {
-          return {
-            kind: "cup",
-            cupResult: CupGuessResult.fromCupSweepstake(
-              item.sweepstake,
-              subGuess.cupGuess,
-            ),
-            factor: item.factor,
-          };
+          return [
+            {
+              kind: "cup",
+              cupResult: CupGuessResult.fromCupSweepstake(
+                item.sweepstake,
+                subGuess.cupGuess,
+              ),
+              factor: item.factor,
+            },
+          ];
         }
-        throw new Error("Mismatch between sweepstake kind and guess kind");
-      },
-    );
+        return [];
+      });
     return new PoolGuessResult(user, subResultList);
   }
 }

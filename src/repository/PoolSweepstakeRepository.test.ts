@@ -141,7 +141,7 @@ describe("FilePoolSweepstakeRepository", () => {
       expect(result!.id).toBe("2026-world-cup");
       expect(result!.subSweepstakeList).toHaveLength(1);
 
-      const item = result!.subSweepstakeList[0];
+      const item = result!.subSweepstakeList[0]!;
       expect(item.kind).toBe("group");
       expect(item.factor).toBe(1);
       expect(item.sweepstake).toBeInstanceOf(GroupListSweepstake);

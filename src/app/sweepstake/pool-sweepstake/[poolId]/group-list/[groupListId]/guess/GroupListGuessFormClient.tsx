@@ -52,7 +52,9 @@ function useGroupListGuessForm({
     const newExtraGuesses = extraGuesses.filter((teamId) => {
       let posInGroup = -1;
       for (let i = 0; i < newGroupGuesses.length; i++) {
-        const idx = newGroupGuesses[i].indexOf(teamId);
+        const newGroupGuess = newGroupGuesses[i];
+        if (!newGroupGuess) throw new Error("Group guess is missing");
+        const idx = newGroupGuess.indexOf(teamId);
         if (idx !== -1) {
           posInGroup = idx;
           break;
@@ -75,10 +77,15 @@ function useGroupListGuessForm({
   };
 
   const swapTeams = (groupIndex: number, idxA: number, idxB: number) => {
-    const list = [...groupGuesses[groupIndex]];
-    const temp = list[idxA];
-    list[idxA] = list[idxB];
-    list[idxB] = temp;
+    const listToSwap = groupGuesses[groupIndex];
+    if (!listToSwap) throw new Error("Group guesses out of bounds");
+    const list = [...listToSwap];
+    const tempA = list[idxA];
+    const tempB = list[idxB];
+    if (tempA === undefined || tempB === undefined)
+      throw new Error("Index out of bounds");
+    list[idxA] = tempB;
+    list[idxB] = tempA;
 
     const newGuesses = [...groupGuesses];
     newGuesses[groupIndex] = list;
@@ -91,7 +98,9 @@ function useGroupListGuessForm({
   };
 
   const handleMoveDown = (groupIndex: number, teamIdx: number) => {
-    const listLength = groupGuesses[groupIndex].length;
+    const listToSwap = groupGuesses[groupIndex];
+    if (!listToSwap) return;
+    const listLength = listToSwap.length;
     if (teamIdx < listLength - 1) swapTeams(groupIndex, teamIdx, teamIdx + 1);
   };
 
@@ -188,7 +197,11 @@ function ExtraQualifiedStep({
 }: ExtraQualifiedStepProps) {
   const eligibleTeams = sweepstake.groups.map((group, groupIdx) => {
     const teamId =
-      groupGuesses[groupIdx][sweepstake.maxRegularQualifiedPosition];
+      groupGuesses[groupIdx]?.[sweepstake.maxRegularQualifiedPosition];
+    if (!teamId)
+      throw new Error(
+        `Missing regular qualified position for group index ${groupIdx}`,
+      );
     const teamObj = group.classification.find((t) => t?.id === teamId);
     return {
       teamId,
@@ -530,8 +543,8 @@ export function GroupListGuessFormClient({
   const isLastStep = currentStep === totalSteps - 1;
 
   const stepLabel = isGroupStep
-    ? `Grupo ${sweepstake.groups[currentStep].id}`
-    : "Classificados Extras";
+    ? `Grupo ${sweepstake.groups[currentStep]?.id ?? ""}`
+    : "Classificações Extras";
 
   return (
     <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
@@ -549,54 +562,64 @@ export function GroupListGuessFormClient({
       )}
 
       {isGroupStep ? (
-        <Card className="bg-zinc-900/40 border border-zinc-900 backdrop-blur-md rounded-3xl p-6 shadow-xl flex-1 flex flex-col justify-between">
-          <div>
-            <div className="mb-4">
-              <h2 className="text-xl font-black text-white">
-                Ordenar Grupo {sweepstake.groups[currentStep].id}
-              </h2>
-              <p className="text-zinc-500 text-xs mt-1">
-                Use as setas para ordenar os times na posição correta.
-              </p>
-            </div>
+        (() => {
+          const currentGroup = sweepstake.groups[currentStep];
+          const currentGroupGuess = groupGuesses[currentStep];
+          if (!currentGroup || !currentGroupGuess) return null;
 
-            <div className="space-y-3 mt-6">
-              {groupGuesses[currentStep].map((teamId, idx) => {
-                const teamObj = sweepstake.groups[
-                  currentStep
-                ].classification.find((t) => t?.id === teamId);
+          return (
+            <Card className="bg-zinc-900/40 border border-zinc-900 backdrop-blur-md rounded-3xl p-6 shadow-xl flex-1 flex flex-col justify-between">
+              <div>
+                <div className="mb-4">
+                  <h2 className="text-xl font-black text-white">
+                    Ordenar Grupo {currentGroup.id}
+                  </h2>
+                  <p className="text-zinc-500 text-xs mt-1">
+                    Use as setas para ordenar os times na posição correta.
+                  </p>
+                </div>
 
-                const isExtraEligiblePosition =
-                  idx === sweepstake.maxRegularQualifiedPosition;
-                const isChecked = extraGuesses.includes(teamId);
-                const canCheckMore =
-                  extraGuesses.length < sweepstake.extraQualifiedLength;
+                <div className="space-y-3 mt-6">
+                  {currentGroupGuess.map((teamId, idx) => {
+                    const teamObj = currentGroup.classification.find(
+                      (t) => t?.id === teamId,
+                    );
 
-                return (
-                  <TeamItem
-                    key={teamId}
-                    teamId={teamId}
-                    teamName={teamObj?.name ?? "TBD"}
-                    index={idx}
-                    maxRegularQualifiedPosition={
-                      sweepstake.maxRegularQualifiedPosition
-                    }
-                    isExtraEligiblePosition={isExtraEligiblePosition}
-                    isChecked={isChecked}
-                    canCheckMore={canCheckMore}
-                    isFirst={idx === 0}
-                    isLast={idx === groupGuesses[currentStep].length - 1}
-                    onMoveUp={(moveIdx) => handleMoveUp(currentStep, moveIdx)}
-                    onMoveDown={(moveIdx) =>
-                      handleMoveDown(currentStep, moveIdx)
-                    }
-                    onToggleExtraQualified={handleToggleExtraQualified}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        </Card>
+                    const isExtraEligiblePosition =
+                      idx === sweepstake.maxRegularQualifiedPosition;
+                    const isChecked = extraGuesses.includes(teamId);
+                    const canCheckMore =
+                      extraGuesses.length < sweepstake.extraQualifiedLength;
+
+                    return (
+                      <TeamItem
+                        key={teamId}
+                        teamId={teamId}
+                        teamName={teamObj?.name ?? "TBD"}
+                        index={idx}
+                        maxRegularQualifiedPosition={
+                          sweepstake.maxRegularQualifiedPosition
+                        }
+                        isExtraEligiblePosition={isExtraEligiblePosition}
+                        isChecked={isChecked}
+                        canCheckMore={canCheckMore}
+                        isFirst={idx === 0}
+                        isLast={idx === currentGroupGuess.length - 1}
+                        onMoveUp={(moveIdx) =>
+                          handleMoveUp(currentStep, moveIdx)
+                        }
+                        onMoveDown={(moveIdx) =>
+                          handleMoveDown(currentStep, moveIdx)
+                        }
+                        onToggleExtraQualified={handleToggleExtraQualified}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </Card>
+          );
+        })()
       ) : isExtraQualifiedStep ? (
         <ExtraQualifiedStep
           sweepstake={sweepstake}

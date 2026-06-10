@@ -76,8 +76,8 @@ describe("FileCupChampionshipRepository", () => {
       );
       expect(result!.root).toBeInstanceOf(BinaryTree);
 
-      // Check that it's an empty tree of height 5 with exactly 16 null leaves
-      expect(result!.root.numLeafs()).toBe(16);
+      // Check that it's an empty tree of height 5 with exactly 32 null leaves
+      expect(result!.root.numLeafs()).toBe(32);
       expect(result!.root.listLeaf().every((l) => l === null)).toBe(true);
     });
   });

@@ -13,6 +13,9 @@ export default async function Home() {
   }
 
   const first = sweepstakes[0];
+  if (!first) {
+    notFound();
+  }
   if (first.kind === "pool") {
     redirect(`/sweepstake/pool-sweepstake/${first.pool.id}`);
   } else if (first.kind === "cup") {

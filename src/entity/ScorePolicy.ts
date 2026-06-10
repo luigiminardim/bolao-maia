@@ -176,8 +176,10 @@ export class ScorePolicyBuilder {
     }
     const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
     if (log2Match) {
+      const innerPolicyId = log2Match[1];
+      if (!innerPolicyId) throw new Error(`Invalid ScorePolicy ID: ${id}`);
       return new WithLogarithm2GroupScorePolicy(
-        this.buildGroupListScorePolicyFromId(log2Match[1]),
+        this.buildGroupListScorePolicyFromId(innerPolicyId),
       );
     }
     throw new Error(`Unknown GroupListScorePolicy ID: ${id}`);
@@ -190,8 +192,10 @@ export class ScorePolicyBuilder {
     }
     const log2Match = trimmedId.match(/^log2\((.*?)\)?$/);
     if (log2Match) {
+      const innerPolicyId = log2Match[1];
+      if (!innerPolicyId) throw new Error(`Invalid CupScorePolicy ID: ${id}`);
       return new WithLogarithm2CupScorePolicy(
-        this.buildCupScorePolicyFromId(log2Match[1]),
+        this.buildCupScorePolicyFromId(innerPolicyId),
       );
     }
     throw new Error(`Unknown CupScorePolicy ID: ${id}`);

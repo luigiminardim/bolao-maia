@@ -186,6 +186,7 @@ export function DashboardClient({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {sweepstake.groups.map((group, gIdx) => {
                         const userClassification = groupGuesses[gIdx];
+                        if (!userClassification) return null;
                         return (
                           <Card
                             key={group.id}
@@ -510,6 +511,7 @@ export function DashboardClient({
                       {sweepstake.groups.map((group, gIdx) => {
                         // User guess for this group
                         const userClassification = groupGuesses[gIdx];
+                        if (!userClassification) return null;
                         // Points breakdown from leaderboard if matching
                         const userGroupSubResult =
                           userLeaderboardEntry?.subResultList.find(
@@ -517,9 +519,9 @@ export function DashboardClient({
                           );
                         const groupResult =
                           userGroupSubResult?.kind === "group"
-                            ? userGroupSubResult.groupResult.groupResultList[
+                            ? (userGroupSubResult.groupResult.groupResultList[
                                 gIdx
-                              ]
+                              ] ?? null)
                             : null;
 
                         return (
@@ -786,6 +788,7 @@ export function DashboardClient({
                             : []
                           ).map((gr, idx) => {
                             const officialGroup = sweepstake.groups[idx];
+                            if (!officialGroup) return null;
                             return (
                               <Card
                                 key={officialGroup.id}

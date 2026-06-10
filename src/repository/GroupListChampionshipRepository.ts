@@ -138,11 +138,11 @@ export class MockGroupListChampionshipRepository implements GroupListChampionshi
   }
 
   async findById(id: string): Promise<GroupListChampionship | null> {
-    const dao = JSON.parse(
-      JSON.stringify(GROUP_LIST_MOCK_DAO),
-    ) as GroupListChampionshipDao;
+    const dao = structuredClone(GROUP_LIST_MOCK_DAO);
     if (id === "test-status-draft") {
-      dao.groups[0].classification[0] = null; // simulate missing team
+      const group = dao.groups[0];
+      if (!group) throw new Error("Mock group A not found");
+      group.classification[0] = null; // simulate missing team
       dao.startDate = new Date(Date.now() + 1000000000).toISOString();
       dao.name = "Test Draft Status of Group List";
     } else if (id === "test-status-waiting") {
