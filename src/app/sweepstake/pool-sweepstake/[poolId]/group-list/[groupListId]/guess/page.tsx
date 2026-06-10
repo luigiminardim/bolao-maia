@@ -1,11 +1,13 @@
 import React from "react";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@heroui/react";
 import {
   getPoolSweepstakeUsecase,
   getGroupListGuessFromPoolUsecase,
 } from "../../../../../../../usecase/index";
 import { getLoggedInUser } from "../../../../../../actions";
-import { GuessWizardClient } from "./GuessWizardClient";
+import { GroupListGuessFormClient } from "./GroupListGuessFormClient";
 
 interface PageProps {
   params: Promise<{
@@ -56,11 +58,26 @@ export default async function GuessWizardPage({ params }: PageProps) {
   );
 
   return (
-    <GuessWizardClient
-      poolId={poolId}
-      groupListId={groupListId}
-      sweepstake={serializedSweepstake}
-      existingGuess={serializedGuess}
-    />
+    <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-start max-w-5xl">
+      <div className="mb-6 w-full max-w-2xl mx-auto flex">
+        <Link
+          href={`/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}`}
+        >
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-zinc-400 hover:text-zinc-100 rounded-xl text-xs pl-0"
+          >
+            ← Voltar para o Ranking
+          </Button>
+        </Link>
+      </div>
+      <GroupListGuessFormClient
+        poolId={poolId}
+        groupListId={groupListId}
+        sweepstake={serializedSweepstake}
+        existingGuess={serializedGuess}
+      />
+    </main>
   );
 }
