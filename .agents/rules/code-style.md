@@ -57,6 +57,7 @@ description: You MUST read this file every time you are about to write or modify
 
 ## 7. React & Next.js Specific (If applicable)
 
-- **Component Size:** Keep components small and focused. Extract sub-components if a file exceeds 200-300 lines.
-- **Hooks:** Extract complex state logic into custom hooks.
+- **Component Size:** Keep components small and focused. Extract sub-components as separate functions within the same file — there is no need for a separate file if the component is only used in one place.
+- **File Cohesion:** A file should only export things related to a single concept. For example, exporting `ScorePolicy` and `ScorePolicyParams` from the same file is fine because they are directly related. Exporting `ScorePolicy` and `Championship` from the same file is not — they are independent concepts and belong in separate files.
+- **Hooks:** Extract complex state logic into custom hooks. If the hook is only used by one component, it can live in the same file.
 - **Server/Client Boundaries:** Explicitly mark files with `"use client"` or `"use server"` only where strictly necessary. Maximize Server Components where possible.
