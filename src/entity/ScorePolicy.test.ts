@@ -153,8 +153,8 @@ describe("ScaledScorePolicy", () => {
 
     test("evaluates correct matches", () => {
       // team1A is position 1, guessed position 1, qualified.
-      // score: numTeams (8) / worstPosition (1) = 8. log2(8) = 3. scaled(10) = 30.
-      expect(policy.groupListTeamScore(team1A, championship, 1, [])).toBe(30);
+      // score: numTeams (4) / worstPosition (1) = 4. log2(8) = 2. scaled(10) = 20.
+      expect(policy.groupListTeamScore(team1A, championship, 1, [])).toBe(20);
 
       // team3A is position 3, extra qualified. Guessed 3, extra qualified.
       // worstPosition = 3. 3 is not <= maxRegularQualifiedPosition (2).
@@ -172,8 +172,8 @@ describe("ScaledScorePolicy", () => {
       // return MIN_SCORE = 1. log2(1) = 0. scaled(10) = 0
       expect(policy.groupListTeamScore(team4A, championship, 4, [])).toBe(0);
 
-      // Guess team1A at position 2. worst = 2. 8 / 2 = 4. log2(4) = 2. scaled(10) = 20
-      expect(policy.groupListTeamScore(team1A, championship, 2, [])).toBe(20);
+      // Guess team1A at position 2. worst = 2. 4 / 2 = 2. log2(2) = 1. scaled(10) = 10.
+      expect(policy.groupListTeamScore(team1A, championship, 2, [])).toBe(10);
     });
 
     test("evaluates not started championship or null guesses", () => {

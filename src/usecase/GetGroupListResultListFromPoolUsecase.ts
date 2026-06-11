@@ -34,9 +34,7 @@ export class GetGroupListResultListFromPoolUsecase {
     for (const guess of guesses) {
       const user = await this.userRepository.findById(guess.userId);
       if (user) {
-        results.push(
-          PoolGuessResult.fromPoolSweepstake(sweepstake, guess, user),
-        );
+        results.push(new PoolGuessResult(sweepstake, guess, user));
       }
     }
 

@@ -50,10 +50,11 @@ export class InverseProbabilityPositionScorePolicy
     _extraQualifiedListGuess: Team[],
   ): number {
     const position = championship.teamPosition(team);
-    if (position === null) {
-      return 0;
+    const group = championship.getTeamGroup(team);
+    if (position === null || group === null) {
+      return this.MIN_SCORE;
     }
-    return this.score(position, positionGuess, championship.numTeams());
+    return this.score(position, positionGuess, group.numTeams());
   }
 
   cupTeamScore(

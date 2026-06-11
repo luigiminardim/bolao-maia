@@ -46,7 +46,7 @@ export function toPoolGuessResultDto(
           factor: subRes.factor,
           groupResult: {
             score: subRes.groupResult.score,
-            groupResultList: subRes.groupResult.groupResultList.map((gRes) => ({
+            groupResultList: subRes.groupResult.groups.map((gRes) => ({
               score: gRes.score,
               classification: gRes.classification.map((node) => ({
                 team: node.team ? toTeamDto(node.team) : null,

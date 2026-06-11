@@ -25,6 +25,9 @@ export class CupGuess {
   }
 
   teamPosition(team: Team): number | null {
+    if (this.thirdPlace !== null && team.id === this.thirdPlace.id) {
+      return 3;
+    }
     const height = this.root.findHeight((t) => t.id === team.id);
     if (height === null) return null;
     return Math.pow(2, height);

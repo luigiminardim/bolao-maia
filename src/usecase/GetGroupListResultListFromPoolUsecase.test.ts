@@ -84,7 +84,7 @@ describe("GetGroupListResultListFromPoolUsecase", () => {
       subResultList: [],
     } as unknown as PoolGuessResult;
 
-    (PoolGuessResult.fromPoolSweepstake as jest.Mock)
+    (PoolGuessResult as unknown as jest.Mock)
       .mockReturnValueOnce(mockResult1)
       .mockReturnValueOnce(mockResult2);
 
