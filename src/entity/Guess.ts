@@ -42,7 +42,7 @@ export class GroupGuess {
   }
 
   teamPosition(team: Team): number | null {
-    const position = this.classification.indexOf(team);
+    const position = this.classification.findIndex((x) => x.id === team.id);
     return position === -1 ? null : position + 1;
   }
 }
