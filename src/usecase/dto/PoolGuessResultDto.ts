@@ -4,7 +4,7 @@ import { TeamDto, toTeamDto } from "./TeamDto";
 
 export interface PoolGuessResultDto {
   user: UserDto;
-  score: number;
+  score: number | null;
   subResultList: PoolItemResultDto[];
 }
 
@@ -13,12 +13,12 @@ export type PoolItemResultDto =
   | { kind: "cup"; factor: number; cupResult: CupGuessResultDto };
 
 export interface GroupListGuessResultDto {
-  score: number;
+  score: number | null;
   groupResultList: GroupGuessResultDto[];
 }
 
 export interface GroupGuessResultDto {
-  score: number;
+  score: number | null;
   classification: GroupGuessNodeInfoDto[];
 }
 
@@ -30,7 +30,7 @@ export interface GroupGuessNodeInfoDto {
 }
 
 export interface CupGuessResultDto {
-  score: number;
+  score: number | null;
 }
 
 export function toPoolGuessResultDto(

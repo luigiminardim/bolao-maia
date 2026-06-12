@@ -63,6 +63,18 @@ describe("GuessResult", () => {
     new Date(),
   );
 
+  const waitingGroupListChampionship = new GroupListChampionship(
+    "gl1",
+    "Group List 1",
+    [
+      new GroupChampionship("gA", [t1A, t2A, t3A, t4A]),
+      new GroupChampionship("gB", [t1B, t2B, t3B, t4B]),
+    ],
+    [null],
+    1,
+    new Date(Date.now() + 1000000000), // FUTURE
+  );
+
   const finishedGroupListChampionship = new GroupListChampionship(
     "gl1",
     "Group List 1",
@@ -103,6 +115,36 @@ describe("GuessResult", () => {
     true,
     null,
     new Date(),
+  );
+
+  const waitingCupChampionship = new CupChampionship(
+    "cup1",
+    "Cup 1",
+    new BinaryTree<Team | null>(null, [
+      new BinaryTree<Team | null>(null, [
+        new BinaryTree<Team | null>(null, [
+          new BinaryTree<Team | null>(c1),
+          new BinaryTree<Team | null>(c5),
+        ]),
+        new BinaryTree<Team | null>(null, [
+          new BinaryTree<Team | null>(c3),
+          new BinaryTree<Team | null>(c6),
+        ]),
+      ]),
+      new BinaryTree<Team | null>(null, [
+        new BinaryTree<Team | null>(null, [
+          new BinaryTree<Team | null>(c2),
+          new BinaryTree<Team | null>(c7),
+        ]),
+        new BinaryTree<Team | null>(null, [
+          new BinaryTree<Team | null>(c4),
+          new BinaryTree<Team | null>(c8),
+        ]),
+      ]),
+    ]),
+    true,
+    null,
+    new Date(Date.now() + 1000000000), // FUTURE
   );
 
   const finishedCupChampionship = new CupChampionship(
@@ -174,6 +216,25 @@ describe("GuessResult", () => {
   );
 
   describe("GroupGuessResult", () => {
+    it("open sweepstake", () => {
+      const groupSweepstake = new GroupListSweepstake(
+        "swG",
+        "Group Sweepstake",
+        "Desc",
+        waitingGroupListChampionship,
+        groupScorePolicy,
+      );
+      const res = new GroupGuessResult(
+        groupSweepstake,
+        "gA",
+        groupGuess.groupGuesses[0]!,
+        groupGuess.extraQualifiedListGuess,
+      );
+      expect(res.classification).toHaveLength(4);
+      expect(res.score).toBeNull();
+      expect(res.classification[0]?.score).toBeNull();
+    });
+
     it("just started championship", () => {
       const groupSweepstake = new GroupListSweepstake(
         "swG",
@@ -222,6 +283,19 @@ describe("GuessResult", () => {
   });
 
   describe("GroupListGuessResult", () => {
+    it("open sweepstake", () => {
+      const groupSweepstake = new GroupListSweepstake(
+        "swG",
+        "Group Sweepstake",
+        "Desc",
+        waitingGroupListChampionship,
+        groupScorePolicy,
+      );
+      const res = new GroupListGuessResult(groupSweepstake, groupGuess);
+      expect(res.groups).toHaveLength(2);
+      expect(res.score).toBeNull();
+    });
+
     it("just started championship", () => {
       const groupSweepstake = new GroupListSweepstake(
         "swG",
@@ -258,6 +332,20 @@ describe("GuessResult", () => {
   });
 
   describe("CupGuessResult", () => {
+    it("open sweepstake", () => {
+      const cupSweepstake = new CupSweepstake(
+        "swC",
+        "Cup Sweepstake",
+        "Desc",
+        waitingCupChampionship,
+        cupScorePolicy,
+      );
+      const res = new CupGuessResult(cupSweepstake, cupGuess);
+      expect(res.score).toBeNull();
+      expect(res.root.elem.score).toBeNull();
+      expect(res.thirdPlace?.score).toBeNull();
+    });
+
     it("just started championship (teams on round of 8)", () => {
       const cupSweepstake = new CupSweepstake(
         "swC",
@@ -297,6 +385,43 @@ describe("GuessResult", () => {
   });
 
   describe("PoolGuessResult", () => {
+    it("open sweepstakes", () => {
+      const groupSweepstake = new GroupListSweepstake(
+        "swG",
+        "Group Sweepstake",
+        "Desc",
+        waitingGroupListChampionship,
+        groupScorePolicy,
+      );
+      const cupSweepstake = new CupSweepstake(
+        "swC",
+        "Cup Sweepstake",
+        "Desc",
+        waitingCupChampionship,
+        cupScorePolicy,
+      );
+      const poolSweepstake = new PoolSweepstake(
+        "swP",
+        "Pool Sweepstake",
+        "Subtitle",
+        "Desc",
+        [
+          { kind: "group", sweepstake: groupSweepstake, factor: 1 },
+          { kind: "cup", sweepstake: cupSweepstake, factor: 1 },
+        ],
+      );
+
+      const poolGuess = new PoolGuess(user.id(), poolSweepstake.id, [
+        { kind: "group", groupGuess: groupGuess },
+        { kind: "cup", cupGuess: cupGuess },
+      ]);
+
+      const result = new PoolGuessResult(poolSweepstake, poolGuess, user);
+
+      expect(result.subResultList).toHaveLength(2);
+      expect(result.score).toBeNull();
+    });
+
     it("finished championships", () => {
       const groupSweepstake = new GroupListSweepstake(
         "swG",

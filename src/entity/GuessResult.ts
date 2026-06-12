@@ -15,13 +15,14 @@ type CupGuessNodeInfo = {
 };
 
 export class CupGuessResult {
-  score: number;
+  score: number | null;
   root: BinaryTree<CupGuessNodeInfo>;
   thirdPlace: null | CupGuessNodeInfo;
 
   constructor(sweepstake: CupSweepstake, guess: CupGuess) {
     const cup = sweepstake.championship;
     const scorePolicy = sweepstake.scorePolicy;
+    const isLocked = sweepstake.getStatus() === "locked";
     let thirdPlace: null | CupGuessNodeInfo = null;
     const scanContext: { seen: Team[] } = { seen: [] };
 
@@ -29,7 +30,9 @@ export class CupGuessResult {
       if (cup.thirdPlace) {
         const team = cup.thirdPlace;
         const guessPosition = guess.teamPosition(team) ?? (-1 as never);
-        const score = scorePolicy.cupTeamScore(team, cup, guessPosition);
+        const score = isLocked
+          ? scorePolicy.cupTeamScore(team, cup, guessPosition)
+          : null;
         thirdPlace = {
           team,
           positionGuess: guessPosition,
@@ -61,7 +64,9 @@ export class CupGuessResult {
           return { team, positionGuess: null, score: null };
         }
         const guessPosition = guess.teamPosition(team) ?? (-1 as never);
-        const score = scorePolicy.cupTeamScore(team, cup, guessPosition);
+        const score = isLocked
+          ? scorePolicy.cupTeamScore(team, cup, guessPosition)
+          : null;
         return { team, positionGuess: guessPosition, score };
       },
       scanContext,
@@ -69,11 +74,15 @@ export class CupGuessResult {
     );
 
     this.thirdPlace = thirdPlace;
-    const rootScore = this.root.reduce(
-      (acc, node) => acc + (node.score ?? 0),
-      0,
-    );
-    this.score = rootScore + (this.thirdPlace?.score ?? 0);
+    if (isLocked) {
+      const rootScore = this.root.reduce(
+        (acc, node) => acc + (node.score ?? 0),
+        0,
+      );
+      this.score = rootScore + (this.thirdPlace?.score ?? 0);
+    } else {
+      this.score = null;
+    }
   }
 }
 
@@ -85,7 +94,7 @@ type GroupGuessNodeInfo = {
 };
 
 export class GroupGuessResult {
-  score: number;
+  score: number | null;
   classification: GroupGuessNodeInfo[];
 
   constructor(
@@ -95,10 +104,11 @@ export class GroupGuessResult {
     extraQualifiedListGuess: Team[],
   ) {
     const { championship, scorePolicy } = sweepstake;
+    const isLocked = sweepstake.getStatus() === "locked";
     const group = championship.getGroup(groupId);
     if (!group) {
       this.classification = [];
-      this.score = 0;
+      this.score = isLocked ? 0 : null;
       return;
     }
 
@@ -115,12 +125,14 @@ export class GroupGuessResult {
       const extraQualifiedGuess = !!extraQualifiedListGuess.find(
         (t) => t.id === team.id,
       );
-      const score = scorePolicy.groupListTeamScore(
-        team,
-        championship,
-        guessPosition,
-        extraQualifiedListGuess,
-      );
+      const score = isLocked
+        ? scorePolicy.groupListTeamScore(
+            team,
+            championship,
+            guessPosition,
+            extraQualifiedListGuess,
+          )
+        : null;
       return {
         team,
         positionGuess: guessPosition,
@@ -129,18 +141,18 @@ export class GroupGuessResult {
       };
     });
 
-    this.score = this.classification.reduce(
-      (acc, node) => acc + (node.score ?? 0),
-      0,
-    );
+    this.score = isLocked
+      ? this.classification.reduce((acc, node) => acc + (node.score ?? 0), 0)
+      : null;
   }
 }
 
 export class GroupListGuessResult {
-  score: number;
+  score: number | null;
   groups: GroupGuessResult[];
 
   constructor(sweepstake: GroupListSweepstake, guess: GroupListGuess) {
+    const isLocked = sweepstake.getStatus() === "locked";
     this.groups = sweepstake.championship.getGroups().map((group, idx) => {
       const groupGuess = guess.groupGuesses[idx];
       if (!groupGuess) throw new Error(`Missing group guess at index ${idx}`);
@@ -151,7 +163,9 @@ export class GroupListGuessResult {
         guess.extraQualifiedListGuess,
       );
     });
-    this.score = this.groups.reduce((acc, result) => acc + result.score, 0);
+    this.score = isLocked
+      ? this.groups.reduce((acc, result) => acc + (result.score ?? 0), 0)
+      : null;
   }
 }
 
@@ -161,7 +175,7 @@ export type PoolItemResult =
 
 export class PoolGuessResult {
   user: User;
-  score: number;
+  score: number | null;
   subResultList: PoolItemResult[];
 
   constructor(sweepstake: PoolSweepstake, guess: PoolGuess, user: User) {
@@ -204,12 +218,18 @@ export class PoolGuessResult {
       },
     );
 
-    this.score = this.subResultList.reduce((acc, result) => {
-      if (result.kind === "group") {
-        return acc + result.groupResult.score * result.factor;
-      } else {
-        return acc + result.cupResult.score * result.factor;
+    let hasValidScore = false;
+    let totalScore = 0;
+    for (const result of this.subResultList) {
+      const subScore =
+        result.kind === "group"
+          ? result.groupResult.score
+          : result.cupResult.score;
+      if (subScore !== null) {
+        hasValidScore = true;
+        totalScore += subScore * result.factor;
       }
-    }, 0);
+    }
+    this.score = hasValidScore ? totalScore : null;
   }
 }

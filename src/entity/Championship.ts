@@ -91,7 +91,9 @@ export class GroupListChampionship {
   }
 
   getTeamGroup(team: Team): GroupChampionship | null {
-    return this.groups.find((group) => group.teamPosition(team) !== null) ?? null;
+    return (
+      this.groups.find((group) => group.teamPosition(team) !== null) ?? null
+    );
   }
 
   getGroups(): GroupChampionship[] {
