@@ -25,6 +25,7 @@ import {
 import { GetUserUsecase } from "./GetUserUsecase";
 import { GetPoolSweepstakeUsecase } from "./GetPoolSweepstakeUsecase";
 import { GetGroupListResultListFromPoolUsecase } from "./GetGroupListResultListFromPoolUsecase";
+import { GetGroupListSweepstakeResultFromPoolUsecase } from "./GetGroupListSweepstakeResultFromPoolUsecase";
 import { GuessGroupListFromPoolSweepstake } from "./GuessGroupListFromPoolSweepstake";
 import { GetGroupListGuessFromPoolSweepstakeUsecase } from "./GetGroupListGuessFromPoolSweepstakeUsecase";
 import { GetSweepstakeListUsecase } from "./GetSweepstakeListUsecase";
@@ -81,6 +82,12 @@ export const getSweepstakeListUsecase = new GetSweepstakeListUsecase(
 );
 export const getGroupListResultListFromPoolUsecase =
   new GetGroupListResultListFromPoolUsecase(
+    poolSweepstakeRepository,
+    poolGuessRepository,
+    userRepository,
+  );
+export const getGroupListSweepstakeResultFromPoolUsecase =
+  new GetGroupListSweepstakeResultFromPoolUsecase(
     poolSweepstakeRepository,
     poolGuessRepository,
     userRepository,
