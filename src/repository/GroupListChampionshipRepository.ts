@@ -30,23 +30,23 @@ export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
   groups: [
     {
       id: "A",
-      classification: ["mexico", "south-africa", "south-korea", "czechia"],
+      classification: ["mexico", "south-korea", "czechia", "south-africa"],
     },
     {
       id: "B",
-      classification: ["canada", "bosnia-herzegovina", "qatar", "switzerland"],
+      classification: ["switzerland", "canada", "qatar", "bosnia-herzegovina"],
     },
     {
       id: "C",
-      classification: ["brazil", "morocco", "haiti", "scotland"],
+      classification: ["scotland", "morocco", "brazil", "haiti"],
     },
     {
       id: "D",
-      classification: ["usa", "paraguay", "australia", "turkiye"],
+      classification: ["usa", "australia", "turkiye", "paraguay"],
     },
     {
       id: "E",
-      classification: ["germany", "curacao", "ivory-coast", "ecuador"],
+      classification: ["germany", "ecuador", "ivory-coast", "curacao"],
     },
     {
       id: "F",
