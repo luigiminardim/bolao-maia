@@ -46,11 +46,11 @@ export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
     },
     {
       id: "E",
-      classification: ["germany", "ecuador", "ivory-coast", "curacao"],
+      classification: ["germany", "ivory-coast", "ecuador", "curacao"],
     },
     {
       id: "F",
-      classification: ["netherlands", "japan", "tunisia", "sweden"],
+      classification: ["japan", "netherlands", "tunisia", "sweden"],
     },
     {
       id: "G",
