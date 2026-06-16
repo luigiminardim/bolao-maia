@@ -81,7 +81,7 @@ export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
     "netherlands",
     "brazil",
     "belgium",
-    "quatar",
+    "qatar",
     "spain",
     "austria",
     "uzbekistan",
