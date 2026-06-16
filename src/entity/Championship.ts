@@ -119,7 +119,7 @@ export class GroupListChampionship {
   }
 
   teamIsExtraQualified(team: Team): boolean {
-    return this.getExtraQualifiedList().includes(team);
+    return this.getExtraQualifiedList().some((t) => t?.id === team.id);
   }
 
   teamIsQualified(team: Team): boolean {
