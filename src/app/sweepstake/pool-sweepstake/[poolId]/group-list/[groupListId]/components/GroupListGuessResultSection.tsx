@@ -93,8 +93,10 @@ function GroupListTeamGuessResultArticle({
       }
       BottomRightComponent={
         <span className="text-[10px] font-semibold text-zinc-500">
-          Posição Real: {result.teamPosition}º{" "}
-          {result.teamExtraQualified ? "classificado" : ""}
+          Oficial:{" "}
+          <span className="font-bold">
+            {result.teamPosition}º {result.teamQualified ? "classificado" : ""}
+          </span>
         </span>
       }
     />
