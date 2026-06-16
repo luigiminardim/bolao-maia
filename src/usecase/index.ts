@@ -3,6 +3,7 @@ import {
   JsonStorage,
   JsonFileStorage,
   JsonAwsS3Storage,
+  WithLoadCacheJsonFileStorage,
 } from "../infra/JsonStorage";
 import { UserRepository } from "../repository/UserRepository";
 import {
@@ -47,7 +48,9 @@ export const storage: JsonStorage =
         ),
       );
 
-export const teamRepository = new TeamRepository(storage);
+export const teamRepository = new TeamRepository(
+  new WithLoadCacheJsonFileStorage(storage),
+);
 export const userRepository = new UserRepository(storage);
 
 export const cupChampionshipRepository: CupChampionshipRepository =
@@ -58,7 +61,7 @@ export const groupListChampionshipRepository: GroupListChampionshipRepository =
 
 export const poolSweepstakeRepository: PoolSweepstakeRepository =
   new FilePoolSweepstakeRepository(
-    storage,
+    new WithLoadCacheJsonFileStorage(storage),
     groupListChampionshipRepository,
     cupChampionshipRepository,
   );

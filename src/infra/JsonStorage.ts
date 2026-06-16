@@ -38,6 +38,7 @@ export class JsonFileStorage implements JsonStorage {
   }
 
   async load<T>(id: string): Promise<T | null> {
+    console.info("Load file:", id);
     const filePath = this.getFilePath(id);
     try {
       const content = await fs.readFile(filePath, "utf-8");
@@ -173,5 +174,38 @@ export class JsonAwsS3Storage implements JsonStorage {
       }
       throw error;
     }
+  }
+}
+
+export class WithLoadCacheJsonFileStorage implements JsonStorage {
+  private readonly storage: JsonStorage;
+  private readonly cache = new Map<string, unknown>();
+
+  constructor(storage: JsonStorage) {
+    this.storage = storage;
+  }
+
+  async save<T>(id: string, data: T): Promise<void> {
+    this.cache.delete(id);
+    await this.storage.save(id, data);
+  }
+
+  async load<T>(id: string): Promise<T | null> {
+    const cachedData = this.cache.get(id);
+    if (cachedData) {
+      return cachedData as T;
+    }
+    const data = await this.storage.load<T>(id);
+    if (data) {
+      this.cache.set(id, data);
+    }
+    return data;
+  }
+
+  async listIds(
+    dir: string,
+    filter?: (filename: string) => boolean,
+  ): Promise<string[]> {
+    return this.storage.listIds(dir, filter);
   }
 }
