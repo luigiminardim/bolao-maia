@@ -8,7 +8,7 @@ import {
 } from "./ScorePolicy";
 import { Team } from "./Team";
 import {
-  GroupChampionship,
+  GroupListGroupChampionship,
   GroupListChampionship,
   CupChampionship,
 } from "./Championship";
@@ -135,8 +135,18 @@ describe("ScaledScorePolicy", () => {
   const team4B = new Team("team4B", "Team 4B");
 
   describe("GroupList test scenario", () => {
-    const groupA = new GroupChampionship("A", [team1A, team2A, team3A, team4A]);
-    const groupB = new GroupChampionship("B", [team1B, team2B, team3B, team4B]);
+    const groupA = new GroupListGroupChampionship("A", [
+      team1A,
+      team2A,
+      team3A,
+      team4A,
+    ]);
+    const groupB = new GroupListGroupChampionship("B", [
+      team1B,
+      team2B,
+      team3B,
+      team4B,
+    ]);
 
     const championship = new GroupListChampionship(
       "id",
@@ -177,13 +187,13 @@ describe("ScaledScorePolicy", () => {
     });
 
     test("evaluates not started championship or null guesses", () => {
-      const groupANotStarted = new GroupChampionship("A", [
+      const groupANotStarted = new GroupListGroupChampionship("A", [
         null,
         null,
         null,
         null,
       ]);
-      const groupBNotStarted = new GroupChampionship("B", [
+      const groupBNotStarted = new GroupListGroupChampionship("B", [
         null,
         null,
         null,

@@ -1,13 +1,7 @@
-import React from "react";
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { GroupListGuessResultSection } from "../../components/GroupListGuessResultSection";
-
 import { getLoggedInUser } from "@/app/actions";
-import {
-  getPoolSweepstakeUsecase,
-  getGroupListSweepstakeResultFromPoolUsecase,
-} from "@/usecase";
+import { getGroupListGuessResultFromPoolUsecase } from "@/usecase";
 
 interface PageProps {
   params: Promise<{
@@ -17,31 +11,20 @@ interface PageProps {
   }>;
 }
 
-export default async function GuessResultPage({ params }: PageProps) {
+export default async function GroupListGuessResultFromPoolPage({
+  params,
+}: PageProps) {
   const { poolId, groupListId, userId } = await params;
-  const currentUser = await getLoggedInUser();
+  const loggedUser = await getLoggedInUser();
+  const groupListGuessResult =
+    await getGroupListGuessResultFromPoolUsecase.execute(
+      poolId,
+      groupListId,
+      userId,
+      loggedUser?.id ?? null,
+    );
 
-  const pool = await getPoolSweepstakeUsecase.execute(poolId);
-  if (!pool) {
-    notFound();
-  }
-
-  const sweepstakeItem = pool.subSweepstakeList.find(
-    (item) => item.kind === "group" && item.sweepstake.id === groupListId,
-  );
-
-  if (!sweepstakeItem || sweepstakeItem.kind !== "group") {
-    notFound();
-  }
-
-  const resultDto = await getGroupListSweepstakeResultFromPoolUsecase.execute(
-    poolId,
-    groupListId,
-    userId,
-    currentUser?.id,
-  );
-
-  if (!resultDto) {
+  if (!groupListGuessResult) {
     return (
       <main className="container mx-auto px-4 py-8 flex-1 flex flex-col items-center justify-center max-w-5xl text-center">
         <span className="text-5xl mb-4 opacity-50 grayscale">📭</span>
@@ -76,17 +59,16 @@ export default async function GuessResultPage({ params }: PageProps) {
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-white tracking-tight">
           Palpite de{" "}
-          <span className="text-emerald-400">{resultDto.user.name}</span>
+          <span className="text-emerald-400">
+            {groupListGuessResult.user.name}
+          </span>
         </h1>
         <p className="text-zinc-400 text-sm mt-2">
           Confira o palpite deste participante na fase de grupos.
         </p>
       </div>
 
-      <GroupListGuessResultSection
-        sweepstake={sweepstakeItem.sweepstake}
-        userLeaderboardEntry={resultDto}
-      />
+      <GroupListGuessResultSection result={groupListGuessResult} />
     </main>
   );
 }

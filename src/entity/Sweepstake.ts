@@ -95,4 +95,12 @@ export class PoolSweepstake {
   getSubtitle(): string {
     return this.subtitle;
   }
+
+  getGroupListSweepstakeById(id: string): GroupListSweepstake | null {
+    return (
+      this.subSweepstakeList
+        .flatMap((sub) => (sub.kind === "group" ? [sub.sweepstake] : []))
+        .find((sub) => sub.id === id) ?? null
+    );
+  }
 }

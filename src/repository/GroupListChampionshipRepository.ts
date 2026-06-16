@@ -1,5 +1,5 @@
 import {
-  GroupChampionship,
+  GroupListGroupChampionship,
   GroupListChampionship,
 } from "../entity/Championship";
 import { TeamRepository } from "./TeamRepository";
@@ -168,7 +168,7 @@ async function mapGroupListChampionshipDaoToEntity(
   id: string,
   teamRepository: TeamRepository,
 ): Promise<GroupListChampionship> {
-  const groups: GroupChampionship[] = [];
+  const groups: GroupListGroupChampionship[] = [];
   for (const groupDao of dao.groups) {
     const classification = [];
     for (const teamId of groupDao.classification) {
@@ -182,7 +182,7 @@ async function mapGroupListChampionshipDaoToEntity(
         classification.push(team);
       }
     }
-    groups.push(new GroupChampionship(groupDao.id, classification));
+    groups.push(new GroupListGroupChampionship(groupDao.id, classification));
   }
 
   const extraQualifiedList = [];

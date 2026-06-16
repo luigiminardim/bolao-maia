@@ -1,4 +1,7 @@
-import { GroupChampionship, GroupListChampionship } from "./Championship";
+import {
+  GroupListGroupChampionship,
+  GroupListChampionship,
+} from "./Championship";
 import { Team } from "./Team";
 
 describe("Championship", () => {
@@ -9,8 +12,8 @@ describe("Championship", () => {
         const team2 = new Team("t2", "Team 2");
         const team3 = new Team("t3", "Team 3");
 
-        const groupA = new GroupChampionship("gA", [team1, team2]);
-        const groupB = new GroupChampionship("gB", [team3]);
+        const groupA = new GroupListGroupChampionship("gA", [team1, team2]);
+        const groupB = new GroupListGroupChampionship("gB", [team3]);
 
         const championship = new GroupListChampionship(
           "c1",
@@ -29,7 +32,7 @@ describe("Championship", () => {
         const team1 = new Team("t1", "Team 1");
         const team2 = new Team("t2", "Team 2");
 
-        const groupA = new GroupChampionship("gA", [team1]);
+        const groupA = new GroupListGroupChampionship("gA", [team1]);
 
         const championship = new GroupListChampionship(
           "c1",

@@ -4,43 +4,34 @@ import { useRouter } from "next/navigation";
 import { Button, Card, Tabs, Table, Alert, Avatar } from "@heroui/react";
 import { UserDto } from "../../../../../../usecase/dto/UserDto";
 import { GroupListSweepstakeDto } from "../../../../../../usecase/dto/SweepstakeDto";
-import { GroupListGuessDto } from "../../../../../../usecase/dto/GuessDto";
-import { PoolGuessResultDto } from "../../../../../../usecase/dto/PoolGuessResultDto";
-import { getTeamFlagSvgUrl } from "../../../../../utils/getTeamFlagSvgUrl";
+import { GroupListGuessResultDto } from "../../../../../../usecase/dto/GuessResultDto";
 import Link from "next/link";
 import { ExternalLinkIcon } from "lucide-react";
 import { GroupListGuessResultSection } from "./components/GroupListGuessResultSection";
+import { GroupListGuessSection } from "./components/GroupListGuessSection";
+import { GuessRankingDto } from "@/usecase/dto/GuessRankingDto";
+import { GroupListGuessDto } from "@/usecase/dto/GuessDto";
 
 interface DashboardClientProps {
   poolId: string;
   groupListId: string;
   currentUser: UserDto | null;
   sweepstake: GroupListSweepstakeDto;
-  existingGuess: GroupListGuessDto | null;
-  leaderboard: PoolGuessResultDto[];
+  guess: GroupListGuessDto | null;
+  groupListGuessResult: null | GroupListGuessResultDto;
+  rankList: GuessRankingDto[];
 }
 
-export function DashboardClient({
+export function GroupListSweepstakeFromPoolPageClient({
   poolId,
   groupListId,
   currentUser,
   sweepstake,
-  existingGuess,
-  leaderboard,
+  guess,
+  rankList,
+  groupListGuessResult,
 }: DashboardClientProps) {
   const router = useRouter();
-
-  const userLeaderboardEntry = leaderboard.find(
-    (entry) => entry.user.id === currentUser?.id,
-  );
-
-  const groupGuesses = existingGuess
-    ? existingGuess.groupGuesses.map((g) => g.classification.map((t) => t.id))
-    : sweepstake.groups.map((g) => g.classification.map((t) => t?.id ?? ""));
-
-  const extraGuesses = existingGuess
-    ? existingGuess.extraQualifiedListGuess.map((t) => t.id)
-    : [];
 
   const handleNavigateToGuess = () => {
     router.push(
@@ -96,11 +87,9 @@ export function DashboardClient({
             <Tabs.Panel id="my-guesses" className="pt-2">
               <MyGuessesTabPanel
                 sweepstake={sweepstake}
-                existingGuess={existingGuess}
+                guess={guess}
                 currentUser={currentUser}
-                userLeaderboardEntry={userLeaderboardEntry}
-                groupGuesses={groupGuesses}
-                extraGuesses={extraGuesses}
+                groupListGuessResult={groupListGuessResult}
                 onNavigateToGuess={handleNavigateToGuess}
                 onNavigateToLogin={handleNavigateToLogin}
               />
@@ -108,7 +97,7 @@ export function DashboardClient({
 
             <Tabs.Panel id="leaderboard" className="pt-2">
               <LeaderboardTabPanel
-                leaderboard={leaderboard}
+                guessRankList={rankList}
                 currentUser={currentUser}
                 poolId={poolId}
                 groupListId={groupListId}
@@ -127,20 +116,16 @@ export function DashboardClient({
 
 function MyGuessesTabPanel({
   sweepstake,
-  existingGuess,
+  guess,
   currentUser,
-  userLeaderboardEntry,
-  groupGuesses,
-  extraGuesses,
+  groupListGuessResult,
   onNavigateToGuess,
   onNavigateToLogin,
 }: {
   sweepstake: GroupListSweepstakeDto;
-  existingGuess: GroupListGuessDto | null;
+  guess: GroupListGuessDto | null;
   currentUser: UserDto | null;
-  userLeaderboardEntry?: PoolGuessResultDto;
-  groupGuesses: string[][];
-  extraGuesses: string[];
+  groupListGuessResult: null | GroupListGuessResultDto;
   onNavigateToGuess: () => void;
   onNavigateToLogin: () => void;
 }) {
@@ -148,28 +133,34 @@ function MyGuessesTabPanel({
     return <LoginCardView onNavigateToLogin={onNavigateToLogin} />;
   }
 
-  if (!existingGuess) {
-    if (sweepstake.status === "open" || sweepstake.status === "draft") {
-      return (
-        <PendingGuessView
-          sweepstakeStatus={sweepstake.status}
-          groupsCount={sweepstake.groups.length}
-          extraQualifiedLength={sweepstake.extraQualifiedLength}
-          onNavigateToGuess={onNavigateToGuess}
-        />
-      );
-    }
-    return <EmptyGuessView />;
+  if (
+    guess &&
+    (sweepstake.status === "open" || sweepstake.status === "draft")
+  ) {
+    return <ExistingGuessView sweepstake={sweepstake} guess={guess} />;
   }
 
-  return (
-    <ExistingGuessView
-      sweepstake={sweepstake}
-      userLeaderboardEntry={userLeaderboardEntry}
-      groupGuesses={groupGuesses}
-      extraGuesses={extraGuesses}
-    />
-  );
+  if (groupListGuessResult) {
+    return (
+      <ExistingGuessView
+        sweepstake={sweepstake}
+        groupListGuessResult={groupListGuessResult}
+      />
+    );
+  }
+
+  if (sweepstake.status === "open" || sweepstake.status === "draft") {
+    return (
+      <PendingGuessView
+        sweepstakeStatus={sweepstake.status}
+        groupsCount={sweepstake.groups.length}
+        extraQualifiedLength={sweepstake.extraQualifiedLength}
+        onNavigateToGuess={onNavigateToGuess}
+      />
+    );
+  }
+
+  return <EmptyGuessView />;
 }
 
 function LoginCardView({
@@ -259,42 +250,31 @@ function PendingGuessView({
 
 function ExistingGuessView({
   sweepstake,
-  userLeaderboardEntry,
-  groupGuesses,
-  extraGuesses,
+  guess,
+  groupListGuessResult,
 }: {
   sweepstake: GroupListSweepstakeDto;
-  userLeaderboardEntry?: PoolGuessResultDto;
-  groupGuesses: string[][];
-  extraGuesses: string[];
+  guess?: GroupListGuessDto;
+  groupListGuessResult?: GroupListGuessResultDto;
 }) {
+  const header =
+    sweepstake.status === "open" ? (
+      <Alert
+        status="success"
+        className="bg-emerald-950/20 border border-emerald-900/30 text-emerald-400 mb-2"
+      >
+        <p className="font-bold text-emerald-400 mb-1">Palpite Confirmado!</p>
+        Seu palpite foi salvo com sucesso. Quando o campeonato começar, os
+        resultados oficiais e o ranking serão liberados em tempo real.
+      </Alert>
+    ) : null;
+
   return (
     <div className="flex-1 flex flex-col gap-6">
-      {sweepstake.status === "open" && (
-        <Alert
-          status="success"
-          className="bg-emerald-950/20 border border-emerald-900/30 text-emerald-400"
-        >
-          <p className="font-bold text-emerald-400 mb-1">Palpite Confirmado!</p>
-          Seu palpite foi salvo com sucesso. Quando o campeonato começar, os
-          resultados oficiais e o ranking serão liberados em tempo real.
-        </Alert>
-      )}
-
       <div className="flex flex-col gap-6">
-        {sweepstake.status === "open" || sweepstake.status === "draft" ? (
-          <GroupListGuessSection
-            sweepstake={sweepstake}
-            groupGuesses={groupGuesses}
-            extraGuesses={extraGuesses}
-          />
-        ) : (
-          <GroupListGuessResultSection
-            sweepstake={sweepstake}
-            groupGuesses={groupGuesses}
-            extraGuesses={extraGuesses}
-            userLeaderboardEntry={userLeaderboardEntry}
-          />
+        {guess && <GroupListGuessSection guess={guess} header={header} />}
+        {groupListGuessResult && (
+          <GroupListGuessResultSection result={groupListGuessResult} />
         )}
       </div>
     </div>
@@ -306,12 +286,12 @@ function ExistingGuessView({
 // -----------------------------------------------------------------------------
 
 function LeaderboardTabPanel({
-  leaderboard,
+  guessRankList,
   currentUser,
   poolId,
   groupListId,
 }: {
-  leaderboard: PoolGuessResultDto[];
+  guessRankList: GuessRankingDto[];
   currentUser: UserDto | null;
   poolId: string;
   groupListId: string;
@@ -347,10 +327,10 @@ function LeaderboardTabPanel({
                 </Table.Column>
               </Table.Header>
               <Table.Body className="text-sm font-semibold text-zinc-200">
-                {leaderboard.map((entry, index) => (
+                {guessRankList.map((entry, index) => (
                   <LeaderboardTableRow
                     key={entry.user.id}
-                    entry={entry}
+                    guessRank={entry}
                     index={index}
                     isMe={entry.user.id === currentUser?.id}
                     poolId={poolId!}
@@ -367,13 +347,13 @@ function LeaderboardTabPanel({
 }
 
 function LeaderboardTableRow({
-  entry,
+  guessRank: entry,
   index,
   isMe,
   poolId,
   groupListId,
 }: {
-  entry: PoolGuessResultDto;
+  guessRank: GuessRankingDto;
   index: number;
   isMe: boolean;
   poolId: string;
@@ -428,150 +408,5 @@ function LeaderboardTableRow({
         </span>
       </Table.Cell>
     </Table.Row>
-  );
-}
-
-// -----------------------------------------------------------------------------
-// GROUP GUESS SECTION COMPONENTS
-// -----------------------------------------------------------------------------
-
-interface GroupListGuessSectionProps {
-  sweepstake: GroupListSweepstakeDto;
-  groupGuesses: string[][];
-  extraGuesses: string[];
-}
-
-export function GroupListGuessSection({
-  sweepstake,
-  groupGuesses,
-  extraGuesses,
-}: GroupListGuessSectionProps) {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col sm:flex-row items-start justify-between gap-4 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-5 mb-2">
-        <div>
-          <h3 className="font-extrabold text-lg text-zinc-200">Seu Palpite</h3>
-          <p className="text-zinc-500 text-xs mt-0.5">
-            Confira como você ordenou as equipes para a fase de grupos.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sweepstake.groups.map((group, gIdx) => {
-          const userClassification = groupGuesses[gIdx] ?? [];
-          return (
-            <GroupGuessList
-              key={group.id}
-              group={group}
-              userClassification={userClassification}
-              extraGuesses={extraGuesses}
-              sweepstake={sweepstake}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function GroupGuessList({
-  group,
-  userClassification,
-  extraGuesses,
-  sweepstake,
-}: {
-  group: GroupListSweepstakeDto["groups"][number];
-  userClassification: string[];
-  extraGuesses: string[];
-  sweepstake: GroupListSweepstakeDto;
-}) {
-  return (
-    <Card className="bg-zinc-900/40 border border-zinc-900 p-5 rounded-2xl shadow-md">
-      <div>
-        <div className="flex justify-between items-center mb-3 pb-1.5 border-b border-zinc-950">
-          <h4 className="font-extrabold text-sm text-zinc-300">
-            Grupo {group.id}
-          </h4>
-        </div>
-
-        <div className="space-y-3">
-          {userClassification.map((teamId, displayRank0Based) => {
-            const team = group.classification.find((t) => t?.id === teamId);
-            if (!team) return null;
-
-            const displayRank = displayRank0Based + 1;
-
-            const isExtraEligiblePosition =
-              displayRank - 1 === sweepstake.maxRegularQualifiedPosition;
-
-            const isQualified =
-              displayRank - 1 < sweepstake.maxRegularQualifiedPosition ||
-              (isExtraEligiblePosition && extraGuesses.includes(teamId));
-
-            return (
-              <GroupGuessListItem
-                key={teamId}
-                teamId={teamId}
-                teamName={team.name}
-                displayRank={displayRank}
-                isQualified={isQualified}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function GroupGuessListItem({
-  teamId,
-  teamName,
-  displayRank,
-  isQualified,
-}: {
-  teamId: string;
-  teamName: string;
-  displayRank: number;
-  isQualified: boolean;
-}) {
-  const positionBadgeColor = isQualified
-    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
-    : "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
-
-  return (
-    <div className="flex flex-col gap-1 p-4 bg-zinc-950/60 border border-zinc-900 hover:border-zinc-800 rounded-2xl group transition-all">
-      <div className="flex items-center gap-3 min-w-0">
-        <span
-          className={`shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-xl ${positionBadgeColor}`}
-        >
-          {displayRank}º
-        </span>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={getTeamFlagSvgUrl(teamId)}
-          alt={teamName}
-          className="shrink-0 w-6 h-4 object-cover rounded-[2px] shadow-sm"
-        />
-        <span className="truncate font-bold text-sm text-zinc-200">
-          {teamName}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-dashed border-zinc-900/40 pt-1 mt-1">
-        <div className="flex items-center">
-          {isQualified ? (
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Classificado
-            </span>
-          ) : (
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-zinc-800/50 text-zinc-500 border border-zinc-800">
-              Eliminado
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
   );
 }

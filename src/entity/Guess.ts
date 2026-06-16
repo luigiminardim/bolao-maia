@@ -84,4 +84,12 @@ export class PoolGuess {
     this.sweepstakeId = sweepstakeId;
     this.subGuesses = subGuesses;
   }
+
+  getGroupListGuess(groupGuessId: string): GroupListGuess | null {
+    return (
+      this.subGuesses
+        .flatMap((sub) => (sub.kind === "group" ? [sub.groupGuess] : []))
+        .find((sub) => sub.sweepstakeId === groupGuessId) ?? null
+    );
+  }
 }

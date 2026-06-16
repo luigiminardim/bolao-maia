@@ -24,11 +24,12 @@ import {
 } from "../repository/CupChampionshipRepository";
 import { GetUserUsecase } from "./GetUserUsecase";
 import { GetPoolSweepstakeUsecase } from "./GetPoolSweepstakeUsecase";
-import { GetGroupListResultListFromPoolUsecase } from "./GetGroupListResultListFromPoolUsecase";
-import { GetGroupListSweepstakeResultFromPoolUsecase } from "./GetGroupListSweepstakeResultFromPoolUsecase";
+import { GetGroupListGuessResultFromPoolUsecase } from "./GetGroupListGuessResultFromPoolUsecase";
 import { GuessGroupListFromPoolSweepstake } from "./GuessGroupListFromPoolSweepstake";
-import { GetGroupListGuessFromPoolSweepstakeUsecase } from "./GetGroupListGuessFromPoolSweepstakeUsecase";
 import { GetSweepstakeListUsecase } from "./GetSweepstakeListUsecase";
+import { GetGroupListSweepstakeFromPoolUsecase } from "./GetGroupListSweepstakeFromPoolUsecase";
+import { GetGroupListGuessRankListFromPoolRankListUsecase } from "./GetGroupListGuessRankListFromPoolRankListUsecase";
+import { GetGroupListGuessFromPoolUsecase as GetGroupListGuessFromPoolUsecase } from "./GetGroupListGuessFromPoolUsecase";
 
 // Shared storage instance
 const storageType = process.env.JSON_STORAGE;
@@ -80,19 +81,26 @@ export const getPoolSweepstakeUsecase = new GetPoolSweepstakeUsecase(
 export const getSweepstakeListUsecase = new GetSweepstakeListUsecase(
   poolSweepstakeRepository,
 );
-export const getGroupListResultListFromPoolUsecase =
-  new GetGroupListResultListFromPoolUsecase(
+export const getGroupListSweepstakeFromPoolUsecase =
+  new GetGroupListSweepstakeFromPoolUsecase(poolSweepstakeRepository);
+
+export const getGroupListGuessFromPoolUsecase =
+  new GetGroupListGuessFromPoolUsecase(
+    poolSweepstakeRepository,
+    poolGuessRepository,
+  );
+
+export const getGroupListGuessRankListFromPoolRankListUsecase =
+  new GetGroupListGuessRankListFromPoolRankListUsecase(
     poolSweepstakeRepository,
     poolGuessRepository,
     userRepository,
   );
-export const getGroupListSweepstakeResultFromPoolUsecase =
-  new GetGroupListSweepstakeResultFromPoolUsecase(
+export const getGroupListGuessResultFromPoolUsecase =
+  new GetGroupListGuessResultFromPoolUsecase(
     poolSweepstakeRepository,
     poolGuessRepository,
     userRepository,
   );
 export const guessGroupListFromPoolSweepstake =
   new GuessGroupListFromPoolSweepstake(poolGuessRepository, teamRepository);
-export const getGroupListGuessFromPoolUsecase =
-  new GetGroupListGuessFromPoolSweepstakeUsecase(poolGuessRepository);

@@ -1,273 +1,102 @@
-import { Card, Chip } from "@heroui/react";
-import { GroupListSweepstakeDto } from "../../../../../../../usecase/dto/SweepstakeDto";
+import { Chip } from "@heroui/react";
 import {
-  PoolGuessResultDto,
-  GroupGuessResultDto,
+  GroupListGroupGuessResultDto,
   GroupListGuessResultDto,
-} from "../../../../../../../usecase/dto/PoolGuessResultDto";
-import { getTeamFlagSvgUrl } from "../../../../../../utils/getTeamFlagSvgUrl";
+  GroupListTeamGuessResultDto,
+} from "@/usecase/dto/GuessResultDto";
+import { GroupListView } from "./GroupListView";
 
 interface GroupListGuessResultSectionProps {
-  sweepstake: GroupListSweepstakeDto;
-  groupGuesses?: string[][];
-  extraGuesses?: string[];
-  userLeaderboardEntry?: PoolGuessResultDto;
+  result: GroupListGuessResultDto;
 }
 
 export function GroupListGuessResultSection({
-  sweepstake,
-  groupGuesses,
-  extraGuesses,
-  userLeaderboardEntry,
+  result,
 }: GroupListGuessResultSectionProps) {
-  let resultDto: GroupListGuessResultDto;
-
-  if (userLeaderboardEntry) {
-    const groupSubResult = userLeaderboardEntry.subResultList.find(
-      (sub) => sub.kind === "group",
-    );
-    // clone it so we can safely sort
-    resultDto = {
-      score: groupSubResult?.groupResult?.score ?? null,
-      groupResultList:
-        groupSubResult?.groupResult?.groupResultList.map((gr) => ({
-          score: gr.score,
-          classification: [...gr.classification],
-        })) ?? [],
-    };
-  } else if (groupGuesses && extraGuesses) {
-    // Manually construct the DTO from guesses
-    resultDto = {
-      score: null,
-      groupResultList: sweepstake.groups.map((group, gIdx) => {
-        const userClassification = groupGuesses[gIdx] ?? [];
-        return {
-          score: null,
-          classification: group.classification.map((team) => {
-            const guessRank = team
-              ? userClassification.indexOf(team.id) + 1
-              : null;
-            return {
-              team,
-              positionGuess: guessRank,
-              extraQualifiedGuess: team
-                ? extraGuesses.includes(team.id)
-                : false,
-              score: null,
-            };
-          }),
-        };
-      }),
-    };
-  } else {
-    // Fallback if neither are provided
-    resultDto = {
-      score: null,
-      groupResultList: [],
-    };
-  }
-
   return (
-    <GroupListResultSection sweepstake={sweepstake} resultDto={resultDto} />
-  );
-}
-
-interface GroupListResultSectionProps {
-  sweepstake: GroupListSweepstakeDto;
-  resultDto: GroupListGuessResultDto;
-}
-
-export function GroupListResultSection({
-  sweepstake,
-  resultDto,
-}: GroupListResultSectionProps) {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-5 mb-2">
-        <div>
-          <h3 className="font-extrabold text-lg text-zinc-200">
-            Resultados dos Grupos
-          </h3>
-          <p className="text-zinc-500 text-xs mt-0.5">
-            Confira a pontuação obtida em cada palpite da fase de grupos.
-          </p>
+    <GroupListView.Container
+      header={
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-5 mb-2">
+          <div>
+            <h3 className="font-extrabold text-lg text-zinc-200">
+              Resultados dos Grupos
+            </h3>
+            <p className="text-zinc-500 text-xs mt-0.5">
+              Confira a pontuação obtida em cada palpite da fase de grupos.
+            </p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl shadow-inner">
+              <span className="text-xs text-emerald-400 font-bold">Total:</span>
+              <span className="text-lg text-white font-black">
+                {result.score != null ? `${result.score} pts` : "--"}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl shadow-inner">
-          <span className="text-xs text-emerald-400 font-bold">Total:</span>
-          <span className="text-lg text-white font-black">
-            {resultDto.score != null ? `${resultDto.score} pts` : "--"}
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {sweepstake.groups.map((group, gIdx) => {
-          const groupResult = resultDto.groupResultList[gIdx];
-          if (!groupResult) return null;
-
-          return (
-            <GroupResultList
-              key={group.id}
-              group={group}
-              groupResult={groupResult}
-              sweepstake={sweepstake}
-            />
-          );
-        })}
-      </div>
-    </div>
+      }
+    >
+      {result.groupList.map((groupResult, groupIdx) => (
+        <GroupListGroupResultSection key={groupIdx} result={groupResult} />
+      ))}
+    </GroupListView.Container>
   );
 }
 
 interface GroupResultListProps {
-  group: GroupListSweepstakeDto["groups"][number];
-  groupResult: GroupGuessResultDto;
-  sweepstake: GroupListSweepstakeDto;
+  result: GroupListGroupGuessResultDto;
 }
 
-function GroupResultList({
-  group,
-  groupResult,
-  sweepstake,
-}: GroupResultListProps) {
-  const groupScore =
-    groupResult.classification.reduce((acc, c) => acc + (c.score ?? 0), 0) ?? 0;
-
+function GroupListGroupResultSection({ result }: GroupResultListProps) {
   return (
-    <Card className="bg-zinc-900/40 border border-zinc-900 p-5 rounded-2xl shadow-md">
-      <div>
-        <div className="flex justify-between items-center mb-3 pb-1.5 border-b border-zinc-950">
-          <h4 className="font-extrabold text-sm text-zinc-300">
-            Grupo {group.id}
-          </h4>
-          {groupResult.score != null && (
-            <Chip size="sm" color="success" className="text-[10px] font-bold">
-              +{groupScore} pts
-            </Chip>
-          )}
-        </div>
-
-        <div className="space-y-3">
-          {groupResult.classification.map((node, displayRank0Based) => {
-            if (!node.team) return null;
-            const teamId = node.team.id;
-
-            const displayRank = displayRank0Based + 1;
-            const isGuessExtra =
-              node.positionGuess ===
-                sweepstake.maxRegularQualifiedPosition + 1 &&
-              node.extraQualifiedGuess;
-
-            const isExtraEligiblePosition =
-              displayRank - 1 === sweepstake.maxRegularQualifiedPosition;
-
-            const isQualified =
-              displayRank - 1 < sweepstake.maxRegularQualifiedPosition ||
-              (isExtraEligiblePosition &&
-                (sweepstake.status === "open"
-                  ? node.extraQualifiedGuess
-                  : (sweepstake.extraQualifiedList?.some(
-                      (t) => t?.id === teamId,
-                    ) ?? false)));
-
-            return (
-              <GroupResultListItem
-                key={teamId}
-                teamId={teamId}
-                teamName={node.team.name}
-                displayRank={displayRank}
-                guessRank={node.positionGuess ?? displayRank}
-                isQualified={isQualified}
-                isGuessExtra={isGuessExtra}
-                teamPoints={node.score}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </Card>
+    <GroupListView.Group
+      groupName={`Grupo ${result.group.id}`}
+      topRightContent={
+        result.score != null && (
+          <Chip size="sm" color="success" className="text-[10px] font-bold">
+            {result.score} pts
+          </Chip>
+        )
+      }
+    >
+      {result.classification.map((teamResult, index) => (
+        <GroupListTeamGuessResultArticle key={index} result={teamResult} />
+      ))}
+    </GroupListView.Group>
   );
 }
 
-interface GroupResultListItemProps {
-  teamId: string;
-  teamName: string;
-  displayRank: number;
-  guessRank: number;
-  isQualified: boolean;
-  isGuessExtra: boolean;
-  teamPoints?: number | null;
+interface GroupListTeamGuessResultArticleProps {
+  result: GroupListTeamGuessResultDto;
 }
 
-function GroupResultListItem({
-  teamId,
-  teamName,
-  displayRank,
-  guessRank,
-  isQualified,
-  isGuessExtra,
-  teamPoints,
-}: GroupResultListItemProps) {
-  const positionBadgeColor = isQualified
-    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
-    : "bg-zinc-950/80 text-zinc-500 border border-zinc-900";
-
+function GroupListTeamGuessResultArticle({
+  result,
+}: GroupListTeamGuessResultArticleProps) {
   return (
-    <div className="flex flex-col gap-1 p-4 bg-zinc-950/60 border border-zinc-900 hover:border-zinc-800 rounded-2xl group transition-all">
-      {/* Row 1: Position + Flag + Team Name + Team Score */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <span
-            className={`shrink-0 text-[10px] font-bold px-2.5 py-1 rounded-xl ${positionBadgeColor}`}
-          >
-            {displayRank}º
-          </span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={getTeamFlagSvgUrl(teamId)}
-            alt={teamName}
-            className="shrink-0 w-6 h-4 object-cover rounded-[2px] shadow-sm"
-          />
-          <span className="truncate font-bold text-sm text-zinc-200">
-            {teamName}
-          </span>
-        </div>
-
-        <div className="shrink-0">
-          {teamPoints != null ? (
-            teamPoints > 0 ? (
-              <span className="text-emerald-400 font-extrabold text-xs">
-                +{teamPoints} pts
-              </span>
-            ) : (
-              <span className="text-zinc-600 font-bold text-xs">0 pts</span>
-            )
-          ) : (
-            <span className="text-zinc-500 font-bold text-xs">-</span>
-          )}
-        </div>
-      </div>
-
-      {/* Row 2: Status Badge + Guess Info */}
-      <div className="flex items-center justify-between border-t border-dashed border-zinc-900/40 pt-1 mt-1">
-        <div className="flex items-center">
-          {isQualified ? (
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Classificado
+    <GroupListView.Team
+      team={result.team}
+      position={result.guessPosition}
+      isQualified={result.guessQualified}
+      TopRightComponent={
+        result.score != null ? (
+          result.score > 0 ? (
+            <span className="text-emerald-400 font-extrabold text-xs">
+              +{result.score} pts
             </span>
           ) : (
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-zinc-800/50 text-zinc-500 border border-zinc-800">
-              Eliminado
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] font-semibold text-zinc-500">
-            Palpite: {guessRank}º {isGuessExtra ? "classificado" : ""}
-          </span>
-        </div>
-      </div>
-    </div>
+            <span className="text-zinc-600 font-bold text-xs">0 pts</span>
+          )
+        ) : (
+          <span className="text-zinc-500 font-bold text-xs">-</span>
+        )
+      }
+      BottomRightComponent={
+        <span className="text-[10px] font-semibold text-zinc-500">
+          Posição Real: {result.teamPosition}º{" "}
+          {result.teamExtraQualified ? "classificado" : ""}
+        </span>
+      }
+    />
   );
 }

@@ -13,39 +13,24 @@ import {
 } from "@heroui/react";
 import { submitGuessAction } from "../../../../../../actions";
 import { GroupListSweepstakeDto } from "../../../../../../../usecase/dto/SweepstakeDto";
-import { GroupListGuessDto } from "../../../../../../../usecase/dto/GuessDto";
 import { getTeamFlagSvgUrl } from "../../../../../../utils/getTeamFlagSvgUrl";
 
 // --- Custom Hook ---
 
 interface UseGroupListGuessFormProps {
   sweepstake: GroupListSweepstakeDto;
-  existingGuess: GroupListGuessDto | null;
 }
 
-function useGroupListGuessForm({
-  sweepstake,
-  existingGuess,
-}: UseGroupListGuessFormProps) {
+function useGroupListGuessForm({ sweepstake }: UseGroupListGuessFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const [groupGuesses, setGroupGuesses] = useState<string[][]>(() => {
-    if (existingGuess) {
-      return existingGuess.groupGuesses.map((g) =>
-        g.classification.map((t) => t.id),
-      );
-    }
     return sweepstake.groups.map((g) =>
       g.classification.map((t) => t?.id ?? ""),
     );
   });
 
-  const [extraGuesses, setExtraGuesses] = useState<string[]>(() => {
-    if (existingGuess) {
-      return existingGuess.extraQualifiedListGuess.map((t) => t.id);
-    }
-    return [];
-  });
+  const [extraGuesses, setExtraGuesses] = useState<string[]>([]);
 
   const validateExtraGuesses = (newGroupGuesses: string[][]) => {
     let changed = false;
@@ -491,14 +476,12 @@ interface GroupListGuessFormClientProps {
   poolId: string;
   groupListId: string;
   sweepstake: GroupListSweepstakeDto;
-  existingGuess: GroupListGuessDto | null;
 }
 
 export function GroupListGuessFormClient({
   poolId,
   groupListId,
   sweepstake,
-  existingGuess,
 }: GroupListGuessFormClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -511,7 +494,7 @@ export function GroupListGuessFormClient({
     handleMoveUp,
     handleMoveDown,
     handleToggleExtraQualified,
-  } = useGroupListGuessForm({ sweepstake, existingGuess });
+  } = useGroupListGuessForm({ sweepstake });
 
   const handleSubmitGuess = () => {
     if (extraGuesses.length !== sweepstake.extraQualifiedLength) return;

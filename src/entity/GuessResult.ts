@@ -1,4 +1,5 @@
 import { BinaryTree } from "../utils/BinaryTree";
+import { GroupListGroupChampionship } from "./Championship";
 import { CupGuess, GroupGuess, GroupListGuess, PoolGuess } from "./Guess";
 import {
   CupSweepstake,
@@ -15,11 +16,15 @@ type CupGuessNodeInfo = {
 };
 
 export class CupGuessResult {
+  sweepstakeId: string;
+  userId: string;
   score: number | null;
   root: BinaryTree<CupGuessNodeInfo>;
   thirdPlace: null | CupGuessNodeInfo;
 
   constructor(sweepstake: CupSweepstake, guess: CupGuess) {
+    this.userId = guess.userId;
+    this.sweepstakeId = guess.sweepstakeId;
     const cup = sweepstake.championship;
     const scorePolicy = sweepstake.scorePolicy;
     const isLocked = sweepstake.getStatus() === "locked";
@@ -86,65 +91,58 @@ export class CupGuessResult {
   }
 }
 
-type GroupGuessNodeInfo = {
-  team: null | Team;
-  positionGuess: null | number;
-  extraQualifiedGuess: boolean;
+export type GroupListTeamGuessResult = {
+  team: Team;
+  guessPosition: number;
+  guessQualified: boolean;
+  guessExtraQualified: boolean;
+  teamPosition: null | number;
+  teamQualified: boolean;
+  teamExtraQualified: boolean;
   score: null | number;
 };
 
-export class GroupGuessResult {
+export class GroupListGroupGuessResult {
   score: number | null;
-  classification: GroupGuessNodeInfo[];
+  classification: GroupListTeamGuessResult[];
 
   constructor(
     sweepstake: GroupListSweepstake,
-    groupId: string,
+    group: GroupListGroupChampionship,
     groupGuess: GroupGuess,
     extraQualifiedListGuess: Team[],
   ) {
     const { championship, scorePolicy } = sweepstake;
     const isLocked = sweepstake.getStatus() === "locked";
-    const group = championship.getGroup(groupId);
-    if (!group) {
-      this.classification = [];
-      this.score = isLocked ? 0 : null;
-      return;
-    }
 
-    this.classification = group.classification.map((team) => {
-      if (team === null) {
+    this.classification = groupGuess.classification.map(
+      (team, teamIdx): GroupListTeamGuessResult => {
+        const guessPosition = teamIdx + 1;
+        const guessQualified =
+          sweepstake.championship.positionIsRegularQualified(guessPosition);
+        const guessExtraQualified = !!extraQualifiedListGuess.find(
+          (t) => t.id === team.id,
+        );
+        const score = isLocked
+          ? scorePolicy.groupListTeamScore(
+              team,
+              championship,
+              guessPosition,
+              extraQualifiedListGuess,
+            )
+          : null;
         return {
-          team: null,
-          positionGuess: null,
-          extraQualifiedGuess: false,
-          score: null,
+          team,
+          guessPosition,
+          guessQualified,
+          guessExtraQualified,
+          teamPosition: championship.teamPosition(team),
+          teamQualified: championship.teamIsQualified(team),
+          teamExtraQualified: championship.teamIsExtraQualified(team),
+          score,
         };
-      }
-      const guessPosition = groupGuess.teamPosition(team) ?? -1;
-      console.log({
-        group: JSON.stringify(group),
-        team: JSON.stringify(team),
-        guessPosition,
-      });
-      const extraQualifiedGuess = !!extraQualifiedListGuess.find(
-        (t) => t.id === team.id,
-      );
-      const score = isLocked
-        ? scorePolicy.groupListTeamScore(
-            team,
-            championship,
-            guessPosition,
-            extraQualifiedListGuess,
-          )
-        : null;
-      return {
-        team,
-        positionGuess: guessPosition,
-        extraQualifiedGuess,
-        score,
-      };
-    });
+      },
+    );
 
     this.score = isLocked
       ? this.classification.reduce((acc, node) => acc + (node.score ?? 0), 0)
@@ -153,23 +151,27 @@ export class GroupGuessResult {
 }
 
 export class GroupListGuessResult {
+  sweepstakeId: string;
+  userId: string;
   score: number | null;
-  groups: GroupGuessResult[];
+  groupList: GroupListGroupGuessResult[];
 
   constructor(sweepstake: GroupListSweepstake, guess: GroupListGuess) {
+    this.sweepstakeId = guess.sweepstakeId;
+    this.userId = guess.userId;
     const isLocked = sweepstake.getStatus() === "locked";
-    this.groups = sweepstake.championship.getGroups().map((group, idx) => {
+    this.groupList = sweepstake.championship.getGroups().map((group, idx) => {
       const groupGuess = guess.groupGuesses[idx];
       if (!groupGuess) throw new Error(`Missing group guess at index ${idx}`);
-      return new GroupGuessResult(
+      return new GroupListGroupGuessResult(
         sweepstake,
-        group.getId(),
+        group,
         groupGuess,
         guess.extraQualifiedListGuess,
       );
     });
     this.score = isLocked
-      ? this.groups.reduce((acc, result) => acc + (result.score ?? 0), 0)
+      ? this.groupList.reduce((acc, result) => acc + (result.score ?? 0), 0)
       : null;
   }
 }

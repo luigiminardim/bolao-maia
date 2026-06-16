@@ -1,12 +1,12 @@
 import {
   CupChampionship,
-  GroupChampionship,
+  GroupListGroupChampionship,
   GroupListChampionship,
 } from "./Championship";
 import { CupGuess, GroupGuess, GroupListGuess, PoolGuess } from "./Guess";
 import {
   CupGuessResult,
-  GroupGuessResult,
+  GroupListGroupGuessResult,
   GroupListGuessResult,
   PoolGuessResult,
 } from "./GuessResult";
@@ -24,14 +24,14 @@ describe("GuessResult", () => {
   const user = new User("User 1");
 
   const t1A = new Team("t1A", "Team 1A");
-  const t2A = new Team("t2A", "Team 2A");
-  const t3A = new Team("t3A", "Team 3A");
+  const t2A_guess3_extraQualified = new Team("t2A", "Team 2A");
+  const t3A_guess2 = new Team("t3A", "Team 3A");
   const t4A = new Team("t4A", "Team 4A");
 
-  const t1B = new Team("t1B", "Team 1B");
-  const t2B = new Team("t2B", "Team 2B");
-  const t3B = new Team("t3B", "Team 3B");
-  const t4B = new Team("t4B", "Team 4B");
+  const t1B_guess4 = new Team("t1B", "Team 1B");
+  const t2B_guess3 = new Team("t2B", "Team 2B");
+  const t3B_guess2 = new Team("t3B", "Team 3B");
+  const t4B_guess1 = new Team("t4B", "Team 4B");
 
   const c1 = new Team("c1", "Cup 1");
   const c2 = new Team("c2", "Cup 2");
@@ -55,8 +55,18 @@ describe("GuessResult", () => {
     "gl1",
     "Group List 1",
     [
-      new GroupChampionship("gA", [t1A, t2A, t3A, t4A]),
-      new GroupChampionship("gB", [t1B, t2B, t3B, t4B]),
+      new GroupListGroupChampionship("gA", [
+        t1A,
+        t2A_guess3_extraQualified,
+        t3A_guess2,
+        t4A,
+      ]),
+      new GroupListGroupChampionship("gB", [
+        t1B_guess4,
+        t2B_guess3,
+        t3B_guess2,
+        t4B_guess1,
+      ]),
     ],
     [null],
     1,
@@ -67,8 +77,18 @@ describe("GuessResult", () => {
     "gl1",
     "Group List 1",
     [
-      new GroupChampionship("gA", [t1A, t2A, t3A, t4A]),
-      new GroupChampionship("gB", [t1B, t2B, t3B, t4B]),
+      new GroupListGroupChampionship("gA", [
+        t1A,
+        t2A_guess3_extraQualified,
+        t3A_guess2,
+        t4A,
+      ]),
+      new GroupListGroupChampionship("gB", [
+        t1B_guess4,
+        t2B_guess3,
+        t3B_guess2,
+        t4B_guess1,
+      ]),
     ],
     [null],
     1,
@@ -79,10 +99,20 @@ describe("GuessResult", () => {
     "gl1",
     "Group List 1",
     [
-      new GroupChampionship("gA", [t1A, t2A, t3A, t4A]),
-      new GroupChampionship("gB", [t1B, t2B, t3B, t4B]),
+      new GroupListGroupChampionship("gA", [
+        t1A,
+        t2A_guess3_extraQualified,
+        t3A_guess2,
+        t4A,
+      ]),
+      new GroupListGroupChampionship("gB", [
+        t1B_guess4,
+        t2B_guess3,
+        t3B_guess2,
+        t4B_guess1,
+      ]),
     ],
-    [t3A], // team 3A extra qualified
+    [t3A_guess2], // team 3A extra qualified
     1,
     new Date(),
   );
@@ -181,10 +211,10 @@ describe("GuessResult", () => {
     user.id(),
     "swG",
     [
-      new GroupGuess([t1A, t3A, t2A, t4A]),
-      new GroupGuess([t4B, t3B, t2B, t1B]),
+      new GroupGuess([t1A, t3A_guess2, t2A_guess3_extraQualified, t4A]),
+      new GroupGuess([t4B_guess1, t3B_guess2, t2B_guess3, t1B_guess4]),
     ],
-    [t2A],
+    [t2A_guess3_extraQualified],
   );
 
   const cupGuess = new CupGuess(
@@ -224,9 +254,9 @@ describe("GuessResult", () => {
         waitingGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupGuessResult(
+      const res = new GroupListGroupGuessResult(
         groupSweepstake,
-        "gA",
+        groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
       );
@@ -243,9 +273,9 @@ describe("GuessResult", () => {
         justStartedGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupGuessResult(
+      const res = new GroupListGroupGuessResult(
         groupSweepstake,
-        "gA",
+        groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
       );
@@ -253,9 +283,9 @@ describe("GuessResult", () => {
       expect(res.score).toBe(20);
       expect(res.classification[0]?.team).toBe(t1A);
       expect(res.classification[0]?.score).toBe(20); // score(1º) = 10 * log2(4/1)
-      expect(res.classification[0]?.extraQualifiedGuess).toBe(false);
-      expect(res.classification[1]?.team).toBe(t2A);
-      expect(res.classification[1]?.extraQualifiedGuess).toBe(true);
+      expect(res.classification[0]?.guessExtraQualified).toBe(false);
+      expect(res.classification[2]?.team).toBe(t2A_guess3_extraQualified);
+      expect(res.classification[2]?.guessExtraQualified).toBe(true);
     });
 
     it("finished championship", () => {
@@ -266,9 +296,9 @@ describe("GuessResult", () => {
         finishedGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupGuessResult(
+      const res = new GroupListGroupGuessResult(
         groupSweepstake,
-        "gA",
+        groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
       );
@@ -276,9 +306,9 @@ describe("GuessResult", () => {
       expect(res.score).toBe(20);
       expect(res.classification[0]?.team).toBe(t1A);
       expect(res.classification[0]?.score).toBe(20);
-      expect(res.classification[0]?.extraQualifiedGuess).toBe(false);
-      expect(res.classification[1]?.team).toBe(t2A);
-      expect(res.classification[1]?.extraQualifiedGuess).toBe(true);
+      expect(res.classification[0]?.guessExtraQualified).toBe(false);
+      expect(res.classification[1]?.team).toBe(t3A_guess2);
+      expect(res.classification[1]?.teamExtraQualified).toBe(true);
     });
   });
 
@@ -292,7 +322,7 @@ describe("GuessResult", () => {
         groupScorePolicy,
       );
       const res = new GroupListGuessResult(groupSweepstake, groupGuess);
-      expect(res.groups).toHaveLength(2);
+      expect(res.groupList).toHaveLength(2);
       expect(res.score).toBeNull();
     });
 
@@ -305,11 +335,13 @@ describe("GuessResult", () => {
         groupScorePolicy,
       );
       const res = new GroupListGuessResult(groupSweepstake, groupGuess);
-      expect(res.groups).toHaveLength(2);
+      expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(20);
-      expect(res.groups[0]?.classification[0]?.team).toBe(t1A);
-      expect(res.groups[0]?.classification[1]?.team).toBe(t2A);
-      expect(res.groups[0]?.classification[1]?.extraQualifiedGuess).toBe(true);
+      expect(res.groupList[0]?.classification[0]?.team).toBe(t1A);
+      expect(res.groupList[0]?.classification[2]?.team).toBe(t2A_guess3_extraQualified);
+      expect(res.groupList[0]?.classification[2]?.guessExtraQualified).toBe(
+        true,
+      );
     });
 
     it("finished championship", () => {
@@ -321,13 +353,17 @@ describe("GuessResult", () => {
         groupScorePolicy,
       );
       const res = new GroupListGuessResult(groupSweepstake, groupGuess);
-      expect(res.groups).toHaveLength(2);
+      expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(20);
-      expect(res.groups[0]?.classification[0]?.team).toBe(t1A);
-      expect(res.groups[0]?.classification[0]?.extraQualifiedGuess).toBe(false);
-      expect(res.groups[0]?.classification[1]?.team).toBe(t2A);
-      expect(res.groups[0]?.classification[1]?.extraQualifiedGuess).toBe(true);
-      expect(res.groups[0]?.classification[0]?.score).toBe(20);
+      expect(res.groupList[0]?.classification[0]?.team).toBe(t1A);
+      expect(res.groupList[0]?.classification[0]?.guessExtraQualified).toBe(
+        false,
+      );
+      expect(res.groupList[0]?.classification[1]?.team).toBe(t3A_guess2);
+      expect(res.groupList[0]?.classification[1]?.teamExtraQualified).toBe(
+        true,
+      );
+      expect(res.groupList[0]?.classification[0]?.score).toBe(20);
     });
   });
 
@@ -461,10 +497,10 @@ describe("GuessResult", () => {
 
       expect(groupRes).toBeDefined();
       if (groupRes?.kind === "group") {
-        expect(groupRes.groupResult.groups).toHaveLength(2);
-        expect(groupRes.groupResult.groups[0]?.classification[0]?.score).toBe(
-          20,
-        );
+        expect(groupRes.groupResult.groupList).toHaveLength(2);
+        expect(
+          groupRes.groupResult.groupList[0]?.classification[0]?.score,
+        ).toBe(20);
       }
 
       expect(cupRes).toBeDefined();

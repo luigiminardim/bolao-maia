@@ -3,7 +3,7 @@ import { Team } from "./Team.ts";
 
 export type ChampionshipStatus = "draft" | "waiting" | "running";
 
-export class GroupChampionship {
+export class GroupListGroupChampionship {
   private id: string;
   classification: (Team | null)[];
 
@@ -29,7 +29,7 @@ export class GroupChampionship {
 export class GroupListChampionship {
   private id: string;
   private name: string;
-  private groups: GroupChampionship[];
+  private groups: GroupListGroupChampionship[];
   private extraQualifiedList: (null | Team)[];
   readonly maxRegularQualifiedPosition: number;
   private startDate: Date;
@@ -37,7 +37,7 @@ export class GroupListChampionship {
   constructor(
     id: string,
     name: string,
-    groups: GroupChampionship[],
+    groups: GroupListGroupChampionship[],
     extraQualifiedList: (null | Team)[],
     maxRegularQualifiedPosition: number,
     startDate: Date,
@@ -90,13 +90,13 @@ export class GroupListChampionship {
     return null;
   }
 
-  getTeamGroup(team: Team): GroupChampionship | null {
+  getTeamGroup(team: Team): GroupListGroupChampionship | null {
     return (
       this.groups.find((group) => group.teamPosition(team) !== null) ?? null
     );
   }
 
-  getGroups(): GroupChampionship[] {
+  getGroups(): GroupListGroupChampionship[] {
     return this.groups;
   }
 
@@ -104,7 +104,7 @@ export class GroupListChampionship {
     return this.extraQualifiedList;
   }
 
-  getGroup(groupId: string): GroupChampionship | null {
+  getGroup(groupId: string): GroupListGroupChampionship | null {
     return this.groups.find((g) => g.getId() === groupId) ?? null;
   }
 

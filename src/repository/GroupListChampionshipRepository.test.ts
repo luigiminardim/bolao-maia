@@ -1,7 +1,7 @@
 import { FileGroupListChampionshipRepository } from "./GroupListChampionshipRepository";
 import {
   GroupListChampionship,
-  GroupChampionship,
+  GroupListGroupChampionship,
 } from "../entity/Championship";
 import { Team } from "../entity/Team";
 import { TeamRepository } from "./TeamRepository";
@@ -29,7 +29,7 @@ describe("FileGroupListChampionshipRepository", () => {
   describe("save", () => {
     it("should map GroupListChampionship to GroupListChampionshipDao and call save on storage", async () => {
       const brazil = new Team("brazil", "Brazil");
-      const groupA = new GroupChampionship("group-a", [brazil, null]);
+      const groupA = new GroupListGroupChampionship("group-a", [brazil, null]);
       const groupList = new GroupListChampionship(
         "2026-world-cup",
         "Test Group List",
