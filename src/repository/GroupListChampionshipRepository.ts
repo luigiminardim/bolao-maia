@@ -77,7 +77,16 @@ export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
       classification: ["england", "croatia", "ghana", "panama"],
     },
   ],
-  extraQualifiedList: Array(8).fill(null),
+  extraQualifiedList: [
+    "netherlands",
+    "brazil",
+    "belgium",
+    "quatar",
+    "spain",
+    "austria",
+    "uzbekistan",
+    "iraq",
+  ],
   maxRegularQualifiedPosition: 2,
   startDate: "2026-06-11T19:00:00Z",
 };
