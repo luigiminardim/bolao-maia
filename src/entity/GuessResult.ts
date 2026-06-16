@@ -118,11 +118,12 @@ export class GroupListGroupGuessResult {
     this.classification = groupGuess.classification.map(
       (team, teamIdx): GroupListTeamGuessResult => {
         const guessPosition = teamIdx + 1;
-        const guessQualified =
-          sweepstake.championship.positionIsRegularQualified(guessPosition);
         const guessExtraQualified = !!extraQualifiedListGuess.find(
           (t) => t.id === team.id,
         );
+        const guessQualified =
+          sweepstake.championship.positionIsRegularQualified(guessPosition) ||
+          guessExtraQualified;
         const score = isLocked
           ? scorePolicy.groupListTeamScore(
               team,
