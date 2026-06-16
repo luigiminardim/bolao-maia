@@ -338,7 +338,9 @@ describe("GuessResult", () => {
       expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(20);
       expect(res.groupList[0]?.classification[0]?.team).toBe(t1A);
-      expect(res.groupList[0]?.classification[2]?.team).toBe(t2A_guess3_extraQualified);
+      expect(res.groupList[0]?.classification[2]?.team).toBe(
+        t2A_guess3_extraQualified,
+      );
       expect(res.groupList[0]?.classification[2]?.guessExtraQualified).toBe(
         true,
       );
