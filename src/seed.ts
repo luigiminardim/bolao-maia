@@ -261,7 +261,7 @@ async function seed() {
   const worldCup2026CupSweepstake = new CupSweepstake(
     "2026-world-cup",
     "Mata-Mata",
-    "Defina",
+    "Defina os vencedores de cada confronto eliminatório até a grande final.",
     worldCup2026Cup,
     ScorePolicyBuilder.buildCupScorePolicyFromId(
       "scaled(10, log2(inverse-probability-position))",
