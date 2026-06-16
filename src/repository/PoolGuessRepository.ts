@@ -7,9 +7,8 @@ import {
 } from "../entity/Guess";
 import { Team } from "../entity/Team";
 import { BinaryTree } from "../utils/BinaryTree";
-import { JsonStorage, JsonFileStorage } from "../infra/JsonStorage";
+import { JsonStorage } from "../infra/JsonStorage";
 import { TeamRepository } from "./TeamRepository";
-import path from "path";
 
 export interface GroupGuessDao {
   classification: string[]; // Team IDs
@@ -153,10 +152,9 @@ export class PoolGuessRepository {
   private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
 
-  constructor(storage?: JsonStorage, teamRepository?: TeamRepository) {
-    this.storage =
-      storage || new JsonFileStorage(path.join(process.cwd(), ".filestorage"));
-    this.teamRepository = teamRepository || new TeamRepository();
+  constructor(storage: JsonStorage, teamRepository: TeamRepository) {
+    this.storage = storage;
+    this.teamRepository = teamRepository;
   }
 
   private getStorageId(userId: string, sweepstakeId: string): string {

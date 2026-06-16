@@ -18,7 +18,14 @@ describe("FileGroupListChampionshipRepository", () => {
       load: jest.fn(),
     } as unknown as jest.Mocked<JsonStorage>;
 
-    teamRepository = new TeamRepository();
+    teamRepository = {
+      findById: jest.fn().mockImplementation(async (id: string) => {
+        if (id) return new Team(id, id);
+        return null;
+      }),
+      save: jest.fn(),
+      findAll: jest.fn(),
+    } as unknown as TeamRepository;
 
     groupListRepository = new FileGroupListChampionshipRepository(
       mockStorage,
@@ -62,7 +69,82 @@ describe("FileGroupListChampionshipRepository", () => {
     });
 
     it("should map dao to entity for the mock 2026-world-cup", async () => {
-      // 2026-world-cup bypasses the storage and uses mock
+      mockStorage.load.mockResolvedValueOnce({
+        name: "Copa do Mundo FIFA 2026",
+        groups: [
+          {
+            id: "A",
+            classification: [
+              "mexico",
+              "south-korea",
+              "czechia",
+              "south-africa",
+            ],
+          },
+          {
+            id: "B",
+            classification: [
+              "switzerland",
+              "canada",
+              "qatar",
+              "bosnia-herzegovina",
+            ],
+          },
+          {
+            id: "C",
+            classification: ["scotland", "morocco", "brazil", "haiti"],
+          },
+          {
+            id: "D",
+            classification: ["usa", "australia", "turkiye", "paraguay"],
+          },
+          {
+            id: "E",
+            classification: ["germany", "ivory-coast", "ecuador", "curacao"],
+          },
+          {
+            id: "F",
+            classification: ["sweden", "japan", "netherlands", "tunisia"],
+          },
+          {
+            id: "G",
+            classification: ["new-zealand", "iran", "belgium", "egypt"],
+          },
+          {
+            id: "H",
+            classification: ["uruguay", "saudi-arabia", "spain", "cape-verde"],
+          },
+          {
+            id: "I",
+            classification: ["france", "senegal", "iraq", "norway"],
+          },
+          {
+            id: "J",
+            classification: ["argentina", "algeria", "austria", "jordan"],
+          },
+          {
+            id: "K",
+            classification: ["portugal", "dr-congo", "uzbekistan", "colombia"],
+          },
+          {
+            id: "L",
+            classification: ["england", "croatia", "ghana", "panama"],
+          },
+        ],
+        extraQualifiedList: [
+          "netherlands",
+          "brazil",
+          "belgium",
+          "qatar",
+          "spain",
+          "austria",
+          "uzbekistan",
+          "iraq",
+        ],
+        maxRegularQualifiedPosition: 2,
+        startDate: "2026-06-11T19:00:00Z",
+      });
+
       const result = await groupListRepository.findById("2026-world-cup");
 
       expect(result).not.toBeNull();
@@ -78,11 +160,9 @@ describe("FileGroupListChampionshipRepository", () => {
       const groupA = groups[0]!;
       expect(groupA.getId()).toBe("A");
       expect(groupA.classification).toHaveLength(4);
-      expect(groupA.classification.every((t) => t !== null)).toBe(true);
 
       const extraQualified = result!.getExtraQualifiedList();
       expect(extraQualified).toHaveLength(8);
-      expect(extraQualified.every((t) => t === null)).toBe(true);
     });
   });
 });

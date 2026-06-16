@@ -8,19 +8,16 @@ import { UserRepository } from "../repository/UserRepository";
 import {
   PoolSweepstakeRepository,
   FilePoolSweepstakeRepository,
-  MockPoolSweepstakeRepository,
 } from "../repository/PoolSweepstakeRepository";
 import { PoolGuessRepository } from "../repository/PoolGuessRepository";
 import { TeamRepository } from "../repository/TeamRepository";
 import {
   GroupListChampionshipRepository,
   FileGroupListChampionshipRepository,
-  MockGroupListChampionshipRepository,
 } from "../repository/GroupListChampionshipRepository";
 import {
   CupChampionshipRepository,
   FileCupChampionshipRepository,
-  MockCupChampionshipRepository,
 } from "../repository/CupChampionshipRepository";
 import { GetUserUsecase } from "./GetUserUsecase";
 import { GetPoolSweepstakeUsecase } from "./GetPoolSweepstakeUsecase";
@@ -44,30 +41,21 @@ export const storage: JsonStorage =
         ),
       );
 
-export const teamRepository = new TeamRepository();
+export const teamRepository = new TeamRepository(storage);
 export const userRepository = new UserRepository(storage);
 
 export const cupChampionshipRepository: CupChampionshipRepository =
-  storageType === "MOCK"
-    ? new MockCupChampionshipRepository(teamRepository)
-    : new FileCupChampionshipRepository(storage, teamRepository);
+  new FileCupChampionshipRepository(storage, teamRepository);
 
 export const groupListChampionshipRepository: GroupListChampionshipRepository =
-  storageType === "MOCK"
-    ? new MockGroupListChampionshipRepository(teamRepository)
-    : new FileGroupListChampionshipRepository(storage, teamRepository);
+  new FileGroupListChampionshipRepository(storage, teamRepository);
 
 export const poolSweepstakeRepository: PoolSweepstakeRepository =
-  storageType === "MOCK"
-    ? new MockPoolSweepstakeRepository(
-        groupListChampionshipRepository,
-        cupChampionshipRepository,
-      )
-    : new FilePoolSweepstakeRepository(
-        storage,
-        groupListChampionshipRepository,
-        cupChampionshipRepository,
-      );
+  new FilePoolSweepstakeRepository(
+    storage,
+    groupListChampionshipRepository,
+    cupChampionshipRepository,
+  );
 
 export const poolGuessRepository = new PoolGuessRepository(
   storage,

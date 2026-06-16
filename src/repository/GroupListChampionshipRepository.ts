@@ -25,72 +25,6 @@ export interface GroupListChampionshipRepository {
   findById(id: string): Promise<GroupListChampionship | null>;
 }
 
-export const GROUP_LIST_MOCK_DAO: GroupListChampionshipDao = {
-  name: "Copa do Mundo FIFA 2026",
-  groups: [
-    {
-      id: "A",
-      classification: ["mexico", "south-korea", "czechia", "south-africa"],
-    },
-    {
-      id: "B",
-      classification: ["switzerland", "canada", "qatar", "bosnia-herzegovina"],
-    },
-    {
-      id: "C",
-      classification: ["scotland", "morocco", "brazil", "haiti"],
-    },
-    {
-      id: "D",
-      classification: ["usa", "australia", "turkiye", "paraguay"],
-    },
-    {
-      id: "E",
-      classification: ["germany", "ivory-coast", "ecuador", "curacao"],
-    },
-    {
-      id: "F",
-      classification: ["sweden", "japan", "netherlands", "tunisia"],
-    },
-    {
-      id: "G",
-      classification: ["new-zealand", "iran", "belgium", "egypt"],
-    },
-    {
-      id: "H",
-      classification: ["uruguay", "saudi-arabia", "spain", "cape-verde"],
-    },
-    {
-      id: "I",
-      classification: ["france", "senegal", "iraq", "norway"],
-    },
-    {
-      id: "J",
-      classification: ["argentina", "algeria", "austria", "jordan"],
-    },
-    {
-      id: "K",
-      classification: ["portugal", "dr-congo", "uzbekistan", "colombia"],
-    },
-    {
-      id: "L",
-      classification: ["england", "croatia", "ghana", "panama"],
-    },
-  ],
-  extraQualifiedList: [
-    "netherlands",
-    "brazil",
-    "belgium",
-    "qatar",
-    "spain",
-    "austria",
-    "uzbekistan",
-    "iraq",
-  ],
-  maxRegularQualifiedPosition: 2,
-  startDate: "2026-06-11T19:00:00Z",
-};
-
 export class FileGroupListChampionshipRepository implements GroupListChampionshipRepository {
   private readonly storage: JsonStorage;
   private readonly teamRepository: TeamRepository;
@@ -122,45 +56,10 @@ export class FileGroupListChampionshipRepository implements GroupListChampionshi
   }
 
   async findById(id: string): Promise<GroupListChampionship | null> {
-    if (id !== "2026-world-cup") {
-      return null;
-    }
-    const dao = GROUP_LIST_MOCK_DAO;
-
-    return await mapGroupListChampionshipDaoToEntity(
-      dao,
-      id,
-      this.teamRepository,
+    const dao = await this.storage.load<GroupListChampionshipDao>(
+      `/sweepstake/GroupListChampionship/${id}`,
     );
-  }
-}
-
-export class MockGroupListChampionshipRepository implements GroupListChampionshipRepository {
-  private readonly teamRepository: TeamRepository;
-
-  constructor(teamRepository: TeamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  async save(_id: string, _championship: GroupListChampionship): Promise<void> {
-    // Mock save does nothing
-  }
-
-  async findById(id: string): Promise<GroupListChampionship | null> {
-    const dao = structuredClone(GROUP_LIST_MOCK_DAO);
-    if (id === "test-status-draft") {
-      const group = dao.groups[0];
-      if (!group) throw new Error("Mock group A not found");
-      group.classification[0] = null; // simulate missing team
-      dao.startDate = new Date(Date.now() + 1000000000).toISOString();
-      dao.name = "Test Draft Status of Group List";
-    } else if (id === "test-status-waiting") {
-      dao.startDate = new Date(Date.now() + 1000000000).toISOString();
-      dao.name = "Test Waiting Status of Group List";
-    } else if (id === "test-status-running") {
-      dao.startDate = new Date(Date.now() - 1000000000).toISOString();
-      dao.name = "Test Running Status of Group List";
-    } else {
+    if (!dao) {
       return null;
     }
 

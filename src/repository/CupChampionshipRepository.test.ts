@@ -64,7 +64,104 @@ describe("FileCupChampionshipRepository", () => {
     });
 
     it("should map dao to entity for the mock 2026-world-cup", async () => {
-      // For 2026-world-cup, it bypasses storage and uses the mock DAO
+      mockStorage.load.mockResolvedValueOnce({
+        id: "2026-world-cup",
+        name: "Copa do Mundo FIFA 2026",
+        startDate: "2026-06-28T19:00:00.000Z",
+        hasThirdPlaceMatch: true,
+        thirdPlace: null,
+        root: {
+          elem: null,
+          children: [
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              elem: null,
+              children: [
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  elem: null,
+                  children: [
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                    {
+                      elem: null,
+                      children: [
+                        { elem: null, children: [null, null] },
+                        { elem: null, children: [null, null] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
       const result = await cupRepository.findById("2026-world-cup");
 
       expect(result).not.toBeNull();
@@ -76,8 +173,8 @@ describe("FileCupChampionshipRepository", () => {
       );
       expect(result!.root).toBeInstanceOf(BinaryTree);
 
-      // Check that it's an empty tree of height 5 with exactly 32 null leaves
-      expect(result!.root.numLeafs()).toBe(32);
+      // Check that it's an empty tree of height 4 with exactly 16 null leaves
+      expect(result!.root.numLeafs()).toBe(16);
       expect(result!.root.listLeaf().every((l) => l === null)).toBe(true);
     });
   });
