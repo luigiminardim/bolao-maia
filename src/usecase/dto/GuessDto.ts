@@ -1,5 +1,6 @@
 import { GroupListChampionship } from "../../entity/Championship";
-import { GroupListGuess } from "../../entity/Guess";
+import { CupGuess, GroupListGuess, PoolGuessItem } from "../../entity/Guess";
+import { BinaryTree, BinaryTreeDao } from "../../utils/BinaryTree";
 import { TeamDto, toTeamDto } from "./TeamDto";
 
 export interface GroupListTeamGuessDto {
@@ -47,4 +48,39 @@ export function toGroupListGuessDto(
     extraQualifiedListGuess:
       groupListGuess.extraQualifiedListGuess.map(toTeamDto),
   };
+}
+
+export interface CupGuessDto {
+  root: BinaryTreeDao<TeamDto>;
+  thirdPlace: TeamDto | null;
+}
+
+export function toCupGuessDto(cupGuess: CupGuess): CupGuessDto {
+  return {
+    root: BinaryTree.toDto(cupGuess.root, toTeamDto),
+    thirdPlace: cupGuess.thirdPlace ? toTeamDto(cupGuess.thirdPlace) : null,
+  };
+}
+
+export type PoolGuessItemDto =
+  | { kind: "group"; groupGuess: GroupListGuessDto }
+  | { kind: "cup"; cupGuess: CupGuessDto };
+
+export function toPoolGuessItemDto(
+  item: PoolGuessItem,
+  championships: { groupList?: GroupListChampionship },
+): PoolGuessItemDto {
+  if (item.kind === "group" && championships.groupList) {
+    return {
+      kind: "group",
+      groupGuess: toGroupListGuessDto(item.groupGuess, championships.groupList),
+    };
+  }
+  if (item.kind === "cup") {
+    return {
+      kind: "cup",
+      cupGuess: toCupGuessDto(item.cupGuess),
+    };
+  }
+  throw new Error("Invalid guess item or missing championship context");
 }

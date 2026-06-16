@@ -103,4 +103,12 @@ export class PoolSweepstake {
         .find((sub) => sub.id === id) ?? null
     );
   }
+
+  getCupSweepstakeById(id: string): CupSweepstake | null {
+    return (
+      this.subSweepstakeList
+        .flatMap((sub) => (sub.kind === "cup" ? [sub.sweepstake] : []))
+        .find((sub) => sub.id === id) ?? null
+    );
+  }
 }

@@ -92,4 +92,30 @@ export class PoolGuess {
         .find((sub) => sub.sweepstakeId === groupGuessId) ?? null
     );
   }
+
+  getCupGuess(cupGuessId: string): CupGuess | null {
+    return (
+      this.subGuesses
+        .flatMap((sub) => (sub.kind === "cup" ? [sub.cupGuess] : []))
+        .find((sub) => sub.sweepstakeId === cupGuessId) ?? null
+    );
+  }
+
+  addGroupListGuess(groupGuess: GroupListGuess): void {
+    if (this.getGroupListGuess(groupGuess.sweepstakeId)) {
+      throw new Error(
+        `Guess for group list sweepstake ${groupGuess.sweepstakeId} already exists and cannot be overwritten.`,
+      );
+    }
+    this.subGuesses.push({ kind: "group", groupGuess });
+  }
+
+  addCupGuess(cupGuess: CupGuess): void {
+    if (this.getCupGuess(cupGuess.sweepstakeId)) {
+      throw new Error(
+        `Guess for cup sweepstake ${cupGuess.sweepstakeId} already exists and cannot be overwritten.`,
+      );
+    }
+    this.subGuesses.push({ kind: "cup", cupGuess });
+  }
 }

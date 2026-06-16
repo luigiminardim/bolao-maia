@@ -35,13 +35,7 @@ export class GuessGroupListFromPoolSweepstake {
       poolGuess = new PoolGuess(userId, params.poolSweepstake, []);
     }
 
-    const existingGuess = poolGuess.subGuesses.find(
-      (sub) =>
-        sub.kind === "group" &&
-        sub.groupGuess.sweepstakeId === params.groupListSweepstake,
-    );
-
-    if (existingGuess) {
+    if (poolGuess.getGroupListGuess(params.groupListSweepstake)) {
       throw new Error(
         `Guess for group list sweepstake ${params.groupListSweepstake} already exists and cannot be overwritten.`,
       );
@@ -76,10 +70,7 @@ export class GuessGroupListFromPoolSweepstake {
       extraQualifiedListGuess,
     );
 
-    poolGuess.subGuesses.push({
-      kind: "group",
-      groupGuess: groupListGuess,
-    });
+    poolGuess.addGroupListGuess(groupListGuess);
 
     await this.poolGuessRepository.save(poolGuess);
   }

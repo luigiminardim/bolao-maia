@@ -1,3 +1,4 @@
+import { BinaryTree, BinaryTreeDao } from "../../utils/BinaryTree";
 import {
   CupGuessResult,
   GroupListGroupGuessResult,
@@ -142,6 +143,39 @@ function toGroupListTeamGuessResultDto(
   };
 }
 
-export interface CupGuessResultDto {
+export interface CupTeamGuessDto {
+  team: TeamDto | null;
+  positionGuess: number | null;
   score: number | null;
+}
+
+export interface CupGuessResultDto {
+  user: UserDto;
+  score: number | null;
+  root: BinaryTreeDao<CupTeamGuessDto>;
+  thirdPlace: CupTeamGuessDto | null;
+}
+
+export function toCupGuessResultDto(
+  result: CupGuessResult,
+  user: User,
+): CupGuessResultDto {
+  return {
+    user: toUserDto(user),
+    score: result.score,
+    root: BinaryTree.toDto(result.root, (node) => ({
+      team: node.team ? toTeamDto(node.team) : null,
+      positionGuess: node.positionGuess,
+      score: node.score,
+    })),
+    thirdPlace: result.thirdPlace
+      ? {
+          team: result.thirdPlace.team
+            ? toTeamDto(result.thirdPlace.team)
+            : null,
+          positionGuess: result.thirdPlace.positionGuess,
+          score: result.thirdPlace.score,
+        }
+      : null,
+  };
 }
