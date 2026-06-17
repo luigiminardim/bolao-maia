@@ -3,8 +3,8 @@ import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository
 import { UserRepository } from "../repository/UserRepository";
 import { GroupListGuessResult } from "../entity/GuessResult";
 import {
-  GuessRankingDto,
-  toGuessRankingDtoFromGroupListGuessResult,
+  GuessRankingListDto,
+  toGuessRankingListDtoFromGroupListGuessResultList,
 } from "./dto/GuessRankingDto";
 
 export class GetGroupListGuessRankListFromPoolRankListUsecase {
@@ -25,7 +25,7 @@ export class GetGroupListGuessRankListFromPoolRankListUsecase {
   async execute(
     poolId: string,
     groupListId: string,
-  ): Promise<GuessRankingDto[] | null> {
+  ): Promise<GuessRankingListDto | null> {
     const poolSweepstake = await this.poolSweepstakeRepository.findById(poolId);
     if (!poolSweepstake) {
       return null;
@@ -45,11 +45,9 @@ export class GetGroupListGuessRankListFromPoolRankListUsecase {
       (groupListGuess) =>
         new GroupListGuessResult(groupListSweepstake, groupListGuess),
     );
-    groupListGuessResultList.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-    return await Promise.all(
-      groupListGuessResultList.map((res) =>
-        toGuessRankingDtoFromGroupListGuessResult(res, this.userRepository),
-      ),
+    return await toGuessRankingListDtoFromGroupListGuessResultList(
+      groupListGuessResultList,
+      this.userRepository,
     );
   }
 }

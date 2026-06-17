@@ -1,18 +1,23 @@
 import { Table, Avatar } from "@heroui/react";
 import Link from "next/link";
 import { ExternalLinkIcon } from "lucide-react";
-import { GuessRankingDto } from "@/usecase/dto/GuessRankingDto";
+import {
+  GuessRankingDto,
+  GuessRankingListDto,
+} from "@/usecase/dto/GuessRankingDto";
 import { UserDto } from "@/usecase/dto/UserDto";
 
 export function SweepstakeLeaderboard({
-  guessRankList,
+  guessRankListDto,
   currentUser,
   getUserGuessLink,
 }: {
-  guessRankList: GuessRankingDto[];
+  guessRankListDto: GuessRankingListDto;
   currentUser: UserDto | null;
   getUserGuessLink: (userId: string) => string;
 }) {
+  const guessRankList = guessRankListDto?.rankings ?? [];
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -48,7 +53,10 @@ export function SweepstakeLeaderboard({
                   <LeaderboardTableRow
                     key={entry.user.id}
                     guessRank={entry}
-                    index={index}
+                    showPosition={
+                      index === 0 ||
+                      entry.position !== guessRankList[index - 1]?.position
+                    }
                     isMe={entry.user.id === currentUser?.id}
                     userGuessLink={getUserGuessLink(entry.user.id)}
                   />
@@ -64,16 +72,16 @@ export function SweepstakeLeaderboard({
 
 function LeaderboardTableRow({
   guessRank: entry,
-  index,
+  showPosition,
   isMe,
   userGuessLink,
 }: {
   guessRank: GuessRankingDto;
-  index: number;
+  showPosition: boolean;
   isMe: boolean;
   userGuessLink: string;
 }) {
-  const rank = index + 1;
+  const rank = entry.position;
   return (
     <Table.Row
       className={`border-b border-zinc-900 transition-all ${
@@ -83,7 +91,9 @@ function LeaderboardTableRow({
       <Table.Cell className="pl-4 sm:pl-6 py-3 sm:py-4">
         <div className="flex items-center gap-2">
           <span
-            className={`flex items-center justify-center size-6 rounded-full text-xs font-bold ${
+            className={`flex items-center justify-center size-6 rounded-full text-xs font-bold transition-opacity ${
+              showPosition ? "opacity-100" : "opacity-0"
+            } ${
               isMe
                 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                 : "text-zinc-500"

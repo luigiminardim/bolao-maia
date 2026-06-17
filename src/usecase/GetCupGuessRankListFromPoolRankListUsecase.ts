@@ -3,8 +3,8 @@ import { PoolSweepstakeRepository } from "../repository/PoolSweepstakeRepository
 import { UserRepository } from "../repository/UserRepository";
 import { CupGuessResult } from "../entity/GuessResult";
 import {
-  GuessRankingDto,
-  toGuessRankingDtoFromCupGuessResult,
+  GuessRankingListDto,
+  toGuessRankingListDtoFromCupGuessResultList,
 } from "./dto/GuessRankingDto";
 
 export class GetCupGuessRankListFromPoolRankListUsecase {
@@ -25,7 +25,7 @@ export class GetCupGuessRankListFromPoolRankListUsecase {
   async execute(
     poolId: string,
     cupId: string,
-  ): Promise<GuessRankingDto[] | null> {
+  ): Promise<GuessRankingListDto | null> {
     const poolSweepstake = await this.poolSweepstakeRepository.findById(poolId);
     if (!poolSweepstake) {
       return null;
@@ -43,11 +43,9 @@ export class GetCupGuessRankListFromPoolRankListUsecase {
     const cupGuessResultList = cupGuessList.map(
       (cupGuess) => new CupGuessResult(cupSweepstake, cupGuess),
     );
-    cupGuessResultList.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-    return await Promise.all(
-      cupGuessResultList.map((res) =>
-        toGuessRankingDtoFromCupGuessResult(res, this.userRepository),
-      ),
+    return await toGuessRankingListDtoFromCupGuessResultList(
+      cupGuessResultList,
+      this.userRepository,
     );
   }
 }

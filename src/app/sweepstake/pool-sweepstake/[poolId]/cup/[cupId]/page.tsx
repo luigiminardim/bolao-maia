@@ -40,9 +40,11 @@ export default async function CupSweepstakePage({ params }: PageProps) {
       )
     : null;
 
-  const rankingList =
-    (await getCupGuessRankListFromPoolRankListUsecase.execute(poolId, cupId)) ??
-    [];
+  const rankingListDto =
+    (await getCupGuessRankListFromPoolRankListUsecase.execute(
+      poolId,
+      cupId,
+    )) ?? { rankings: [] };
 
   return (
     <CupSweepstakeFromPoolPageClient
@@ -51,7 +53,7 @@ export default async function CupSweepstakePage({ params }: PageProps) {
       currentUser={user}
       sweepstake={cupSweepstake}
       guess={cupGuess}
-      rankList={rankingList}
+      rankingListDto={rankingListDto}
       cupGuessResult={cupGuessResult}
     />
   );

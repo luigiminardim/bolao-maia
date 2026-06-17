@@ -43,11 +43,11 @@ export default async function GroupListSweepstakePage({ params }: PageProps) {
       )
     : null;
 
-  const rankingList =
+  const rankingListDto =
     (await getGroupListGuessRankListFromPoolRankListUsecase.execute(
       poolId,
       groupListId,
-    )) ?? [];
+    )) ?? { rankings: [] };
 
   return (
     <GroupListSweepstakeFromPoolPageClient
@@ -56,7 +56,7 @@ export default async function GroupListSweepstakePage({ params }: PageProps) {
       currentUser={user}
       sweepstake={groupListSweepstake}
       guess={groupListGuess}
-      rankList={rankingList}
+      rankingListDto={rankingListDto}
       groupListGuessResult={groupListGuessResult}
     />
   );

@@ -5,7 +5,7 @@ import { Button, Card, Tabs, Alert } from "@heroui/react";
 import { UserDto } from "@/usecase/dto/UserDto";
 import { CupSweepstakeDto } from "@/usecase/dto/SweepstakeDto";
 import { CupGuessResultDto } from "@/usecase/dto/GuessResultDto";
-import { GuessRankingDto } from "@/usecase/dto/GuessRankingDto";
+import { GuessRankingListDto } from "@/usecase/dto/GuessRankingDto";
 import { CupGuessDto } from "@/usecase/dto/GuessDto";
 import { LoginCard } from "../../../../components/LoginCard";
 import { EmptyGuessCard } from "../../../../components/EmptyGuessCard";
@@ -18,7 +18,7 @@ interface DashboardClientProps {
   sweepstake: CupSweepstakeDto;
   guess: CupGuessDto | null;
   cupGuessResult: null | CupGuessResultDto;
-  rankList: GuessRankingDto[];
+  rankingListDto: GuessRankingListDto;
 }
 
 export function CupSweepstakeFromPoolPageClient({
@@ -27,7 +27,7 @@ export function CupSweepstakeFromPoolPageClient({
   currentUser,
   sweepstake,
   guess,
-  rankList,
+  rankingListDto,
   cupGuessResult,
 }: DashboardClientProps) {
   const router = useRouter();
@@ -89,7 +89,7 @@ export function CupSweepstakeFromPoolPageClient({
 
           <Tabs.Panel id="leaderboard" className="pt-2">
             <SweepstakeLeaderboard
-              guessRankList={rankList}
+              guessRankListDto={rankingListDto}
               currentUser={currentUser}
               getUserGuessLink={(userId) =>
                 `/sweepstake/pool-sweepstake/${poolId}/cup/${cupId}/guess/${userId}`

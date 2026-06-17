@@ -7,7 +7,7 @@ import { GroupListSweepstakeDto } from "../../../../../../usecase/dto/Sweepstake
 import { GroupListGuessResultDto } from "../../../../../../usecase/dto/GuessResultDto";
 import { GroupListGuessResultSection } from "./components/GroupListGuessResultSection";
 import { GroupListGuessSection } from "./components/GroupListGuessSection";
-import { GuessRankingDto } from "@/usecase/dto/GuessRankingDto";
+import { GuessRankingListDto } from "@/usecase/dto/GuessRankingDto";
 import { GroupListGuessDto } from "@/usecase/dto/GuessDto";
 import { LoginCard } from "../../../../components/LoginCard";
 import { EmptyGuessCard } from "../../../../components/EmptyGuessCard";
@@ -20,7 +20,7 @@ interface DashboardClientProps {
   sweepstake: GroupListSweepstakeDto;
   guess: GroupListGuessDto | null;
   groupListGuessResult: null | GroupListGuessResultDto;
-  rankList: GuessRankingDto[];
+  rankingListDto: GuessRankingListDto;
 }
 
 export function GroupListSweepstakeFromPoolPageClient({
@@ -29,7 +29,7 @@ export function GroupListSweepstakeFromPoolPageClient({
   currentUser,
   sweepstake,
   guess,
-  rankList,
+  rankingListDto,
   groupListGuessResult,
 }: DashboardClientProps) {
   const router = useRouter();
@@ -94,7 +94,7 @@ export function GroupListSweepstakeFromPoolPageClient({
 
             <Tabs.Panel id="leaderboard" className="pt-2">
               <SweepstakeLeaderboard
-                guessRankList={rankList}
+                guessRankListDto={rankingListDto}
                 currentUser={currentUser}
                 getUserGuessLink={(userId) =>
                   `/sweepstake/pool-sweepstake/${poolId}/group-list/${groupListId}/guess/${userId}`
