@@ -22,7 +22,6 @@ export default async function CupSweepstakePage({ params }: PageProps) {
     poolId,
     cupId,
   );
-
   if (!cupSweepstake) {
     return notFound();
   }

@@ -6,8 +6,10 @@ import {
   userRepository,
   getUserUsecase,
   guessGroupListFromPoolSweepstake,
+  guessCupFromPoolSweepstake,
 } from "../usecase/index";
 import { GuessGroupListFromPoolSweepstakeParam } from "../usecase/GuessGroupListFromPoolSweepstake";
+import { GuessCupFromPoolSweepstakeParam } from "../usecase/GuessCupFromPoolSweepstake";
 import { UserDto } from "../usecase/dto/UserDto";
 
 /**
@@ -102,6 +104,32 @@ export async function submitGuessAction(
     return { success: true };
   } catch (err: unknown) {
     console.error("Erro no submitGuessAction:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Falha ao enviar palpite.",
+    };
+  }
+}
+
+/**
+ * Submit a guess for a cup sweepstake.
+ */
+export async function submitCupGuessAction(
+  params: GuessCupFromPoolSweepstakeParam,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await getLoggedInUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "Você precisa estar logado para palpitar.",
+      };
+    }
+
+    await guessCupFromPoolSweepstake.execute(user.id, params);
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Erro no submitCupGuessAction:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Falha ao enviar palpite.",
