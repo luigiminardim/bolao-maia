@@ -146,16 +146,16 @@ async function seed() {
         qatar,
       ]),
       new GroupListGroupChampionship("C", [
-        scotland, 
-        morocco, 
-        brazil, 
+        brazil,
+        morocco,
+        scotland,
         haiti,
       ]),
       new GroupListGroupChampionship("D", [
-        usa, 
-        australia, 
-        turkiye, 
+        usa,
+        australia,
         paraguay,
+        turkiye,
       ]),
       new GroupListGroupChampionship("E", [
         germany,
@@ -206,7 +206,7 @@ async function seed() {
         croatia,
       ]),
     ],
-    [netherlands, brazil, belgium, portugal, spain, czechia, bosniaHerzegovina, ecuador],
+    [scotland, paraguay, netherlands, belgium, portugal, spain, czechia, bosniaHerzegovina],
     2,
     new Date("2026-06-11T19:00:00Z"),
   );
