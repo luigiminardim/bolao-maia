@@ -164,9 +164,9 @@ async function seed() {
         curacao,
       ]),
       new GroupListGroupChampionship("F", [
-        sweden,
-        japan,
         netherlands,
+        japan,
+        sweden,
         tunisia,
       ]),
       new GroupListGroupChampionship("G", [
@@ -206,7 +206,7 @@ async function seed() {
         croatia,
       ]),
     ],
-    [scotland, paraguay, netherlands, belgium, portugal, spain, czechia, bosniaHerzegovina],
+    [sweden, scotland, paraguay, belgium, portugal, spain, czechia, ecuador],
     2,
     new Date("2026-06-11T19:00:00Z"),
   );
