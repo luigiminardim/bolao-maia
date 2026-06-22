@@ -10,6 +10,8 @@ import { CupGuessDto } from "@/usecase/dto/GuessDto";
 import { LoginCard } from "../../../../components/LoginCard";
 import { EmptyGuessCard } from "../../../../components/EmptyGuessCard";
 import { SweepstakeLeaderboard } from "../../../../components/SweepstakeLeaderboard";
+import { CupGuessSection } from "./components/CupGuessSection";
+import { CupGuessResultSection } from "./components/CupGuessResultSection";
 
 interface DashboardClientProps {
   poolId: string;
@@ -198,7 +200,7 @@ function PendingGuessView({
 
 function ExistingGuessView({
   sweepstake,
-  guess: _guess,
+  guess,
   cupGuessResult,
 }: {
   sweepstake: CupSweepstakeDto;
@@ -220,17 +222,37 @@ function ExistingGuessView({
   return (
     <div className="flex-1 flex flex-col gap-6">
       <div className="flex flex-col gap-6">
-        {header}
-        <Card className="p-6 bg-zinc-900/40 border border-zinc-900">
-          <p className="text-zinc-400 text-center">
-            [Visualização do Chaveamento da Copa]
-          </p>
-          {cupGuessResult && (
-            <p className="text-emerald-400 text-center font-bold mt-4">
-              Pontuação Final: {cupGuessResult.score} pts
-            </p>
-          )}
-        </Card>
+        {guess && <CupGuessSection guess={guess} header={header} />}
+        {cupGuessResult && (
+          <CupGuessResultSection
+            result={cupGuessResult}
+            sweepstake={sweepstake}
+            header={
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-5 mb-2">
+                <div>
+                  <h3 className="font-extrabold text-lg text-zinc-200">
+                    Resultados do Campeonato
+                  </h3>
+                  <p className="text-zinc-500 text-xs mt-0.5">
+                    Confira a pontuação obtida em cada palpite.
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl shadow-inner">
+                    <span className="text-xs text-emerald-400 font-bold">
+                      Total:
+                    </span>
+                    <span className="text-lg text-white font-black">
+                      {cupGuessResult.score != null
+                        ? `${cupGuessResult.score} pts`
+                        : "--"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          />
+        )}
       </div>
     </div>
   );
