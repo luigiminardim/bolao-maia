@@ -30,11 +30,12 @@ export class GetGroupListGuessRankListFromPoolRankListUsecase {
     if (!poolSweepstake) {
       return null;
     }
-    const groupListSweepstake =
+    const groupListSweepstakeItem =
       poolSweepstake.getGroupListSweepstakeById(groupListId);
-    if (!groupListSweepstake) {
+    if (!groupListSweepstakeItem) {
       return null;
     }
+    const groupListSweepstake = groupListSweepstakeItem.sweepstake;
     const poolGuessList =
       await this.poolGuessRepository.findBySweepstake(poolId);
     const groupListGuessList = poolGuessList.flatMap((poolGuess) => {
@@ -43,7 +44,11 @@ export class GetGroupListGuessRankListFromPoolRankListUsecase {
     });
     const groupListGuessResultList = groupListGuessList.map(
       (groupListGuess) =>
-        new GroupListGuessResult(groupListSweepstake, groupListGuess),
+        new GroupListGuessResult(
+          groupListSweepstake,
+          groupListGuess,
+          groupListSweepstakeItem.factor,
+        ),
     );
     return await toGuessRankingListDtoFromGroupListGuessResultList(
       groupListGuessResultList,

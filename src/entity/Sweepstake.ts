@@ -96,19 +96,31 @@ export class PoolSweepstake {
     return this.subtitle;
   }
 
-  getGroupListSweepstakeById(id: string): GroupListSweepstake | null {
+  getGroupListSweepstakeById(
+    id: string,
+  ): { sweepstake: GroupListSweepstake; factor: number } | null {
     return (
       this.subSweepstakeList
-        .flatMap((sub) => (sub.kind === "group" ? [sub.sweepstake] : []))
-        .find((sub) => sub.id === id) ?? null
+        .flatMap((sub) =>
+          sub.kind === "group"
+            ? [{ sweepstake: sub.sweepstake, factor: sub.factor }]
+            : [],
+        )
+        .find((sub) => sub.sweepstake.id === id) ?? null
     );
   }
 
-  getCupSweepstakeById(id: string): CupSweepstake | null {
+  getCupSweepstakeById(
+    id: string,
+  ): { sweepstake: CupSweepstake; factor: number } | null {
     return (
       this.subSweepstakeList
-        .flatMap((sub) => (sub.kind === "cup" ? [sub.sweepstake] : []))
-        .find((sub) => sub.id === id) ?? null
+        .flatMap((sub) =>
+          sub.kind === "cup"
+            ? [{ sweepstake: sub.sweepstake, factor: sub.factor }]
+            : [],
+        )
+        .find((sub) => sub.sweepstake.id === id) ?? null
     );
   }
 }

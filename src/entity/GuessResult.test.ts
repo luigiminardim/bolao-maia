@@ -367,6 +367,20 @@ describe("GuessResult", () => {
       );
       expect(res.groupList[0]?.classification[0]?.score).toBe(20);
     });
+
+    it("finished championship with factor", () => {
+      const groupSweepstake = new GroupListSweepstake(
+        "swG",
+        "Group Sweepstake",
+        "Desc",
+        finishedGroupListChampionship,
+        groupScorePolicy,
+      );
+      const res = new GroupListGuessResult(groupSweepstake, groupGuess, 2);
+      expect(res.groupList).toHaveLength(2);
+      expect(res.score).toBe(40);
+      expect(res.groupList[0]?.classification[0]?.score).toBe(20);
+    });
   });
 
   describe("CupGuessResult", () => {
@@ -418,6 +432,20 @@ describe("GuessResult", () => {
 
       expect(res.thirdPlace?.team).toBe(c3);
       expect(res.thirdPlace?.positionGuess).toBe(3);
+      expect(res.thirdPlace?.score).toBe(14);
+    });
+
+    it("finished championship with factor", () => {
+      const cupSweepstake = new CupSweepstake(
+        "swC",
+        "Cup Sweepstake",
+        "Desc",
+        finishedCupChampionship,
+        cupScorePolicy,
+      );
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 1.5);
+      expect(res.score).toBe(81);
+      expect(res.root.elem.score).toBe(20);
       expect(res.thirdPlace?.score).toBe(14);
     });
   });

@@ -30,10 +30,11 @@ export class GetCupGuessRankListFromPoolRankListUsecase {
     if (!poolSweepstake) {
       return null;
     }
-    const cupSweepstake = poolSweepstake.getCupSweepstakeById(cupId);
-    if (!cupSweepstake) {
+    const cupSweepstakeItem = poolSweepstake.getCupSweepstakeById(cupId);
+    if (!cupSweepstakeItem) {
       return null;
     }
+    const cupSweepstake = cupSweepstakeItem.sweepstake;
     const poolGuessList =
       await this.poolGuessRepository.findBySweepstake(poolId);
     const cupGuessList = poolGuessList.flatMap((poolGuess) => {
@@ -41,7 +42,8 @@ export class GetCupGuessRankListFromPoolRankListUsecase {
       return cupGuess === null ? [] : [cupGuess];
     });
     const cupGuessResultList = cupGuessList.map(
-      (cupGuess) => new CupGuessResult(cupSweepstake, cupGuess),
+      (cupGuess) =>
+        new CupGuessResult(cupSweepstake, cupGuess, cupSweepstakeItem.factor),
     );
     return await toGuessRankingListDtoFromCupGuessResultList(
       cupGuessResultList,

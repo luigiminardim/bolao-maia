@@ -22,7 +22,7 @@ export class CupGuessResult {
   root: BinaryTree<CupGuessNodeInfo>;
   thirdPlace: null | CupGuessNodeInfo;
 
-  constructor(sweepstake: CupSweepstake, guess: CupGuess) {
+  constructor(sweepstake: CupSweepstake, guess: CupGuess, factor?: number) {
     this.userId = guess.userId;
     this.sweepstakeId = guess.sweepstakeId;
     const cup = sweepstake.championship;
@@ -84,7 +84,7 @@ export class CupGuessResult {
         (acc, node) => acc + (node.score ?? 0),
         0,
       );
-      this.score = rootScore + (this.thirdPlace?.score ?? 0);
+      this.score = (rootScore + (this.thirdPlace?.score ?? 0)) * (factor ?? 1);
     } else {
       this.score = null;
     }
@@ -157,7 +157,11 @@ export class GroupListGuessResult {
   score: number | null;
   groupList: GroupListGroupGuessResult[];
 
-  constructor(sweepstake: GroupListSweepstake, guess: GroupListGuess) {
+  constructor(
+    sweepstake: GroupListSweepstake,
+    guess: GroupListGuess,
+    factor?: number,
+  ) {
     this.sweepstakeId = guess.sweepstakeId;
     this.userId = guess.userId;
     const isLocked = sweepstake.getStatus() === "locked";
@@ -172,7 +176,8 @@ export class GroupListGuessResult {
       );
     });
     this.score = isLocked
-      ? this.groupList.reduce((acc, result) => acc + (result.score ?? 0), 0)
+      ? this.groupList.reduce((acc, result) => acc + (result.score ?? 0), 0) *
+        (factor ?? 1)
       : null;
   }
 }

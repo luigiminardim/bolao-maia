@@ -14,10 +14,12 @@ export class GetCupSweepstakeFromPoolUsecase {
       return null;
     }
 
-    const cupSweepstake = poolSweepstake.getCupSweepstakeById(cupSweepstakeId);
-    if (!cupSweepstake) {
+    const cupSweepstakeItem =
+      poolSweepstake.getCupSweepstakeById(cupSweepstakeId);
+    if (!cupSweepstakeItem) {
       return null;
     }
+    const cupSweepstake = cupSweepstakeItem.sweepstake;
 
     return toCupSweepstakeDto(cupSweepstake);
   }

@@ -16,8 +16,9 @@ export class GetCupGuessFromPoolUsecase {
   ): Promise<CupGuessDto | null> {
     const poolSweepstake = await this.poolSweepstakeRepository.findById(poolId);
     if (!poolSweepstake) return null;
-    const cupSweepstake = poolSweepstake.getCupSweepstakeById(cupId);
-    if (!cupSweepstake) return null;
+    const cupSweepstakeItem = poolSweepstake.getCupSweepstakeById(cupId);
+    if (!cupSweepstakeItem) return null;
+    const cupSweepstake = cupSweepstakeItem.sweepstake;
 
     const status = cupSweepstake.getStatus();
     if (status === "draft" || (status === "open" && userId !== loggedUserId))

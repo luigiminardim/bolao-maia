@@ -29,7 +29,10 @@ export default async function GroupListGuessResultFromPoolPage({
 
   if (!groupListGuessResult) {
     return (
-      <GuessResultEmptyState backLink={backLink} backText="Voltar para o Bolão" />
+      <GuessResultEmptyState
+        backLink={backLink}
+        backText="Voltar para o Bolão"
+      />
     );
   }
 

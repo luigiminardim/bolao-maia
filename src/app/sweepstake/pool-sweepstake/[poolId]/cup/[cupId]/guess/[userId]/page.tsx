@@ -15,7 +15,9 @@ interface PageProps {
   }>;
 }
 
-export default async function CupGuessResultFromPoolPage({ params }: PageProps) {
+export default async function CupGuessResultFromPoolPage({
+  params,
+}: PageProps) {
   const { poolId, cupId, userId } = await params;
   const loggedUser = await getLoggedInUser();
 
@@ -33,7 +35,10 @@ export default async function CupGuessResultFromPoolPage({ params }: PageProps) 
 
   if (!cupSweepstake || !cupGuessResult) {
     return (
-      <GuessResultEmptyState backLink={backLink} backText="Voltar para o Bolão" />
+      <GuessResultEmptyState
+        backLink={backLink}
+        backText="Voltar para o Bolão"
+      />
     );
   }
 

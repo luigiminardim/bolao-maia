@@ -30,10 +30,12 @@ export class GetCupGuessResultFromPoolUsecase {
     if (!poolSweepstake) {
       return null;
     }
-    const cupSweepstake = poolSweepstake.getCupSweepstakeById(cupSweepstakeId);
-    if (!cupSweepstake) {
+    const cupSweepstakeItem =
+      poolSweepstake.getCupSweepstakeById(cupSweepstakeId);
+    if (!cupSweepstakeItem) {
       return null;
     }
+    const cupSweepstake = cupSweepstakeItem.sweepstake;
 
     const status = cupSweepstake.getStatus();
     if ((status === "draft" || status === "open") && userId !== loggedUserId) {
@@ -57,7 +59,11 @@ export class GetCupGuessResultFromPoolUsecase {
       return null;
     }
 
-    const result = new CupGuessResult(cupSweepstake, cupGuess);
+    const result = new CupGuessResult(
+      cupSweepstake,
+      cupGuess,
+      cupSweepstakeItem.factor,
+    );
     return toCupGuessResultDto(result, user);
   }
 }

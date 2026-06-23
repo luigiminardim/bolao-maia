@@ -17,12 +17,13 @@ export class GetGroupListSweepstakeFromPoolUsecase {
       return null;
     }
 
-    const groupListSweepstake = poolSweepstake.getGroupListSweepstakeById(
+    const groupListSweepstakeItem = poolSweepstake.getGroupListSweepstakeById(
       groupListSweepstakeId,
     );
-    if (!groupListSweepstake) {
+    if (!groupListSweepstakeItem) {
       return null;
     }
+    const groupListSweepstake = groupListSweepstakeItem.sweepstake;
 
     return toGroupListSweepstakeDto(groupListSweepstake);
   }

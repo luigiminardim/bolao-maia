@@ -16,9 +16,10 @@ export class GetGroupListGuessFromPoolUsecase {
   ): Promise<GroupListGuessDto | null> {
     const poolSweepstake = await this.poolSweepstakeRepository.findById(poolId);
     if (!poolSweepstake) return null;
-    const groupListSweepstake =
+    const groupListSweepstakeItem =
       poolSweepstake?.getGroupListSweepstakeById(groupListId);
-    if (!groupListSweepstake) return null;
+    if (!groupListSweepstakeItem) return null;
+    const groupListSweepstake = groupListSweepstakeItem.sweepstake;
 
     const status = groupListSweepstake.getStatus();
     if (status === "draft" || (status === "open" && userId !== loggedUserId))

@@ -33,12 +33,13 @@ export class GetGroupListGuessResultFromPoolUsecase {
     if (!poolSweepstake) {
       return null;
     }
-    const groupListSweepstake = poolSweepstake.getGroupListSweepstakeById(
+    const groupListSweepstakeItem = poolSweepstake.getGroupListSweepstakeById(
       groupListSweepstakeId,
     );
-    if (!groupListSweepstake) {
+    if (!groupListSweepstakeItem) {
       return null;
     }
+    const groupListSweepstake = groupListSweepstakeItem.sweepstake;
 
     const status = groupListSweepstake.getStatus();
     if ((status === "draft" || status === "open") && userId !== loggedUserId) {
@@ -65,6 +66,7 @@ export class GetGroupListGuessResultFromPoolUsecase {
     const result = new GroupListGuessResult(
       groupListSweepstake,
       groupListGuess,
+      groupListSweepstakeItem.factor,
     );
     return toGroupListGuessResultDto(
       result,
