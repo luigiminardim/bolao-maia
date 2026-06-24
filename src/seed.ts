@@ -175,8 +175,8 @@ async function seed() {
       ]),
       new GroupListGroupChampionship("K", [
         colombia,
-        drCongo,
         portugal,
+        drCongo,
         uzbekistan,
       ]),
       new GroupListGroupChampionship("L", [england, ghana, panama, croatia]),
@@ -184,11 +184,11 @@ async function seed() {
     [
       sweden,
       scotland,
+      croatia,
       algeria,
       paraguay,
       capeVerde,
       belgium,
-      portugal,
       czechia,
     ],
     2,
