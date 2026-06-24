@@ -34,6 +34,7 @@ import { GetCupGuessFromPoolUsecase } from "./GetCupGuessFromPoolUsecase";
 import { GetCupGuessRankListFromPoolRankListUsecase } from "./GetCupGuessRankListFromPoolRankListUsecase";
 import { GetCupGuessResultFromPoolUsecase } from "./GetCupGuessResultFromPoolUsecase";
 import { GuessCupFromPoolSweepstake } from "./GuessCupFromPoolSweepstake";
+import { GetPoolGuessRankListUsecase } from "./GetPoolGuessRankListUsecase";
 
 // Shared storage instance
 const storageType = process.env.JSON_STORAGE;
@@ -127,4 +128,10 @@ export const getCupGuessResultFromPoolUsecase =
 export const guessCupFromPoolSweepstake = new GuessCupFromPoolSweepstake(
   poolGuessRepository,
   teamRepository,
+);
+
+export const getPoolGuessRankListUsecase = new GetPoolGuessRankListUsecase(
+  poolSweepstakeRepository,
+  poolGuessRepository,
+  userRepository,
 );

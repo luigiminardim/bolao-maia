@@ -1,4 +1,8 @@
-import { CupGuessResult, GroupListGuessResult } from "./GuessResult";
+import {
+  CupGuessResult,
+  GroupListGuessResult,
+  PoolGuessResult,
+} from "./GuessResult";
 
 export class GuessRankingItem {
   constructor(
@@ -66,5 +70,13 @@ export class GuessRankingList {
     results: CupGuessResult[],
   ): GuessRankingList {
     return this.calculateRankings(results);
+  }
+
+  public static fromPoolGuessResultList(
+    results: PoolGuessResult[],
+  ): GuessRankingList {
+    return this.calculateRankings(
+      results.map((r) => ({ userId: r.user.id(), score: r.score })),
+    );
   }
 }

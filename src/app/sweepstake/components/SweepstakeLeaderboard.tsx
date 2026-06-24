@@ -121,7 +121,7 @@ function LeaderboardTableRow({
                 : "text-zinc-200 hover:text-white"
             }`}
           >
-            <span>{entry.user.name}</span>
+            <span className="line-clamp-2">{entry.user.name}</span>
             <ExternalLinkIcon className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
           </Link>
         </div>
