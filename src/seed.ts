@@ -179,7 +179,7 @@ async function seed() {
         drCongo,
         uzbekistan,
       ]),
-      new GroupListGroupChampionship("L", [england, ghana, panama, croatia]),
+      new GroupListGroupChampionship("L", [england, ghana, croatia, panama]),
     ],
     [
       sweden,
