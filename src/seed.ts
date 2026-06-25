@@ -135,9 +135,9 @@ async function seed() {
     [
       new GroupListGroupChampionship("A", [
         mexico,
+        southAfrica,
         southKorea,
         czechia,
-        southAfrica,
       ]),
       new GroupListGroupChampionship("B", [
         switzerland,
