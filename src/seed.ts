@@ -189,7 +189,7 @@ async function seed() {
       algeria,
       paraguay,
       scotland,
-      capeVerde,
+      ecuador,
     ],
     2,
     new Date("2026-06-11T19:00:00Z"),
