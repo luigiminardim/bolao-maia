@@ -208,44 +208,44 @@ async function seed() {
       new BinaryTree(null, [
         new BinaryTree(null, [
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(germany), new BinaryTree(paraguay)]),
+            new BinaryTree(null, [new BinaryTree(france), new BinaryTree(sweden)]),
           ]),
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(southAfrica), new BinaryTree(canada)]),
+            new BinaryTree(null, [new BinaryTree(netherlands), new BinaryTree(morocco)]),
           ]),
         ]),
         new BinaryTree(null, [
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(portugal), new BinaryTree(croatia)]),
+            new BinaryTree(null, [new BinaryTree(spain), new BinaryTree(null)]),
           ]),
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(usa), new BinaryTree(bosniaHerzegovina)]),
+            new BinaryTree(null, [new BinaryTree(belgium), new BinaryTree(null)]),
           ]),
         ]),
       ]),
       new BinaryTree(null, [
         new BinaryTree(null, [
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(brazil), new BinaryTree(japan)]),
+            new BinaryTree(null, [new BinaryTree(ivoryCoast), new BinaryTree(norway)]),
           ]),
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(mexico), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(england), new BinaryTree(drCongo)]),
           ]),
         ]),
         new BinaryTree(null, [
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(argentina), new BinaryTree(capeVerde)]),
+            new BinaryTree(null, [new BinaryTree(australia), new BinaryTree(egypt)]),
           ]),
           new BinaryTree(null, [
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(null), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(swiss), new BinaryTree(null)]),
+            new BinaryTree(null, [new BinaryTree(colombia), new BinaryTree(gana)]),
           ]),
         ]),
       ]),
