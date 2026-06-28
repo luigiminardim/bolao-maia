@@ -245,7 +245,7 @@ async function seed() {
           ]),
           new BinaryTree(null, [
             new BinaryTree(null, [new BinaryTree(switzerland), new BinaryTree(null)]),
-            new BinaryTree(null, [new BinaryTree(colombia), new BinaryTree(gana)]),
+            new BinaryTree(null, [new BinaryTree(colombia), new BinaryTree(ghana)]),
           ]),
         ]),
       ]),
