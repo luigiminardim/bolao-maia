@@ -12,7 +12,6 @@ import {
 } from "./entity/Sweepstake";
 import { ScorePolicyBuilder } from "./entity/ScorePolicy";
 import {
-  teamRepository,
   groupListChampionshipRepository,
   cupChampionshipRepository,
   poolSweepstakeRepository,
@@ -72,61 +71,6 @@ async function seed() {
   const croatia = new Team("croatia", "Croácia");
   const panama = new Team("panama", "Panamá");
   const ghana = new Team("ghana", "Gana");
-
-  const teams = [
-    mexico,
-    southKorea,
-    southAfrica,
-    czechia,
-    canada,
-    switzerland,
-    qatar,
-    bosniaHerzegovina,
-    brazil,
-    morocco,
-    scotland,
-    haiti,
-    usa,
-    paraguay,
-    australia,
-    turkiye,
-    germany,
-    ecuador,
-    ivoryCoast,
-    curacao,
-    netherlands,
-    japan,
-    tunisia,
-    sweden,
-    belgium,
-    iran,
-    egypt,
-    newZealand,
-    spain,
-    uruguay,
-    saudiArabia,
-    capeVerde,
-    france,
-    senegal,
-    norway,
-    iraq,
-    argentina,
-    austria,
-    algeria,
-    jordan,
-    portugal,
-    colombia,
-    uzbekistan,
-    drCongo,
-    england,
-    croatia,
-    panama,
-    ghana,
-  ];
-
-  for (const team of teams) {
-    await teamRepository.save(team);
-  }
 
   // GroupListChampionship
   const worldCup2026GroupList = new GroupListChampionship(
