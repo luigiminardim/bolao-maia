@@ -1,14 +1,9 @@
 import { ReactNode } from "react";
-import {
-  CupGuessResultDto,
-  CupTeamGuessDto,
-} from "@/usecase/dto/GuessResultDto";
+import { CupGuessResultDto } from "@/usecase/dto/GuessResultDto";
 import { CupSweepstakeDto } from "@/usecase/dto/SweepstakeDto";
 import { Table, Card } from "@heroui/react";
 import { getTeamFlagSvgUrl } from "@/app/utils/getTeamFlagSvgUrl";
 import { getPhaseName, extractTeamsFromCupGuess } from "./CupGuessSection";
-import { BinaryTreeDao } from "@/utils/BinaryTree";
-import { TeamDto } from "@/usecase/dto/TeamDto";
 
 interface CupGuessResultSectionProps {
   result: CupGuessResultDto;
@@ -21,46 +16,6 @@ export function CupGuessResultSection({
   sweepstake,
   header,
 }: CupGuessResultSectionProps) {
-  const guessesList: {
-    team: TeamDto;
-    positionGuess: number;
-    score: number | null;
-  }[] = [];
-
-  function traverseResultForList(
-    node: BinaryTreeDao<CupTeamGuessDto> | null | undefined,
-  ) {
-    if (!node) return;
-    if (node.elem && node.elem.team && node.elem.team.id) {
-      if (!guessesList.find((g) => g.team.id === node.elem.team!.id)) {
-        guessesList.push({
-          team: node.elem.team,
-          positionGuess: node.elem.positionGuess ?? 999,
-          score: node.elem.score,
-        });
-      }
-    }
-    if (node.children) {
-      traverseResultForList(node.children[0]);
-      traverseResultForList(node.children[1]);
-    }
-  }
-  traverseResultForList(result.root);
-  if (
-    result.thirdPlace?.team?.id &&
-    !guessesList.find((g) => g.team.id === result.thirdPlace!.team!.id)
-  ) {
-    guessesList.push({
-      team: result.thirdPlace.team,
-      positionGuess: result.thirdPlace.positionGuess ?? 3,
-      score: result.thirdPlace.score,
-    });
-  }
-
-  guessesList.sort(
-    (a, b) => (a.positionGuess || 999) - (b.positionGuess || 999),
-  );
-
   const officialPositions = extractTeamsFromCupGuess(
     sweepstake.championship.root,
     sweepstake.championship.thirdPlace,
@@ -85,10 +40,10 @@ export function CupGuessResultSection({
                 <Table.Column className="text-right">Pontuação</Table.Column>
               </Table.Header>
               <Table.Body>
-                {guessesList.map((g, index) => {
-                  const prev = index > 0 ? guessesList[index - 1] : null;
+                {result.list.map((g, index) => {
+                  const prev = index > 0 ? result.list[index - 1] : null;
                   const isNewPhase =
-                    prev && prev.positionGuess !== g.positionGuess;
+                    prev && prev.guessPosition !== g.guessPosition;
                   const officialPos = officialPositionsMap.get(g.team.id);
 
                   return (
@@ -101,7 +56,7 @@ export function CupGuessResultSection({
                       }
                     >
                       <Table.Cell className="whitespace-nowrap font-bold text-zinc-400 text-xs py-3">
-                        {g.positionGuess ? getPhaseName(g.positionGuess) : "-"}
+                        {getPhaseName(g.guessPosition)}
                       </Table.Cell>
                       <Table.Cell className="py-3">
                         <div className="flex items-center gap-3">

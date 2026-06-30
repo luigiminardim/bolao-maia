@@ -33,10 +33,10 @@ describe("GuessResult", () => {
   const t3B_guess2 = new Team("t3B", "Team 3B");
   const t4B_guess1 = new Team("t4B", "Team 4B");
 
-  const c1 = new Team("c1", "Cup 1");
-  const c2 = new Team("c2", "Cup 2");
+  const c1_guess2 = new Team("c1", "Cup 1");
+  const c2_guess4 = new Team("c2", "Cup 2");
   const c3 = new Team("c3", "Cup 3");
-  const c4 = new Team("c4", "Cup 4");
+  const c4_guess1 = new Team("c4", "Cup 4");
   const c5 = new Team("c5", "Cup 5");
   const c6 = new Team("c6", "Cup 6");
   const c7 = new Team("c7", "Cup 7");
@@ -123,7 +123,7 @@ describe("GuessResult", () => {
     new BinaryTree<Team | null>(null, [
       new BinaryTree<Team | null>(null, [
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c1),
+          new BinaryTree<Team | null>(c1_guess2),
           new BinaryTree<Team | null>(c5),
         ]),
         new BinaryTree<Team | null>(null, [
@@ -133,11 +133,11 @@ describe("GuessResult", () => {
       ]),
       new BinaryTree<Team | null>(null, [
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c2),
+          new BinaryTree<Team | null>(c2_guess4),
           new BinaryTree<Team | null>(c7),
         ]),
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c4),
+          new BinaryTree<Team | null>(c4_guess1),
           new BinaryTree<Team | null>(c8),
         ]),
       ]),
@@ -153,7 +153,7 @@ describe("GuessResult", () => {
     new BinaryTree<Team | null>(null, [
       new BinaryTree<Team | null>(null, [
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c1),
+          new BinaryTree<Team | null>(c1_guess2),
           new BinaryTree<Team | null>(c5),
         ]),
         new BinaryTree<Team | null>(null, [
@@ -163,11 +163,11 @@ describe("GuessResult", () => {
       ]),
       new BinaryTree<Team | null>(null, [
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c2),
+          new BinaryTree<Team | null>(c2_guess4),
           new BinaryTree<Team | null>(c7),
         ]),
         new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(c4),
+          new BinaryTree<Team | null>(c4_guess1),
           new BinaryTree<Team | null>(c8),
         ]),
       ]),
@@ -180,10 +180,10 @@ describe("GuessResult", () => {
   const finishedCupChampionship = new CupChampionship(
     "cup1",
     "Cup 1",
-    new BinaryTree<Team | null>(c1, [
-      new BinaryTree<Team | null>(c1, [
-        new BinaryTree<Team | null>(c1, [
-          new BinaryTree<Team | null>(c1),
+    new BinaryTree<Team | null>(c1_guess2, [
+      new BinaryTree<Team | null>(c1_guess2, [
+        new BinaryTree<Team | null>(c1_guess2, [
+          new BinaryTree<Team | null>(c1_guess2),
           new BinaryTree<Team | null>(c5),
         ]),
         new BinaryTree<Team | null>(c3, [
@@ -191,13 +191,13 @@ describe("GuessResult", () => {
           new BinaryTree<Team | null>(c6),
         ]),
       ]),
-      new BinaryTree<Team | null>(c2, [
-        new BinaryTree<Team | null>(c2, [
-          new BinaryTree<Team | null>(c2),
+      new BinaryTree<Team | null>(c2_guess4, [
+        new BinaryTree<Team | null>(c2_guess4, [
+          new BinaryTree<Team | null>(c2_guess4),
           new BinaryTree<Team | null>(c7),
         ]),
-        new BinaryTree<Team | null>(c4, [
-          new BinaryTree<Team | null>(c4),
+        new BinaryTree<Team | null>(c4_guess1, [
+          new BinaryTree<Team | null>(c4_guess1),
           new BinaryTree<Team | null>(c8),
         ]),
       ]),
@@ -220,10 +220,10 @@ describe("GuessResult", () => {
   const cupGuess = new CupGuess(
     user.id(),
     "swC",
-    new BinaryTree<Team>(c4, [
-      new BinaryTree<Team>(c1, [
-        new BinaryTree<Team>(c1, [
-          new BinaryTree<Team>(c1),
+    new BinaryTree<Team>(c4_guess1, [
+      new BinaryTree<Team>(c1_guess2, [
+        new BinaryTree<Team>(c1_guess2, [
+          new BinaryTree<Team>(c1_guess2),
           new BinaryTree<Team>(c5),
         ]),
         new BinaryTree<Team>(c3, [
@@ -231,13 +231,13 @@ describe("GuessResult", () => {
           new BinaryTree<Team>(c6),
         ]),
       ]),
-      new BinaryTree<Team>(c4, [
-        new BinaryTree<Team>(c2, [
-          new BinaryTree<Team>(c2),
+      new BinaryTree<Team>(c4_guess1, [
+        new BinaryTree<Team>(c2_guess4, [
+          new BinaryTree<Team>(c2_guess4),
           new BinaryTree<Team>(c7),
         ]),
-        new BinaryTree<Team>(c4, [
-          new BinaryTree<Team>(c4),
+        new BinaryTree<Team>(c4_guess1, [
+          new BinaryTree<Team>(c4_guess1),
           new BinaryTree<Team>(c8),
         ]),
       ]),
@@ -392,10 +392,53 @@ describe("GuessResult", () => {
         waitingCupChampionship,
         cupScorePolicy,
       );
-      const res = new CupGuessResult(cupSweepstake, cupGuess);
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 1);
       expect(res.score).toBeNull();
-      expect(res.root.elem.score).toBeNull();
-      expect(res.thirdPlace?.score).toBeNull();
+
+      // first place guesss
+      expect(res.root.elem.team).toBe(c4_guess1);
+      expect(res.root.elem.info?.guessPosition).toBe(1);
+      expect(res.root.elem.info?.teamPosition).toBe(8);
+      expect(res.root.elem.info?.score).toBeNull();
+      expect(res.root.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.children[0]?.elem.team).toBe(
+        c4_guess1,
+      );
+      expect(
+        res.root.children[1]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
+
+      // second place guess
+      expect(res.root.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.elem.info).not.toBeNull();
+      expect(res.root.children[0]?.elem.info?.guessPosition).toBe(2);
+      expect(res.root.children[0]?.elem.info?.teamPosition).toBe(8);
+      expect(res.root.children[0]?.elem.info?.score).toBeNull();
+      expect(res.root.children[0]?.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.children[0]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[0]?.children[0]?.elem.team).toBe(
+        c1_guess2,
+      );
+      expect(
+        res.root.children[0]?.children[0]?.children[0]?.elem.info,
+      ).toBeNull();
+
+      // third place guess
+      expect(res.thirdPlace?.team).toBe(c3);
+      expect(res.thirdPlace?.info?.guessPosition).toBe(3);
+      expect(res.thirdPlace?.info?.teamPosition).toBe(8);
+      expect(res.thirdPlace?.info?.score).toBeNull();
+      expect(res.root.children[0]?.children[1]?.elem.team).toBe(c3);
+      expect(res.root.children[0]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[1]?.children[0]?.elem.team).toBe(
+        c3,
+      );
+      expect(
+        res.root.children[0]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
     });
 
     it("just started championship (teams on round of 8)", () => {
@@ -406,10 +449,54 @@ describe("GuessResult", () => {
         justStartedCupChampionship,
         cupScorePolicy,
       );
-      const res = new CupGuessResult(cupSweepstake, cupGuess);
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 1);
+
       expect(res.score).toBe(0);
-      expect(res.root.elem.team).toBeNull();
-      expect(res.thirdPlace?.team).toBeNull();
+
+      // first place guesss
+      expect(res.root.elem.team).toBe(c4_guess1);
+      expect(res.root.elem.info?.guessPosition).toBe(1);
+      expect(res.root.elem.info?.teamPosition).toBe(8);
+      expect(res.root.elem.info?.score).toBe(0);
+      expect(res.root.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.children[0]?.elem.team).toBe(
+        c4_guess1,
+      );
+      expect(
+        res.root.children[1]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
+
+      // second place guess
+      expect(res.root.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.elem.info).not.toBeNull();
+      expect(res.root.children[0]?.elem.info?.guessPosition).toBe(2);
+      expect(res.root.children[0]?.elem.info?.teamPosition).toBe(8);
+      expect(res.root.children[0]?.elem.info?.score).toBe(0);
+      expect(res.root.children[0]?.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.children[0]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[0]?.children[0]?.elem.team).toBe(
+        c1_guess2,
+      );
+      expect(
+        res.root.children[0]?.children[0]?.children[0]?.elem.info,
+      ).toBeNull();
+
+      // third place guess
+      expect(res.thirdPlace?.team).toBe(c3);
+      expect(res.thirdPlace?.info?.guessPosition).toBe(3);
+      expect(res.thirdPlace?.info?.teamPosition).toBe(8);
+      expect(res.thirdPlace?.info?.score).toBe(0);
+      expect(res.root.children[0]?.children[1]?.elem.team).toBe(c3);
+      expect(res.root.children[0]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[1]?.children[0]?.elem.team).toBe(
+        c3,
+      );
+      expect(
+        res.root.children[0]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
     });
 
     it("finished championship", () => {
@@ -420,19 +507,58 @@ describe("GuessResult", () => {
         finishedCupChampionship,
         cupScorePolicy,
       );
-      const res = new CupGuessResult(cupSweepstake, cupGuess);
-      expect(res.score).toBe(54);
-      expect(res.root.elem.team).toBe(c1);
-      expect(res.root.elem.score).toBe(20);
-      expect(res.root.elem.positionGuess).toBe(2);
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 1);
+      expect(res.score).toBe(
+        20 + // c1_guess2
+          10 + // c2_guess4
+          14 + // c3
+          10, // c4_guess1
+      );
 
-      expect(res.root.children[0]?.elem.team).toBe(c1);
-      expect(res.root.children[0]?.elem.score).toBeNull();
-      expect(res.root.children[0]?.elem.positionGuess).toBeNull();
+      // first place guesss
+      expect(res.root.elem.team).toBe(c4_guess1);
+      expect(res.root.elem.info?.guessPosition).toBe(1);
+      expect(res.root.elem.info?.teamPosition).toBe(4);
+      expect(res.root.elem.info?.score).toBe(10);
+      expect(res.root.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.elem.team).toBe(c4_guess1);
+      expect(res.root.children[1]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[1]?.children[1]?.children[0]?.elem.team).toBe(
+        c4_guess1,
+      );
+      expect(
+        res.root.children[1]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
 
+      // second place guess
+      expect(res.root.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.elem.info).not.toBeNull();
+      expect(res.root.children[0]?.elem.info?.guessPosition).toBe(2);
+      expect(res.root.children[0]?.elem.info?.teamPosition).toBe(1);
+      expect(res.root.children[0]?.elem.info?.score).toBe(20);
+      expect(res.root.children[0]?.children[0]?.elem.team).toBe(c1_guess2);
+      expect(res.root.children[0]?.children[0]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[0]?.children[0]?.elem.team).toBe(
+        c1_guess2,
+      );
+      expect(
+        res.root.children[0]?.children[0]?.children[0]?.elem.info,
+      ).toBeNull();
+
+      // third place guess
       expect(res.thirdPlace?.team).toBe(c3);
-      expect(res.thirdPlace?.positionGuess).toBe(3);
-      expect(res.thirdPlace?.score).toBe(14);
+      expect(res.thirdPlace?.info?.guessPosition).toBe(3);
+      expect(res.thirdPlace?.info?.teamPosition).toBe(3);
+      expect(res.thirdPlace?.info?.score).toBe(14);
+      expect(res.root.children[0]?.children[1]?.elem.team).toBe(c3);
+      expect(res.root.children[0]?.children[1]?.elem.info).toBeNull();
+      expect(res.root.children[0]?.children[1]?.children[0]?.elem.team).toBe(
+        c3,
+      );
+      expect(
+        res.root.children[0]?.children[1]?.children[0]?.elem.info,
+      ).toBeNull();
     });
 
     it("finished championship with factor", () => {
@@ -443,10 +569,46 @@ describe("GuessResult", () => {
         finishedCupChampionship,
         cupScorePolicy,
       );
-      const res = new CupGuessResult(cupSweepstake, cupGuess, 1.5);
-      expect(res.score).toBe(81);
-      expect(res.root.elem.score).toBe(20);
-      expect(res.thirdPlace?.score).toBe(14);
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 3);
+      expect(res.score).toBe(
+        60 + // c1_guess2
+          30 + // c2_guess4
+          42 + // c3
+          30, // c4_guess1
+      );
+      expect(res.root.elem.info?.score).toBe(30);
+      expect(res.thirdPlace?.info?.score).toBe(42);
+    });
+
+    it("toList() returns flattened non-nullable ordered list", () => {
+      const cupSweepstake = new CupSweepstake(
+        "swC",
+        "Cup Sweepstake",
+        "Desc",
+        finishedCupChampionship,
+        cupScorePolicy,
+      );
+      const res = new CupGuessResult(cupSweepstake, cupGuess, 1);
+      const list = res.toList();
+
+      expect(list).toHaveLength(8);
+
+      expect(list[0]?.team).toBe(c4_guess1);
+      expect(list[0]?.guessPosition).toBe(1);
+
+      expect(list[1]?.team).toBe(c1_guess2);
+      expect(list[1]?.guessPosition).toBe(2);
+
+      expect(list[2]?.team).toBe(c3);
+      expect(list[2]?.guessPosition).toBe(3);
+
+      expect(list[3]?.team).toBe(c2_guess4);
+      expect(list[3]?.guessPosition).toBe(4);
+
+      expect(list[4]?.guessPosition).toBe(8);
+      expect(list[5]?.guessPosition).toBe(8);
+      expect(list[6]?.guessPosition).toBe(8);
+      expect(list[7]?.guessPosition).toBe(8);
     });
   });
 
@@ -535,8 +697,8 @@ describe("GuessResult", () => {
 
       expect(cupRes).toBeDefined();
       if (cupRes?.kind === "cup") {
-        expect(cupRes.cupResult.root.elem.team).toBe(c1);
-        expect(cupRes.cupResult.root.elem.score).toBe(20);
+        expect(cupRes.cupResult.root.elem.team).toBe(c4_guess1);
+        expect(cupRes.cupResult.root.elem.info?.score).toBe(10);
       }
       expect(result.score).toBe(74);
     });

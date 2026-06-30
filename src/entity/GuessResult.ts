@@ -9,85 +9,102 @@ import {
 import { Team } from "./Team";
 import { User } from "./User";
 
-type CupGuessNodeInfo = {
-  team: null | Team;
-  positionGuess: null | number;
-  score: null | number;
+export type CupGuessTeamResult = {
+  team: Team;
+  info: null | {
+    teamPosition: number;
+    guessPosition: number;
+    score: null | number;
+  };
 };
 
 export class CupGuessResult {
   sweepstakeId: string;
   userId: string;
   score: number | null;
-  root: BinaryTree<CupGuessNodeInfo>;
-  thirdPlace: null | CupGuessNodeInfo;
+  root: BinaryTree<CupGuessTeamResult>;
+  thirdPlace: null | CupGuessTeamResult;
 
-  constructor(sweepstake: CupSweepstake, guess: CupGuess, factor?: number) {
+  constructor(sweepstake: CupSweepstake, guess: CupGuess, factor: number) {
     this.userId = guess.userId;
     this.sweepstakeId = guess.sweepstakeId;
     const cup = sweepstake.championship;
     const scorePolicy = sweepstake.scorePolicy;
     const isLocked = sweepstake.getStatus() === "locked";
-    let thirdPlace: null | CupGuessNodeInfo = null;
     const scanContext: { seen: Team[] } = { seen: [] };
 
-    if (cup.hasThirdPlaceMatch) {
-      if (cup.thirdPlace) {
-        const team = cup.thirdPlace;
-        const guessPosition = guess.teamPosition(team) ?? (-1 as never);
-        const score = isLocked
-          ? scorePolicy.cupTeamScore(team, cup, guessPosition)
-          : null;
-        thirdPlace = {
-          team,
-          positionGuess: guessPosition,
-          score,
-        };
-        scanContext.seen.push(team);
-      } else {
-        thirdPlace = {
-          team: null,
-          positionGuess: null,
-          score: null,
-        };
-      }
+    if (guess.thirdPlace) {
+      const teamPosition = cup.teamPosition(guess.thirdPlace);
+      const score = isLocked
+        ? factor * scorePolicy.cupTeamScore(guess.thirdPlace, cup, 3)
+        : null;
+      this.thirdPlace = {
+        team: guess.thirdPlace,
+        info:
+          teamPosition === null
+            ? null
+            : {
+                teamPosition,
+                guessPosition: 3,
+                score,
+              },
+      };
+      scanContext.seen.push(guess.thirdPlace);
+    } else {
+      this.thirdPlace = null;
     }
 
-    const nextContext = (team: null | Team, context: { seen: Team[] }) => {
-      if (team !== null) {
-        context.seen.push(team);
-      }
-      return context;
-    };
-
-    this.root = cup.root.scanmap(
+    this.root = guess.root.scanmap(
       (team, context) => {
-        if (team === null) {
-          return { team: null, positionGuess: null, score: null };
+        if (context.seen.some((t) => t.id === team.id)) {
+          return { team, info: null };
         }
-        if (context.seen.includes(team)) {
-          return { team, positionGuess: null, score: null };
+        const teamPosition = cup.teamPosition(team);
+        const guessPosition = guess.teamPosition(team);
+        if (guessPosition == null || teamPosition == null) {
+          return { team, info: null };
         }
-        const guessPosition = guess.teamPosition(team) ?? (-1 as never);
         const score = isLocked
-          ? scorePolicy.cupTeamScore(team, cup, guessPosition)
+          ? factor * scorePolicy.cupTeamScore(team, cup, guessPosition)
           : null;
-        return { team, positionGuess: guessPosition, score };
+        return { team, info: { teamPosition, guessPosition, score } };
       },
       scanContext,
-      nextContext,
+      function nextContext(team: null | Team, context: { seen: Team[] }) {
+        if (team !== null) {
+          context.seen.push(team);
+        }
+        return context;
+      },
     );
 
-    this.thirdPlace = thirdPlace;
-    if (isLocked) {
+    if (!isLocked) {
+      this.score = null;
+    } else {
       const rootScore = this.root.reduce(
-        (acc, node) => acc + (node.score ?? 0),
+        (acc, node) => acc + (node.info?.score ?? 0),
         0,
       );
-      this.score = (rootScore + (this.thirdPlace?.score ?? 0)) * (factor ?? 1);
-    } else {
-      this.score = null;
+      this.score = rootScore + (this.thirdPlace?.info?.score ?? 0);
     }
+  }
+
+  toList(): (NonNullable<CupGuessTeamResult["info"]> & { team: Team })[] {
+    const list = this.root.reduce(
+      (acc, node) => {
+        if (node.info) {
+          acc.push({ team: node.team, ...node.info });
+        }
+        return acc;
+      },
+      [] as (NonNullable<CupGuessTeamResult["info"]> & { team: Team })[],
+    );
+
+    if (this.thirdPlace?.info) {
+      list.push({ team: this.thirdPlace.team, ...this.thirdPlace.info });
+    }
+
+    return list.sort((a, b) => a.guessPosition - b.guessPosition);
   }
 }
 
@@ -222,7 +239,11 @@ export class PoolGuessResult {
           return [
             {
               kind: "cup",
-              cupResult: new CupGuessResult(item.sweepstake, subGuess.cupGuess),
+              cupResult: new CupGuessResult(
+                item.sweepstake,
+                subGuess.cupGuess,
+                item.factor,
+              ),
               factor: item.factor,
             },
           ];

@@ -143,39 +143,72 @@ function toGroupListTeamGuessResultDto(
   };
 }
 
-export interface CupTeamGuessDto {
-  team: TeamDto | null;
-  positionGuess: number | null;
+export interface CupGuessTeamResultListItemDto {
+  team: TeamDto;
+  teamPosition: number;
+  guessPosition: number;
   score: number | null;
+}
+
+export interface CupGuessTeamResultDto {
+  team: TeamDto;
+  info: null | {
+    teamPosition: number;
+    guessPosition: number;
+    score: number | null;
+  };
 }
 
 export interface CupGuessResultDto {
   user: UserDto;
   score: number | null;
-  root: BinaryTreeDao<CupTeamGuessDto>;
-  thirdPlace: CupTeamGuessDto | null;
+  root: BinaryTreeDao<CupGuessTeamResultDto>;
+  thirdPlace: CupGuessTeamResultDto | null;
+  list: CupGuessTeamResultListItemDto[];
 }
 
 export function toCupGuessResultDto(
   result: CupGuessResult,
   user: User,
 ): CupGuessResultDto {
+  const root: BinaryTreeDao<CupGuessTeamResultDto> = BinaryTree.toDto(
+    result.root,
+    (node) => ({
+      team: toTeamDto(node.team),
+      info: !!node.info
+        ? {
+            teamPosition: node.info.teamPosition,
+            guessPosition: node.info.guessPosition,
+            score: node.info.score,
+          }
+        : null,
+    }),
+  );
+  const thirdPlace: CupGuessTeamResultDto | null = result.thirdPlace
+    ? {
+        team: toTeamDto(result.thirdPlace.team),
+        info: !!result.thirdPlace.info
+          ? {
+              teamPosition: result.thirdPlace.info.teamPosition,
+              guessPosition: result.thirdPlace.info.guessPosition,
+              score: result.thirdPlace.info.score,
+            }
+          : null,
+      }
+    : null;
+
+  const list: CupGuessTeamResultListItemDto[] = result.toList().map((item) => ({
+    team: toTeamDto(item.team),
+    teamPosition: item.teamPosition,
+    guessPosition: item.guessPosition,
+    score: item.score,
+  }));
+
   return {
     user: toUserDto(user),
     score: result.score,
-    root: BinaryTree.toDto(result.root, (node) => ({
-      team: node.team ? toTeamDto(node.team) : null,
-      positionGuess: node.positionGuess,
-      score: node.score,
-    })),
-    thirdPlace: result.thirdPlace
-      ? {
-          team: result.thirdPlace.team
-            ? toTeamDto(result.thirdPlace.team)
-            : null,
-          positionGuess: result.thirdPlace.positionGuess,
-          score: result.thirdPlace.score,
-        }
-      : null,
+    root,
+    thirdPlace,
+    list,
   };
 }

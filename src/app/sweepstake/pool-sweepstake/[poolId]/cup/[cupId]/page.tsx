@@ -25,7 +25,6 @@ export default async function CupSweepstakePage({ params }: PageProps) {
   if (!cupSweepstake) {
     return notFound();
   }
-  console.log("Olá");
 
   const cupGuess = !!user
     ? await getCupGuessFromPoolUsecase.execute(poolId, cupId, user.id, user?.id)
