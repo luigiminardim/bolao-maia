@@ -140,21 +140,19 @@ export async function toPoolGuessRankingListDto(
           if (sub.kind === "group") {
             const rawScore =
               subResult?.kind === "group" ? subResult.groupResult.score : null;
-            const factor = subResult?.kind === "group" ? subResult.factor : 1;
             return {
               kind: "group",
               sweepstakeId: sub.id,
-              score: rawScore !== null ? rawScore * factor : null,
+              score: rawScore,
             };
           }
 
           const rawScore =
             subResult?.kind === "cup" ? subResult.cupResult.score : null;
-          const factor = subResult?.kind === "cup" ? subResult.factor : 1;
           return {
             kind: "cup",
             sweepstakeId: sub.id,
-            score: rawScore !== null ? rawScore * factor : null,
+            score: rawScore,
           };
         },
       );

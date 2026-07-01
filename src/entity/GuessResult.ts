@@ -128,6 +128,7 @@ export class GroupListGroupGuessResult {
     group: GroupListGroupChampionship,
     groupGuess: GroupGuess,
     extraQualifiedListGuess: Team[],
+    factor: number,
   ) {
     const { championship, scorePolicy } = sweepstake;
     const isLocked = sweepstake.getStatus() === "locked";
@@ -142,7 +143,8 @@ export class GroupListGroupGuessResult {
           sweepstake.championship.positionIsRegularQualified(guessPosition) ||
           guessExtraQualified;
         const score = isLocked
-          ? scorePolicy.groupListTeamScore(
+          ? factor *
+            scorePolicy.groupListTeamScore(
               team,
               championship,
               guessPosition,
@@ -177,7 +179,7 @@ export class GroupListGuessResult {
   constructor(
     sweepstake: GroupListSweepstake,
     guess: GroupListGuess,
-    factor?: number,
+    factor: number,
   ) {
     this.sweepstakeId = guess.sweepstakeId;
     this.userId = guess.userId;
@@ -190,11 +192,11 @@ export class GroupListGuessResult {
         group,
         groupGuess,
         guess.extraQualifiedListGuess,
+        factor,
       );
     });
     this.score = isLocked
-      ? this.groupList.reduce((acc, result) => acc + (result.score ?? 0), 0) *
-        (factor ?? 1)
+      ? this.groupList.reduce((acc, result) => acc + (result.score ?? 0), 0)
       : null;
   }
 }
@@ -231,6 +233,7 @@ export class PoolGuessResult {
               groupResult: new GroupListGuessResult(
                 item.sweepstake,
                 subGuess.groupGuess,
+                item.factor,
               ),
               factor: item.factor,
             },
@@ -261,7 +264,7 @@ export class PoolGuessResult {
           : result.cupResult.score;
       if (subScore !== null) {
         hasValidScore = true;
-        totalScore += subScore * result.factor;
+        totalScore += subScore;
       }
     }
     this.score = hasValidScore ? totalScore : null;

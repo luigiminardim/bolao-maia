@@ -259,6 +259,7 @@ describe("GuessResult", () => {
         groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
+        1,
       );
       expect(res.classification).toHaveLength(4);
       expect(res.score).toBeNull();
@@ -278,6 +279,7 @@ describe("GuessResult", () => {
         groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
+        1,
       );
       expect(res.classification).toHaveLength(4);
       expect(res.score).toBe(20);
@@ -301,6 +303,7 @@ describe("GuessResult", () => {
         groupSweepstake.championship.getGroup("gA")!,
         groupGuess.groupGuesses[0]!,
         groupGuess.extraQualifiedListGuess,
+        1,
       );
       expect(res.classification).toHaveLength(4);
       expect(res.score).toBe(20);
@@ -321,7 +324,7 @@ describe("GuessResult", () => {
         waitingGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupListGuessResult(groupSweepstake, groupGuess);
+      const res = new GroupListGuessResult(groupSweepstake, groupGuess, 1);
       expect(res.groupList).toHaveLength(2);
       expect(res.score).toBeNull();
     });
@@ -334,7 +337,7 @@ describe("GuessResult", () => {
         justStartedGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupListGuessResult(groupSweepstake, groupGuess);
+      const res = new GroupListGuessResult(groupSweepstake, groupGuess, 1);
       expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(20);
       expect(res.groupList[0]?.classification[0]?.team).toBe(t1A);
@@ -354,7 +357,7 @@ describe("GuessResult", () => {
         finishedGroupListChampionship,
         groupScorePolicy,
       );
-      const res = new GroupListGuessResult(groupSweepstake, groupGuess);
+      const res = new GroupListGuessResult(groupSweepstake, groupGuess, 1);
       expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(20);
       expect(res.groupList[0]?.classification[0]?.team).toBe(t1A);
@@ -379,7 +382,7 @@ describe("GuessResult", () => {
       const res = new GroupListGuessResult(groupSweepstake, groupGuess, 2);
       expect(res.groupList).toHaveLength(2);
       expect(res.score).toBe(40);
-      expect(res.groupList[0]?.classification[0]?.score).toBe(20);
+      expect(res.groupList[0]?.classification[0]?.score).toBe(40);
     });
   });
 
