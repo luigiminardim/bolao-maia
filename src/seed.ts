@@ -184,7 +184,7 @@ async function seed() {
             ]),
           ]),
           new BinaryTree(null, [
-            new BinaryTree(null, [
+            new BinaryTree(usa, [
               new BinaryTree(usa),
               new BinaryTree(bosniaHerzegovina),
             ]),
