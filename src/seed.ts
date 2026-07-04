@@ -220,7 +220,7 @@ async function seed() {
         ]),
         new BinaryTree(null, [
           new BinaryTree(null, [
-            new BinaryTree(null, [
+            new BinaryTree(argentina, [
               new BinaryTree(argentina),
               new BinaryTree(capeVerde),
             ]),
@@ -234,7 +234,7 @@ async function seed() {
               new BinaryTree(switzerland),
               new BinaryTree(algeria),
             ]),
-            new BinaryTree(null, [
+            new BinaryTree(colombia, [
               new BinaryTree(colombia),
               new BinaryTree(ghana),
             ]),
