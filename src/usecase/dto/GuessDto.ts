@@ -1,7 +1,15 @@
 import { GroupListChampionship } from "../../entity/Championship";
-import { CupGuess, GroupListGuess, PoolGuessItem } from "../../entity/Guess";
+import {
+  CupGuess,
+  GroupListGuess,
+  PoolGuess,
+  getIsTeamClassified,
+} from "../../entity/Guess";
+import { PoolSweepstake } from "../../entity/Sweepstake";
+import { User } from "../../entity/User";
 import { BinaryTree, BinaryTreeDao } from "../../utils/BinaryTree";
 import { TeamDto, toTeamDto } from "./TeamDto";
+import { UserDto, toUserDto } from "./UserDto";
 
 export interface GroupListTeamGuessDto {
   team: TeamDto;
@@ -30,12 +38,11 @@ export function toGroupListGuessDto(
         id: groupChampionship?.getId() ?? "",
         classification: g.classification.map((team, tIndex) => {
           const guessPosition = tIndex + 1;
-          const isExtraQualified = groupListGuess.extraQualifiedListGuess.some(
-            (et) => et.id === team.id,
+          const guessQualified = getIsTeamClassified(
+            groupListGuess,
+            championship,
+            team,
           );
-          const guessQualified =
-            guessPosition <= championship.maxRegularQualifiedPosition ||
-            isExtraQualified;
 
           return {
             team: toTeamDto(team),
@@ -66,21 +73,40 @@ export type PoolGuessItemDto =
   | { kind: "group"; groupGuess: GroupListGuessDto }
   | { kind: "cup"; cupGuess: CupGuessDto };
 
-export function toPoolGuessItemDto(
-  item: PoolGuessItem,
-  championships: { groupList?: GroupListChampionship },
-): PoolGuessItemDto {
-  if (item.kind === "group" && championships.groupList) {
-    return {
-      kind: "group",
-      groupGuess: toGroupListGuessDto(item.groupGuess, championships.groupList),
-    };
-  }
-  if (item.kind === "cup") {
-    return {
-      kind: "cup",
-      cupGuess: toCupGuessDto(item.cupGuess),
-    };
-  }
-  throw new Error("Invalid guess item or missing championship context");
+export interface PoolGuessDto {
+  user: UserDto;
+  sweepstakeId: string;
+  subGuesses: PoolGuessItemDto[];
+}
+
+export function toPoolGuessDto(
+  poolGuess: PoolGuess,
+  user: User,
+  poolSweepstake: PoolSweepstake,
+): PoolGuessDto {
+  return {
+    user: toUserDto(user),
+    sweepstakeId: poolGuess.sweepstakeId,
+    subGuesses: poolGuess.subGuesses.map((sub): PoolGuessItemDto => {
+      switch (sub.kind) {
+        case "group": {
+          const championship = poolSweepstake.getGroupListSweepstakeById(
+            sub.groupGuess.sweepstakeId,
+          )?.sweepstake.championship;
+          if (!championship) {
+            throw new Error("Missing championship context for group guess");
+          }
+          return {
+            kind: "group",
+            groupGuess: toGroupListGuessDto(sub.groupGuess, championship),
+          };
+        }
+        case "cup":
+          return {
+            kind: "cup",
+            cupGuess: toCupGuessDto(sub.cupGuess),
+          };
+      }
+    }),
+  };
 }

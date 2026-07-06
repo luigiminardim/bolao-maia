@@ -1,4 +1,5 @@
 import { BinaryTree } from "../utils/BinaryTree";
+import { GroupListChampionship } from "./Championship";
 import {
   CupSweepstake,
   GroupListSweepstake,
@@ -118,4 +119,24 @@ export class PoolGuess {
     }
     this.subGuesses.push({ kind: "cup", cupGuess });
   }
+}
+
+export function getIsTeamClassified(
+  groupListGuess: GroupListGuess,
+  championship: GroupListChampionship,
+  team: Team,
+): boolean {
+  const isExtraQualified = groupListGuess.extraQualifiedListGuess.some(
+    (et) => et.id === team.id,
+  );
+  if (isExtraQualified) return true;
+
+  for (const group of groupListGuess.groupGuesses) {
+    const position = group.teamPosition(team);
+    if (position !== null) {
+      return position <= championship.maxRegularQualifiedPosition;
+    }
+  }
+
+  return false;
 }
