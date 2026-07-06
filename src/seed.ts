@@ -173,7 +173,7 @@ async function seed() {
           ]),
         ]),
         new BinaryTree(null, [
-          new BinaryTree(null, [
+          new BinaryTree(spain, [
             new BinaryTree(portugal, [
               new BinaryTree(portugal),
               new BinaryTree(croatia),
