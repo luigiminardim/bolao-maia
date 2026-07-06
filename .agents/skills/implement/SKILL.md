@@ -5,7 +5,7 @@ description: "Implementation skill for bolao-maia. Use this to implement a GitHu
 
 # Skill: Implement a GitHub Issue
 
-This skill implements a feature from a GitHub Issue directly on `main`, following the project's CD workflow.
+This skill implements a feature from a GitHub Issue, following the project's CD workflow. It requires creating a plan before implementing and leaves committing to the developer.
 
 ---
 
@@ -61,7 +61,13 @@ Before writing any code:
 
 ---
 
-## Step 4 — Implement
+## Step 4 — Plan
+
+Before implementing, create an Implementation Plan artifact with `request_feedback=true` to propose your approach. Wait for the user's explicit approval before proceeding.
+
+---
+
+## Step 5 — Implement
 
 Implement each acceptance criterion one at a time:
 
@@ -74,7 +80,7 @@ Implement each acceptance criterion one at a time:
 
 ---
 
-## Step 5 — Write Tests
+## Step 6 — Write Tests
 
 Every acceptance criterion must have at least one corresponding test:
 
@@ -84,27 +90,13 @@ Every acceptance criterion must have at least one corresponding test:
 
 ---
 
-## Step 6 — Run Quality Checks
+## Step 7 — Run Quality Checks
 
 ```bash
 npm run check && npm test
 ```
 
-Both must pass with **zero errors** before committing. Fix any failures before proceeding.
-
----
-
-## Step 7 — Commit to `main`
-
-Commit directly to `main` using a Conventional Commit message. Reference the Issue in the footer:
-
-```
-feat(scope): short summary of what was implemented
-
-Closes #<issue-number>
-```
-
-Common scopes: `entity`, `usecase`, `repository`, `infra`, `app`, `ui`.
+Both must pass with **zero errors** before you can consider the implementation complete. Fix any failures before proceeding.
 
 ---
 
@@ -126,5 +118,15 @@ Tell the user:
 
 - What was implemented (brief summary)
 - Which acceptance criteria are now satisfied
-- The commit hash
+- A reminder that the code is ready for the developer to review and commit
+- A **suggested Conventional Commit message** in a code block, formatted as:
+
+  ```text
+  feat(scope): short summary of what was implemented
+
+  Closes #<issue-number>
+  ```
+
+  _(Common scopes: `entity`, `usecase`, `repository`, `infra`, `app`, `ui`)_
+
 - Any follow-up work or edge cases that were intentionally deferred

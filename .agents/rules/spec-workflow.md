@@ -54,6 +54,7 @@ This skill fetches the Issue, implements against the acceptance criteria, runs q
 ### Clarifying ambiguous requirements
 
 If requirements are ambiguous at any point:
+
 - Use the `/grill-me` interview approach: **one question at a time**, with a recommended answer
 - Research the codebase first to minimize questions
 - Never make silent assumptions
@@ -61,6 +62,7 @@ If requirements are ambiguous at any point:
 ### If no spec exists
 
 If asked to implement a feature without a spec:
+
 1. Stop implementation.
 2. Inform the user a spec is needed.
 3. Offer to run the **`issue`** skill to create one.

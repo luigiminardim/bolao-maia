@@ -36,14 +36,14 @@ See [`docs/workflows/spec-driven-workflow.md`](./docs/workflows/spec-driven-work
 
 ## When a Spec is Required
 
-| Change type                   | Spec required?                                                    |
-| ----------------------------- | ----------------------------------------------------------------- |
-| New feature                   | ✅ Yes — create a GitHub Issue with acceptance criteria            |
-| Architectural change          | ✅ Yes — create a GitHub Issue and update `ARCHITECTURE.md`        |
+| Change type                   | Spec required?                                                        |
+| ----------------------------- | --------------------------------------------------------------------- |
+| New feature                   | ✅ Yes — create a GitHub Issue with acceptance criteria               |
+| Architectural change          | ✅ Yes — create a GitHub Issue and update `ARCHITECTURE.md`           |
 | Bug fix                       | ❌ No — describe the fix in the commit message; add a regression test |
-| Refactor (no behavior change) | ❌ No — describe the rationale in the commit message              |
-| Documentation update          | ❌ No                                                             |
-| Dependency upgrade            | ❌ No — document any breaking changes in the commit body          |
+| Refactor (no behavior change) | ❌ No — describe the rationale in the commit message                  |
+| Documentation update          | ❌ No                                                                 |
+| Dependency upgrade            | ❌ No — document any breaking changes in the commit body              |
 
 ---
 
