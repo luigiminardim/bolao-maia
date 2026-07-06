@@ -106,29 +106,35 @@ Produce the GitHub Issue body in this exact format:
 
 ---
 
-## Step 4 — Create the GitHub Issue
+## Step 4 — Get User Approval
 
-Run the following command to publish the Issue (label it `spec:draft`):
+Before creating the issue on GitHub, you MUST output the full issue body as a markdown code block in chat.
+Ask the user to review the issue and provide approval. **Do not run the `gh` command until the user explicitly approves.**
+
+---
+
+## Step 5 — Create the GitHub Issue
+
+Once approved, run the following command to publish the Issue (use conventional commits tags for labels, e.g., `feat`, `fix`, `docs`, `refactor`):
 
 ```bash
 gh issue create \
-  --title "feat: <short description>" \
+  --title "<type>: <short description>" \
   --body "<issue body>" \
-  --label "spec:draft" \
+  --label "<type>" \
   --repo luigiminardim/bolao-maia
 ```
 
 **If `gh` fails** (not authenticated, no network, etc.):
 
-1. Output the full issue body as a markdown code block in chat.
+1. Output the full issue body as a markdown code block in chat (if you haven't already).
 2. Say: "I couldn't create the GitHub Issue because: `<error>`. Please paste the content above at https://github.com/luigiminardim/bolao-maia/issues/new."
 
 ---
 
-## Step 5 — After Creation
+## Step 6 — After Creation
 
 Tell the user:
 
 - The Issue URL (if created successfully)
-- To review the acceptance criteria and apply the `spec:ready` label when finalized
-- **Implementation must not start until `spec:ready` is set**
+- To review the issue and let you know when to start implementation

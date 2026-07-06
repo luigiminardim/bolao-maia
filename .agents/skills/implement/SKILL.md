@@ -1,11 +1,11 @@
 ---
 name: implement
-description: "Implementation skill for bolao-maia. Use this to implement a GitHub Issue that has been specced and labelled spec:ready. Triggered by: /implement, 'implement issue #N', 'build issue #N', 'work on issue #N'. Reads the issue acceptance criteria, implements against them, runs checks, and commits to main. Keywords: implement, issue, feature, build, develop, spec:ready."
+description: "Implementation skill for bolao-maia. Use this to implement a GitHub Issue that has been specced. Triggered by: /implement, 'implement issue #N', 'build issue #N', 'work on issue #N'. Reads the issue acceptance criteria, implements against them, runs checks, and commits to main. Keywords: implement, issue, feature, build, develop."
 ---
 
 # Skill: Implement a GitHub Issue
 
-This skill implements a feature from a `spec:ready` GitHub Issue directly on `main`, following the project's CD workflow.
+This skill implements a feature from a GitHub Issue directly on `main`, following the project's CD workflow.
 
 ---
 
@@ -37,7 +37,7 @@ Read:
 - **Out of Scope** — what you must NOT implement
 - **Technical Notes** — constraints and relevant files
 
-> If the Issue is not labelled `spec:ready`, stop and tell the user: "This issue is not yet marked `spec:ready`. Please finalize the acceptance criteria and apply the label before implementation begins."
+> If the Issue is missing acceptance criteria, stop and ask the user to provide them before starting.
 
 ---
 

@@ -11,7 +11,7 @@ This project uses a **hybrid spec-first** development model. All changes land di
 
 ## When a Spec is Required
 
-A GitHub Issue labelled `spec:ready` is **required** before implementing:
+A GitHub Issue is **required** before implementing:
 
 - A new user-facing feature
 - A new use case or entity
@@ -43,7 +43,7 @@ This skill conducts a `/grill-me`-style interview, produces a PRD, and publishes
 
 ### Implementing a spec → use the `/implement` skill
 
-When the user wants to implement an existing `spec:ready` Issue, use the **`implement`** skill:
+When the user wants to implement an existing Issue, use the **`implement`** skill:
 
 ```
 .agents/skills/implement/SKILL.md

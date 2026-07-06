@@ -21,7 +21,7 @@ This guide applies equally to **human contributors** and **AI agents**.
 ```
 1. Find or create a GitHub Issue describing the change
        ↓
-2. Get the issue triaged / labelled as spec:ready
+2. Get the issue triaged and reviewed
        ↓
 3. Implement directly on main — guided by the issue's acceptance criteria
        ↓

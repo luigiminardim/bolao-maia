@@ -42,8 +42,6 @@ Before any feature is implemented, a spec must exist as a GitHub Issue.
 
 Use the **`/issue`** skill to start a spec-writing session. The agent will research the codebase, conduct a `/grill-me`-style interview (one question at a time, with a recommended answer), produce a full PRD, and publish it to GitHub.
 
-After creation, apply the `spec:ready` label when the acceptance criteria are finalized. **Implementation must not start until `spec:ready` is set.**
-
 See the full spec-writing process in: `.agents/skills/issue/SKILL.md`
 
 ---
@@ -69,27 +67,14 @@ Use the **Feature Spec** issue template. A good spec includes:
 - [ ] The ranking is recomputed after each guess submission
 ```
 
-### Step 2 — Triage
-
-The Issue is labelled and assigned. Labels used:
-
-| Label          | Meaning                                                     |
-| -------------- | ----------------------------------------------------------- |
-| `spec:ready`   | Acceptance criteria are finalized; implementation can begin |
-| `spec:draft`   | Issue is open for discussion; do not implement yet          |
-| `bug`          | A defect report; no spec required                           |
-| `architecture` | Impacts the system structure                                |
-
-**AI agents must not implement a feature until the Issue has the `spec:ready` label.**
-
-### Step 3 — Implement
+### Step 2 — Implement
 
 1. Read the Issue acceptance criteria in full before writing code.
 2. Implement against those criteria — not against assumptions.
 3. Write or update tests to cover the acceptance criteria.
 4. Run `npm run check` and `npm test` — both must pass.
 
-### Step 4 — Commit to `main`
+### Step 3 — Commit to `main`
 
 Commit directly to `main` using a [Conventional Commit](../../CONTRIBUTING.md#commit-messages-conventional-commits) message. Reference the Issue in the footer to auto-close it:
 
