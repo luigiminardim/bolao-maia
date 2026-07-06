@@ -22,6 +22,7 @@ description: You MUST read this file every time you are about to write or modify
 - **Intention-Revealing:** Names should answer: _why_ it exists, _what_ it does, and _how_ it is used.
 - **Pronounceable & Searchable:** Use words that are easy to say and find in the codebase.
 - **Conventions:** Use noun phrases for classes/objects and verb phrases for methods. Keep boolean prefixes (e.g., `is`, `has`, `should`).
+- **Avoid Plural:** Avoid using plural nouns. Use the base noun followed by the "List" postfix to represent a collection of items (e.g., use `participantList` instead of `participants`).
 
 ### Functions & Methods
 
