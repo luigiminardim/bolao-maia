@@ -207,7 +207,7 @@ async function seed() {
               new BinaryTree(norway),
             ]),
           ]),
-          new BinaryTree(null, [
+          new BinaryTree(england, [
             new BinaryTree(mexico, [
               new BinaryTree(mexico),
               new BinaryTree(ecuador),
