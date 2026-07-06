@@ -15,6 +15,7 @@ import {
   groupListChampionshipRepository,
   cupChampionshipRepository,
   poolSweepstakeRepository,
+  teamRepository,
 } from "./usecase/index";
 
 async function seed() {
@@ -71,6 +72,59 @@ async function seed() {
   const croatia = new Team("croatia", "Croácia");
   const panama = new Team("panama", "Panamá");
   const ghana = new Team("ghana", "Gana");
+
+  const teams = [
+    mexico,
+    southKorea,
+    southAfrica,
+    czechia,
+    canada,
+    switzerland,
+    qatar,
+    bosniaHerzegovina,
+    brazil,
+    morocco,
+    scotland,
+    haiti,
+    usa,
+    paraguay,
+    australia,
+    turkiye,
+    germany,
+    ecuador,
+    ivoryCoast,
+    curacao,
+    netherlands,
+    japan,
+    tunisia,
+    sweden,
+    belgium,
+    iran,
+    egypt,
+    newZealand,
+    spain,
+    uruguay,
+    saudiArabia,
+    capeVerde,
+    france,
+    senegal,
+    norway,
+    iraq,
+    argentina,
+    austria,
+    algeria,
+    jordan,
+    portugal,
+    colombia,
+    uzbekistan,
+    drCongo,
+    england,
+    croatia,
+    panama,
+    ghana,
+  ];
+
+  teams.forEach((t) => teamRepository.save(t));
 
   // GroupListChampionship
   const worldCup2026GroupList = new GroupListChampionship(
