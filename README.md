@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# bolao-maia
+
+> A web application for running _bolões_ — Brazilian sports pool competitions where friends predict match results and compete for the best score.
+
+---
+
+## What is a Bolão?
+
+A _bolão_ is a Brazilian tradition: a group of people each submit predictions for match results before a tournament. Once real scores are in, participants are ranked by how accurate their guesses were. **bolao-maia** digitalizes this experience for any sports championship.
+
+---
+
+## Features
+
+- 🏆 Support for multiple championship formats (group stage + cup final)
+- 📝 Submit and update match result guesses
+- 📊 Real-time score computation using a configurable scoring policy
+- 🥇 Pool ranking leaderboard
+- 👤 Frictionless login — join with just a username, no password required
+- ☁️ Dual storage backends: local filesystem for development, AWS S3 for production
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- [Node.js 24](https://nodejs.org/) (managed via [nvm](https://github.com/nvm-sh/nvm))
+- AWS credentials (for production S3 storage) — optional for local development
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/luigiminardim/bolao-maia.git
+cd bolao-maia
+
+# Install dependencies
+npm install
+```
+
+### Configuration
+
+Copy the example environment file and fill in your values:
+
+```bash
+cp .env .env.development.local
+```
+
+| Variable                | Description                        | Development default |
+| ----------------------- | ---------------------------------- | ------------------- |
+| `JSON_STORAGE`          | Storage backend: `File` or `AwsS3` | `File`              |
+| `FILE_STORAGE_PATH`     | Path for local JSON storage        | `.filestorage`      |
+| `AWS_REGION`            | AWS region                         | `us-east-1`         |
+| `AWS_S3_BUCKET`         | S3 bucket name                     | —                   |
+| `AWS_ACCESS_KEY_ID`     | AWS access key                     | —                   |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key                     | —                   |
+
+### Seed Data
+
+Populate the storage with championship and sweepstake data:
+
+```bash
+npm run seed
+```
+
+### Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+src/
+├── entity/       # Domain layer — pure business logic
+├── usecase/      # Application layer — use cases and DTOs
+├── repository/   # Persistence layer — JSON-backed repositories
+├── infra/        # Infrastructure — storage adapters (File, S3, Cache)
+└── app/          # Next.js App Router — pages, Server Actions, components
+```
 
-To learn more about Next.js, take a look at the following resources:
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for a detailed breakdown of the architecture, design decisions, and layer responsibilities.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See [docs/domain-glossary.md](./docs/domain-glossary.md) for definitions of domain terms.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Running Tests
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test
+```
+
+### Type Check + Lint
+
+```bash
+npm run check
+```
+
+### Auto-fix Formatting
+
+```bash
+npm run check:fix
+```
+
+---
+
+## Contributing
+
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request. This project uses a hybrid spec-first workflow — features require a GitHub Issue (spec) before implementation begins.
