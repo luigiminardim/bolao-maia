@@ -51,7 +51,7 @@ The system follows a strict layered architecture inspired by Clean Architecture.
 | `usecase/`    | `entity/`                                   | `repository/` interfaces only (via DI), `infra/`, `app/` |
 | `repository/` | `entity/`, `infra/`                         | `usecase/`, `app/`                                       |
 | `infra/`      | external libraries                          | `entity/`, `usecase/`, `repository/`, `app/`             |
-| `app/`        | `usecase/`, `entity/` (read-only for types) | `repository/`, `infra/` directly                         |
+| `app/`        | `usecase/`, `entity/` (read-only for types) | `repository/`, `infra/` directly (including API routes)  |
 
 ---
 
@@ -103,6 +103,7 @@ The active backend is selected by the `JSON_STORAGE` environment variable.
 Next.js 16 App Router. Maximizes Server Components. Client components are marked `"use client"` only where necessary.
 
 - **`actions.ts`**: All Server Actions in one file. Client components call these to trigger server-side mutations.
+- **`api/`**: API Route handlers (if any). Must strictly use `usecase/` to interact with the domain layer, and never access `repository/` directly.
 - **`login/`**: Authentication page (cookie-based, username only — no password).
 - **`sweepstake/`**: The main sweepstake experience (guess submission, ranking view).
 

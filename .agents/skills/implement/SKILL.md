@@ -26,7 +26,7 @@ Do **not** use this skill if no Issue number is provided — ask for one first.
 Retrieve the full Issue content:
 
 ```bash
-gh issue view <issue-number> --repo luigiminardim/bolao-maia
+gh issue view <issue-number> --repo luigiminardim/bolao-maia --json title,body
 ```
 
 Read:
@@ -63,7 +63,10 @@ Before writing any code:
 
 ## Step 4 — Plan
 
-Before implementing, create an Implementation Plan artifact with `request_feedback=true` to propose your approach. Wait for the user's explicit approval before proceeding.
+Before creating your plan, you **MUST** always check `ARCHITECTURE.md` to ensure your approach aligns with the project's layered architecture and constraints.
+
+Create an Implementation Plan artifact with `request_feedback=true` to propose your approach.
+When presenting the plan, you **must ask the user questions** about how they want to implement the feature and **make specific technical suggestions** or present alternative approaches. Wait for the user's explicit approval before proceeding.
 
 ---
 
