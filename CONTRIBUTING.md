@@ -30,7 +30,14 @@ This guide applies equally to **human contributors** and **AI agents**.
 5. Commit to main — deployed automatically
 ```
 
-See [`docs/workflows/spec-driven-workflow.md`](./docs/workflows/spec-driven-workflow.md) for the full workflow, including how AI agents should interact with specs.
+### Using AI Workflows
+
+To streamline this process, we use automated AI workflows:
+
+- **Defining a feature:** Use the `/issue` workflow (or ask the AI to "create a spec"). The agent will interview you to draft a Product Requirements Document (PRD) and automatically create the GitHub Issue.
+- **Implementing a feature:** Use the `/implement` workflow (or ask the AI to "implement issue #N"). The agent will read the issue, write code to satisfy the acceptance criteria, run quality checks, and commit directly to `main`.
+
+For detailed agent rules, see `.agents/rules/spec-workflow.md`.
 
 ---
 

@@ -44,7 +44,8 @@ bolao-maia/
 ├── docs/               # Human + AI shared documentation
 ├── .agents/
 │   ├── rules/          # Agent-specific rule files (always read before coding)
-│   └── skills/         # Agent skills (HeroUI, etc.)
+│   ├── skills/         # Agent skills (HeroUI, etc.)
+│   └── workflows/      # Agent workflows (issue, implement)
 ├── AGENTS.md           # ← You are here
 ├── ARCHITECTURE.md     # Evolving architecture document
 ├── CONTRIBUTING.md     # Contribution guide
@@ -125,5 +126,3 @@ This project uses a **hybrid spec-first** workflow. Features and architectural c
 1. Find the corresponding GitHub Issue.
 2. Read its acceptance criteria before writing a single line of code.
 3. Link your PR to the Issue.
-
-See [`docs/workflows/spec-driven-workflow.md`](./docs/workflows/spec-driven-workflow.md) for the full workflow.

@@ -31,25 +31,25 @@ A spec is **not required** for:
 
 ## Workflow
 
-### Creating a spec → use the `/issue` skill
+### Creating a spec → use the `/issue` workflow
 
-When the user wants to define a new feature, use the **`issue`** skill:
-
-```
-.agents/skills/issue/SKILL.md
-```
-
-This skill conducts a `/grill-me`-style interview, produces a PRD, and publishes it to GitHub via `gh issue create`.
-
-### Implementing a spec → use the `/implement` skill
-
-When the user wants to implement an existing Issue, use the **`implement`** skill:
+When the user wants to define a new feature, read the **`issue`** workflow:
 
 ```
-.agents/skills/implement/SKILL.md
+.agents/workflows/issue.md
 ```
 
-This skill fetches the Issue, implements against the acceptance criteria, runs quality checks, and commits to `main`.
+This workflow conducts a `/grill-me`-style interview, produces a PRD, and publishes it to GitHub via `gh issue create`.
+
+### Implementing a spec → use the `/implement` workflow
+
+When the user wants to implement an existing Issue, read the **`implement`** workflow:
+
+```
+.agents/workflows/implement.md
+```
+
+This workflow fetches the Issue, implements against the acceptance criteria, runs quality checks, and commits to `main`.
 
 ### Clarifying ambiguous requirements
 
@@ -65,12 +65,4 @@ If asked to implement a feature without a spec:
 
 1. Stop implementation.
 2. Inform the user a spec is needed.
-3. Offer to run the **`issue`** skill to create one.
-
----
-
-## Full Workflow Documentation
-
-```
-docs/workflows/spec-driven-workflow.md
-```
+3. Offer to run the **`issue`** workflow to create one.
