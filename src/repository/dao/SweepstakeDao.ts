@@ -97,9 +97,7 @@ export class SweepstakeDaoBuilder {
         `GroupListChampionship not found: ${groupDao.championship}`,
       );
     }
-    const scorePolicy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-      groupDao.scorePolicy,
-    );
+    const scorePolicy = ScorePolicyBuilder.build(groupDao.scorePolicy);
     return {
       kind: "group",
       sweepstake: new GroupListSweepstake(
@@ -125,9 +123,7 @@ export class SweepstakeDaoBuilder {
     if (!championship) {
       throw new Error(`CupChampionship not found: ${cupDao.championship}`);
     }
-    const scorePolicy = ScorePolicyBuilder.buildCupScorePolicyFromId(
-      cupDao.scorePolicy,
-    );
+    const scorePolicy = ScorePolicyBuilder.build(cupDao.scorePolicy);
     return {
       kind: "cup",
       sweepstake: new CupSweepstake(

@@ -1,33 +1,50 @@
-import { CupChampionship, GroupListChampionship } from "./Championship";
-import { Team } from "./Team";
-
-export interface GroupListScorePolicy {
-  getId(): string;
-  groupListTeamScore(
-    team: Team,
-    championship: GroupListChampionship,
-    positionGuess: number,
-    extraQualifiedListGuess: Team[],
-  ): number;
+export interface GroupListTeamScoreParam {
+  teamPosition: number;
+  guessPosition: number;
+  teamQualified: boolean;
+  guessQualified: boolean;
+  groupNumTeams: number;
+  groupNumQualified: number;
+  championshipNumQualified: number;
+  championshipNumTeams: number;
 }
 
-export interface CupScorePolicy {
-  getId(): string;
-  cupTeamScore(
-    team: Team,
-    championship: CupChampionship,
-    positionGuess: number,
-  ): number;
+export interface CupTeamScoreParam {
+  teamPosition: number;
+  guessPosition: number;
+  championshipNumTeams: number;
 }
 
-export class InverseProbabilityPositionScorePolicy
-  implements GroupListScorePolicy, CupScorePolicy
-{
-  static readonly idPrefix: string = "inverse-probability-position";
+export interface ScorePolicy {
+  getId(): string;
+  groupListTeamScore(params: GroupListTeamScoreParam): number;
+  cupTeamScore(params: CupTeamScoreParam): number;
+}
 
-  /**
-   * The inverse probability is at least 1.
-   */
+export class ConstScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "const";
+  readonly value: number;
+
+  constructor(value: number) {
+    this.value = value;
+  }
+
+  getId(): string {
+    return `const(${this.value})`;
+  }
+
+  groupListTeamScore(_params: GroupListTeamScoreParam): number {
+    return this.value;
+  }
+
+  cupTeamScore(_params: CupTeamScoreParam): number {
+    return this.value;
+  }
+}
+
+export class PositionInverseProbabilityScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "position-inverse-probability";
+
   MIN_SCORE = 1;
 
   private score(
@@ -35,85 +52,108 @@ export class InverseProbabilityPositionScorePolicy
     positionGuess: number,
     numTeams: number,
   ): number {
-    const worstPostion = Math.max(position, positionGuess);
-    return numTeams / worstPostion;
+    const worstPosition = Math.max(position, positionGuess);
+    return numTeams / worstPosition;
   }
 
   getId(): string {
-    return InverseProbabilityPositionScorePolicy.idPrefix;
+    return PositionInverseProbabilityScorePolicy.idPrefix;
   }
 
-  groupListTeamScore(
-    team: Team,
-    championship: GroupListChampionship,
-    positionGuess: number,
-    _extraQualifiedListGuess: Team[],
-  ): number {
-    const position = championship.teamPosition(team);
-    const group = championship.getTeamGroup(team);
-    if (position === null || group === null) {
-      return this.MIN_SCORE;
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    return this.score(
+      params.teamPosition,
+      params.guessPosition,
+      params.groupNumTeams,
+    );
+  }
+
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return this.score(
+      params.teamPosition,
+      params.guessPosition,
+      params.championshipNumTeams,
+    );
+  }
+}
+
+export class QualifiedInverseProbabilityScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "qualified-inverse-probability";
+
+  getId(): string {
+    return QualifiedInverseProbabilityScorePolicy.idPrefix;
+  }
+
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    if (!params.guessQualified || !params.teamQualified) {
+      return 1;
     }
-    return this.score(position, positionGuess, group.numTeams());
+    return params.championshipNumTeams / params.championshipNumQualified;
   }
 
-  cupTeamScore(
-    team: Team,
-    championship: CupChampionship,
-    positionGuess: number,
-  ): number {
-    const position = championship.teamPosition(team);
-    if (position === null) {
+  cupTeamScore(_params: CupTeamScoreParam): number {
+    return 1;
+  }
+}
+
+export class MaxScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "max";
+  readonly param0: ScorePolicy;
+  readonly param1: ScorePolicy;
+
+  constructor(param0: ScorePolicy, param1: ScorePolicy) {
+    this.param0 = param0;
+    this.param1 = param1;
+  }
+
+  getId(): string {
+    return `${MaxScorePolicy.idPrefix}(${this.param0.getId()}, ${this.param1.getId()})`;
+  }
+
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    return Math.max(
+      this.param0.groupListTeamScore(params),
+      this.param1.groupListTeamScore(params),
+    );
+  }
+
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return Math.max(
+      this.param0.cupTeamScore(params),
+      this.param1.cupTeamScore(params),
+    );
+  }
+}
+
+export class FilterQualifiedScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "filter-qualified";
+  readonly subPolicy: ScorePolicy;
+
+  constructor(subPolicy: ScorePolicy) {
+    this.subPolicy = subPolicy;
+  }
+
+  getId(): string {
+    return `${FilterQualifiedScorePolicy.idPrefix}(${this.subPolicy.getId()})`;
+  }
+
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    if (!params.guessQualified || !params.teamQualified) {
       return 0;
     }
-    return this.score(position, positionGuess, championship.numTeams());
+    return this.subPolicy.groupListTeamScore(params);
+  }
+
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return this.subPolicy.cupTeamScore(params);
   }
 }
 
-export class InverseProbabilityQualifiedPositionGroupListScorePolicy implements GroupListScorePolicy {
-  static readonly idPrefix: string = "inverse-probability-qualified-position";
-
-  private inverseProbabilityScorePolicy: InverseProbabilityPositionScorePolicy =
-    new InverseProbabilityPositionScorePolicy();
-
-  getId(): string {
-    return InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix;
-  }
-
-  groupListTeamScore(
-    team: Team,
-    championship: GroupListChampionship,
-    positionGuess: number,
-    extraQualifiedListGuess: Team[],
-  ): number {
-    const position = championship.teamPosition(team);
-    if (position === null) return this.inverseProbabilityScorePolicy.MIN_SCORE;
-    const guessQualified =
-      championship.positionIsRegularQualified(positionGuess) ||
-      extraQualifiedListGuess.find((x) => x.id === team.id) !== undefined;
-    if (!guessQualified || !championship.teamIsQualified(team))
-      return this.inverseProbabilityScorePolicy.MIN_SCORE;
-    const worstPosition = Math.max(position, positionGuess);
-    const useRegularQualifiedScore =
-      championship.positionIsRegularQualified(worstPosition);
-    if (useRegularQualifiedScore) {
-      return this.inverseProbabilityScorePolicy.groupListTeamScore(
-        team,
-        championship,
-        positionGuess,
-        extraQualifiedListGuess,
-      );
-    } else {
-      return championship.numTeams() / championship.numQualifiedTeams();
-    }
-  }
-}
-
-export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
+export class WithLogarithm2ScorePolicy implements ScorePolicy {
   static readonly idPrefix: string = "log2";
-  readonly scorePolicy: GroupListScorePolicy;
+  readonly scorePolicy: ScorePolicy;
 
-  constructor(scorePolicy: GroupListScorePolicy) {
+  constructor(scorePolicy: ScorePolicy) {
     this.scorePolicy = scorePolicy;
   }
 
@@ -121,97 +161,56 @@ export class WithLogarithm2GroupScorePolicy implements GroupListScorePolicy {
     return `log2(${this.scorePolicy.getId()})`;
   }
 
-  groupListTeamScore(
-    team: Team,
-    championship: GroupListChampionship,
-    positionGuess: number,
-    extraQualifiedListGuess: Team[],
-  ): number {
-    const score = this.scorePolicy.groupListTeamScore(
-      team,
-      championship,
-      positionGuess,
-      extraQualifiedListGuess,
-    );
-    return Math.log2(score);
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    return Math.log2(this.scorePolicy.groupListTeamScore(params));
+  }
+
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return Math.log2(this.scorePolicy.cupTeamScore(params));
   }
 }
 
-export class WithLogarithm2CupScorePolicy implements CupScorePolicy {
-  static readonly idPrefix: string = "log2";
-  readonly scorePolicy: CupScorePolicy;
+export class MultScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "mult";
+  readonly multiplier: number;
+  readonly scorePolicy: ScorePolicy;
 
-  constructor(scorePolicy: CupScorePolicy) {
+  constructor(multiplier: number, scorePolicy: ScorePolicy) {
+    this.multiplier = multiplier;
     this.scorePolicy = scorePolicy;
   }
 
   getId(): string {
-    return `log2(${this.scorePolicy.getId()})`;
+    return `mult(${this.multiplier}, ${this.scorePolicy.getId()})`;
   }
 
-  cupTeamScore(
-    team: Team,
-    championship: CupChampionship,
-    positionGuess: number,
-  ): number {
-    const score = this.scorePolicy.cupTeamScore(
-      team,
-      championship,
-      positionGuess,
-    );
-    return Math.log2(score);
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    return this.multiplier * this.scorePolicy.groupListTeamScore(params);
+  }
+
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return this.multiplier * this.scorePolicy.cupTeamScore(params);
   }
 }
 
-export class ScaledScorePolicy implements GroupListScorePolicy, CupScorePolicy {
-  static readonly idPrefix: string = "scaled";
-  readonly scale: number;
-  readonly scorePolicy: GroupListScorePolicy | CupScorePolicy;
+export class FloorScorePolicy implements ScorePolicy {
+  static readonly idPrefix: string = "floor";
+  readonly scorePolicy: ScorePolicy;
 
-  constructor(
-    scale: number,
-    scorePolicy: GroupListScorePolicy | CupScorePolicy,
-  ) {
-    this.scale = scale;
+  constructor(scorePolicy: ScorePolicy) {
     this.scorePolicy = scorePolicy;
   }
 
   getId(): string {
-    return `scaled(${this.scale}, ${this.scorePolicy.getId()})`;
+    return `floor(${this.scorePolicy.getId()})`;
   }
 
-  groupListTeamScore(
-    team: Team,
-    championship: GroupListChampionship,
-    positionGuess: number,
-    extraQualifiedListGuess: Team[],
-  ): number {
-    if (!("groupListTeamScore" in this.scorePolicy)) {
-      throw new Error("Wrapped policy does not implement GroupListScorePolicy");
-    }
-    const score = this.scorePolicy.groupListTeamScore(
-      team,
-      championship,
-      positionGuess,
-      extraQualifiedListGuess,
-    );
-    return Math.floor(score * this.scale);
+  groupListTeamScore(params: GroupListTeamScoreParam): number {
+    return Math.floor(this.scorePolicy.groupListTeamScore(params));
   }
 
-  cupTeamScore(
-    team: Team,
-    championship: CupChampionship,
-    positionGuess: number,
-  ): number {
-    if (!("cupTeamScore" in this.scorePolicy)) {
-      throw new Error("Wrapped policy does not implement CupScorePolicy");
-    }
-    const score = this.scorePolicy.cupTeamScore(
-      team,
-      championship,
-      positionGuess,
-    );
-    return Math.floor(score * this.scale);
+  cupTeamScore(params: CupTeamScoreParam): number {
+    return Math.floor(this.scorePolicy.cupTeamScore(params));
   }
 }
 
@@ -250,67 +249,59 @@ export class ScorePolicyBuilder {
     return { prefix, params };
   }
 
-  static buildGroupListScorePolicyFromId(id: string): GroupListScorePolicy {
+  static build(id: string): ScorePolicy {
     const { prefix, params } = this.parseScorePolicyId(id);
 
     switch (prefix) {
-      case InverseProbabilityPositionScorePolicy.idPrefix:
-        return new InverseProbabilityPositionScorePolicy();
-      case InverseProbabilityQualifiedPositionGroupListScorePolicy.idPrefix:
-        return new InverseProbabilityQualifiedPositionGroupListScorePolicy();
-      case WithLogarithm2GroupScorePolicy.idPrefix: {
+      case ConstScorePolicy.idPrefix: {
         const param0 = params[0];
         if (param0 === undefined)
-          throw new Error(`Invalid params for log2: ${id}`);
-        return new WithLogarithm2GroupScorePolicy(
-          this.buildGroupListScorePolicyFromId(param0),
-        );
+          throw new Error(`Invalid params for const: ${id}`);
+        const val = Number(param0);
+        if (isNaN(val)) throw new Error(`Invalid value for const: ${id}`);
+        return new ConstScorePolicy(val);
       }
-      case ScaledScorePolicy.idPrefix: {
+      case PositionInverseProbabilityScorePolicy.idPrefix:
+        return new PositionInverseProbabilityScorePolicy();
+      case QualifiedInverseProbabilityScorePolicy.idPrefix:
+        return new QualifiedInverseProbabilityScorePolicy();
+      case MaxScorePolicy.idPrefix: {
         const param0 = params[0];
         const param1 = params[1];
         if (param0 === undefined || param1 === undefined)
-          throw new Error(`Invalid params for scaled: ${id}`);
-        const scale = Number(param0);
-        if (isNaN(scale)) throw new Error(`Invalid scale for scaled: ${id}`);
-        return new ScaledScorePolicy(
-          scale,
-          this.buildGroupListScorePolicyFromId(param1),
-        );
+          throw new Error(`Invalid params for max: ${id}`);
+        return new MaxScorePolicy(this.build(param0), this.build(param1));
       }
-      default:
-        throw new Error(`Unknown GroupListScorePolicy ID: ${id}`);
-    }
-  }
-
-  static buildCupScorePolicyFromId(id: string): CupScorePolicy {
-    const { prefix, params } = this.parseScorePolicyId(id);
-
-    switch (prefix) {
-      case InverseProbabilityPositionScorePolicy.idPrefix:
-        return new InverseProbabilityPositionScorePolicy();
-      case WithLogarithm2CupScorePolicy.idPrefix: {
+      case FilterQualifiedScorePolicy.idPrefix: {
+        const param0 = params[0];
+        if (param0 === undefined)
+          throw new Error(`Invalid params for filter-qualified: ${id}`);
+        return new FilterQualifiedScorePolicy(this.build(param0));
+      }
+      case WithLogarithm2ScorePolicy.idPrefix: {
         const param0 = params[0];
         if (param0 === undefined)
           throw new Error(`Invalid params for log2: ${id}`);
-        return new WithLogarithm2CupScorePolicy(
-          this.buildCupScorePolicyFromId(param0),
-        );
+        return new WithLogarithm2ScorePolicy(this.build(param0));
       }
-      case ScaledScorePolicy.idPrefix: {
+      case MultScorePolicy.idPrefix: {
         const param0 = params[0];
         const param1 = params[1];
         if (param0 === undefined || param1 === undefined)
-          throw new Error(`Invalid params for scaled: ${id}`);
-        const scale = Number(param0);
-        if (isNaN(scale)) throw new Error(`Invalid scale for scaled: ${id}`);
-        return new ScaledScorePolicy(
-          scale,
-          this.buildCupScorePolicyFromId(param1),
-        );
+          throw new Error(`Invalid params for mult: ${id}`);
+        const multiplier = Number(param0);
+        if (isNaN(multiplier))
+          throw new Error(`Invalid multiplier for mult: ${id}`);
+        return new MultScorePolicy(multiplier, this.build(param1));
+      }
+      case FloorScorePolicy.idPrefix: {
+        const param0 = params[0];
+        if (param0 === undefined)
+          throw new Error(`Invalid params for floor: ${id}`);
+        return new FloorScorePolicy(this.build(param0));
       }
       default:
-        throw new Error(`Unknown CupScorePolicy ID: ${id}`);
+        throw new Error(`Unknown ScorePolicy ID: ${id}`);
     }
   }
 }

@@ -1,19 +1,19 @@
 import { CupChampionship, GroupListChampionship } from "./Championship";
-import { CupScorePolicy, GroupListScorePolicy } from "./ScorePolicy";
+import { ScorePolicy } from "./ScorePolicy";
 
 export class GroupListSweepstake {
   id: string;
   name: string;
   description: string;
   championship: GroupListChampionship;
-  scorePolicy: GroupListScorePolicy;
+  scorePolicy: ScorePolicy;
 
   constructor(
     id: string,
     name: string,
     description: string,
     championship: GroupListChampionship,
-    scorePolicy: GroupListScorePolicy,
+    scorePolicy: ScorePolicy,
   ) {
     this.id = id;
     this.name = name;
@@ -39,14 +39,14 @@ export class CupSweepstake {
   name: string;
   description: string;
   championship: CupChampionship;
-  scorePolicy: CupScorePolicy;
+  scorePolicy: ScorePolicy;
 
   constructor(
     id: string,
     name: string,
     description: string,
     championship: CupChampionship,
-    scorePolicy: CupScorePolicy,
+    scorePolicy: ScorePolicy,
   ) {
     this.id = id;
     this.name = name;

@@ -1,323 +1,451 @@
 import {
+  ConstScorePolicy,
+  PositionInverseProbabilityScorePolicy,
+  QualifiedInverseProbabilityScorePolicy,
+  MaxScorePolicy,
+  WithLogarithm2ScorePolicy,
+  MultScorePolicy,
+  FloorScorePolicy,
+  FilterQualifiedScorePolicy,
   ScorePolicyBuilder,
-  InverseProbabilityPositionScorePolicy,
-  InverseProbabilityQualifiedPositionGroupListScorePolicy,
-  WithLogarithm2GroupScorePolicy,
-  WithLogarithm2CupScorePolicy,
-  ScaledScorePolicy,
 } from "./ScorePolicy";
-import { Team } from "./Team";
-import {
-  GroupListGroupChampionship,
-  GroupListChampionship,
-  CupChampionship,
-} from "./Championship";
-import { BinaryTree } from "../utils/BinaryTree";
 
-describe("ScorePolicyBuilder", () => {
-  describe("buildGroupListScorePolicyFromId", () => {
-    test("inverse-probability-position", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "inverse-probability-position",
-      );
-      expect(policy).toBeInstanceOf(InverseProbabilityPositionScorePolicy);
-    });
-
-    test("inverse-probability-qualified-position", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "inverse-probability-qualified-position",
-      );
-      expect(policy).toBeInstanceOf(
-        InverseProbabilityQualifiedPositionGroupListScorePolicy,
-      );
-    });
-
-    test("log2(inverse-probability-position)", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "log2(inverse-probability-position)",
-      ) as WithLogarithm2GroupScorePolicy;
-      expect(policy).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
-      expect(policy.scorePolicy).toBeInstanceOf(
-        InverseProbabilityPositionScorePolicy,
-      );
-    });
-
-    test("log2(inverse-probability-qualified-position)", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "log2(inverse-probability-qualified-position)",
-      ) as WithLogarithm2GroupScorePolicy;
-      expect(policy).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
-      expect(policy.scorePolicy).toBeInstanceOf(
-        InverseProbabilityQualifiedPositionGroupListScorePolicy,
-      );
-    });
-
-    test("log2(log2(inverse-probability-position))", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "log2(log2(inverse-probability-position))",
-      ) as WithLogarithm2GroupScorePolicy;
-      expect(policy).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
-      const wrapped = policy.scorePolicy as WithLogarithm2GroupScorePolicy;
-      expect(wrapped).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
-      expect(wrapped.scorePolicy).toBeInstanceOf(
-        InverseProbabilityPositionScorePolicy,
-      );
-    });
-
-    test("throw an error for unknown GroupListScorePolicy IDs", () => {
-      expect(() => {
-        ScorePolicyBuilder.buildGroupListScorePolicyFromId("invalid-policy");
-      }).toThrow(/Unknown GroupListScorePolicy ID/);
-    });
-
-    test("scaled(10, log2(inverse-probability-qualified-position))", () => {
-      const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-        "scaled(10, log2(inverse-probability-qualified-position))",
-      ) as ScaledScorePolicy;
-      expect(policy).toBeInstanceOf(ScaledScorePolicy);
-      expect(policy.scale).toBe(10);
-      const wrapped = policy.scorePolicy as WithLogarithm2GroupScorePolicy;
-      expect(wrapped).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
-      expect(wrapped.scorePolicy).toBeInstanceOf(
-        InverseProbabilityQualifiedPositionGroupListScorePolicy,
-      );
+describe("ConstScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format", () => {
+      const policy = new ConstScorePolicy(42);
+      expect(policy.getId()).toBe("const(42)");
     });
   });
 
-  describe("buildCupScorePolicyFromId", () => {
-    test("inverse-probability-position", () => {
-      const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
-        "inverse-probability-position",
-      );
-      expect(policy).toBeInstanceOf(InverseProbabilityPositionScorePolicy);
+  describe("groupListTeamScore", () => {
+    it("returns the constant score regardless of params", () => {
+      const policy = new ConstScorePolicy(42);
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(42);
     });
+  });
 
-    test("log2(inverse-probability-position)", () => {
-      const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
-        "log2(inverse-probability-position)",
-      ) as WithLogarithm2CupScorePolicy;
-      expect(policy).toBeInstanceOf(WithLogarithm2CupScorePolicy);
-      expect(policy.scorePolicy).toBeInstanceOf(
-        InverseProbabilityPositionScorePolicy,
-      );
-    });
-
-    test("throw an error for unknown CupScorePolicy IDs", () => {
-      expect(() => {
-        ScorePolicyBuilder.buildCupScorePolicyFromId("invalid-policy");
-      }).toThrow(/Unknown CupScorePolicy ID/);
-    });
-
-    test("scaled(10, log2(inverse-probability-position))", () => {
-      const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
-        "scaled(10, log2(inverse-probability-position))",
-      ) as ScaledScorePolicy;
-      expect(policy).toBeInstanceOf(ScaledScorePolicy);
-      expect(policy.scale).toBe(10);
-      const wrapped = policy.scorePolicy as WithLogarithm2CupScorePolicy;
-      expect(wrapped).toBeInstanceOf(WithLogarithm2CupScorePolicy);
-      expect(wrapped.scorePolicy).toBeInstanceOf(
-        InverseProbabilityPositionScorePolicy,
-      );
+  describe("cupTeamScore", () => {
+    it("returns the constant score regardless of params", () => {
+      const policy = new ConstScorePolicy(42);
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(42);
     });
   });
 });
 
-describe("ScaledScorePolicy", () => {
-  const team1A = new Team("team1A", "Team 1A");
-  const team2A = new Team("team2A", "Team 2A");
-  const team3A = new Team("team3A", "Team 3A");
-  const team4A = new Team("team4A", "Team 4A");
-
-  const team1B = new Team("team1B", "Team 1B");
-  const team2B = new Team("team2B", "Team 2B");
-  const team3B = new Team("team3B", "Team 3B");
-  const team4B = new Team("team4B", "Team 4B");
-
-  describe("GroupList test scenario", () => {
-    const groupA = new GroupListGroupChampionship("A", [
-      team1A,
-      team2A,
-      team3A,
-      team4A,
-    ]);
-    const groupB = new GroupListGroupChampionship("B", [
-      team1B,
-      team2B,
-      team3B,
-      team4B,
-    ]);
-
-    const championship = new GroupListChampionship(
-      "id",
-      "name",
-      [groupA, groupB],
-      [team3A], // 1 extra qualified position
-      2, // 2 regular positions per group
-      new Date(),
-    );
-
-    const policy = ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-      "scaled(10, log2(inverse-probability-qualified-position))",
-    );
-
-    test("evaluates correct matches", () => {
-      // team1A is position 1, guessed position 1, qualified.
-      // score: numTeams (4) / worstPosition (1) = 4. log2(8) = 2. scaled(10) = 20.
-      expect(policy.groupListTeamScore(team1A, championship, 1, [])).toBe(20);
-
-      // team3A is position 3, extra qualified. Guessed 3, extra qualified.
-      // worstPosition = 3. 3 is not <= maxRegularQualifiedPosition (2).
-      // So useRegularQualifiedScore is false.
-      // score: numTeams (8) / numQualifiedTeams (5) = 1.6.
-      // log2(1.6) = 0.678. scaled(10) = 6.78 -> floor = 6.
-      const scoreTeam3A = policy.groupListTeamScore(team3A, championship, 3, [
-        team3A,
-      ]);
-      expect(scoreTeam3A).toBe(6);
-    });
-
-    test("evaluates partial matches and misses", () => {
-      // team4A is position 4 (not qualified). Guess 4, not qualified.
-      // return MIN_SCORE = 1. log2(1) = 0. scaled(10) = 0
-      expect(policy.groupListTeamScore(team4A, championship, 4, [])).toBe(0);
-
-      // Guess team1A at position 2. worst = 2. 4 / 2 = 2. log2(2) = 1. scaled(10) = 10.
-      expect(policy.groupListTeamScore(team1A, championship, 2, [])).toBe(10);
-    });
-
-    test("evaluates not started championship or null guesses", () => {
-      const groupANotStarted = new GroupListGroupChampionship("A", [
-        null,
-        null,
-        null,
-        null,
-      ]);
-      const groupBNotStarted = new GroupListGroupChampionship("B", [
-        null,
-        null,
-        null,
-        null,
-      ]);
-      const notStartedChampionship = new GroupListChampionship(
-        "id2",
-        "name2",
-        [groupANotStarted, groupBNotStarted],
-        [null],
-        2,
-        new Date(),
-      );
-
-      // Championship not started, team position is null -> returns MIN_SCORE = 1. log2(1) = 0. scaled(10) = 0.
-      expect(
-        policy.groupListTeamScore(team1A, notStartedChampionship, 1, []),
-      ).toBe(0);
+describe("PositionInverseProbabilityScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format", () => {
+      const policy = new PositionInverseProbabilityScorePolicy();
+      expect(policy.getId()).toBe("position-inverse-probability");
     });
   });
 
-  describe("Cup test scenario", () => {
-    // Tree: team1A(team1A(team1A(team1A, team1B), team3A(team3A, team2B)), team2A(team2A(team2A, team3B), team4A(team4A, team4B)))
-    const cupRoot = new BinaryTree<Team | null>(team1A, [
-      new BinaryTree<Team | null>(team1A, [
-        new BinaryTree<Team | null>(team1A, [
-          new BinaryTree(team1A),
-          new BinaryTree(team1B),
-        ]),
-        new BinaryTree<Team | null>(team3A, [
-          new BinaryTree(team3A),
-          new BinaryTree(team2B),
-        ]),
-      ]),
-      new BinaryTree<Team | null>(team2A, [
-        new BinaryTree<Team | null>(team2A, [
-          new BinaryTree(team2A),
-          new BinaryTree(team3B),
-        ]),
-        new BinaryTree<Team | null>(team4A, [
-          new BinaryTree(team4A),
-          new BinaryTree(team4B),
-        ]),
-      ]),
-    ]);
-
-    const cupChampionship = new CupChampionship(
-      "cup1",
-      "Cup 1",
-      cupRoot,
-      true,
-      team3A,
-      new Date(),
-    );
-
-    const policy = ScorePolicyBuilder.buildCupScorePolicyFromId(
-      "scaled(10, log2(inverse-probability-position))",
-    );
-
-    test("evaluates exact matches", () => {
-      // team1A is position 1. Guess 1.
-      // numTeams = 8. worstPosition = 1. 8 / 1 = 8. log2(8) = 3. scaled(10) = 30.
-      expect(policy.cupTeamScore(team1A, cupChampionship, 1)).toBe(30);
-
-      // team2A is position 2. Guess 2.
-      // worstPosition = 2. 8 / 2 = 4. log2(4) = 2. scaled(10) = 20.
-      expect(policy.cupTeamScore(team2A, cupChampionship, 2)).toBe(20);
-
-      // team3A is position 3. Guess 3.
-      // worstPosition = 3. 8 / 3 = 2.666... log2(2.666) = 1.415. scaled(10) = 14.
-      expect(policy.cupTeamScore(team3A, cupChampionship, 3)).toBe(14);
-
-      // team1B is position 8. Guess 8.
-      // worstPosition = 8. 8 / 8 = 1. log2(1) = 0. scaled(10) = 0.
-      expect(policy.cupTeamScore(team1B, cupChampionship, 8)).toBe(0);
+  describe("groupListTeamScore", () => {
+    it("returns min score (1) if worst position is max teams", () => {
+      const policy = new PositionInverseProbabilityScorePolicy();
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 4,
+          guessPosition: 4,
+          teamQualified: false,
+          guessQualified: false,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(1); // 4/4 = 1
     });
 
-    test("evaluates partial matches", () => {
-      // team1A guessed at 2. worst = 2. 8/2 = 4. log2(4) = 2. scaled = 20.
-      expect(policy.cupTeamScore(team1A, cupChampionship, 2)).toBe(20);
+    it("returns correct N/worstPosition", () => {
+      const policy = new PositionInverseProbabilityScorePolicy();
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 2, // worst is 2
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(2); // 4/2 = 2
+    });
+  });
 
-      // team2A guessed at 1. worst = 2. 8/2 = 4. log2(4) = 2. scaled = 20.
-      expect(policy.cupTeamScore(team2A, cupChampionship, 1)).toBe(20);
+  describe("cupTeamScore", () => {
+    it("returns min score (1) if worst position is max teams", () => {
+      const policy = new PositionInverseProbabilityScorePolicy();
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 32,
+          guessPosition: 32,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(1); // 32/32 = 1
     });
 
-    test("evaluates not started cup", () => {
-      const notStartedRoot = new BinaryTree<Team | null>(null, [
-        new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(null, [
-            new BinaryTree(team1A),
-            new BinaryTree(team1B),
-          ]),
-          new BinaryTree<Team | null>(null, [
-            new BinaryTree(team3A),
-            new BinaryTree(team2B),
-          ]),
-        ]),
-        new BinaryTree<Team | null>(null, [
-          new BinaryTree<Team | null>(null, [
-            new BinaryTree(team2A),
-            new BinaryTree(team3B),
-          ]),
-          new BinaryTree<Team | null>(null, [
-            new BinaryTree(team4A),
-            new BinaryTree(team4B),
-          ]),
-        ]),
-      ]);
+    it("returns correct N/worstPosition", () => {
+      const policy = new PositionInverseProbabilityScorePolicy();
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 4, // worst is 4
+          guessPosition: 2,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(8); // 32/4 = 8
+    });
+  });
+});
 
-      const notStartedCup = new CupChampionship(
-        "cup2",
-        "Cup 2",
-        notStartedRoot,
-        true,
-        null,
-        new Date(),
+describe("QualifiedInverseProbabilityScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format", () => {
+      const policy = new QualifiedInverseProbabilityScorePolicy();
+      expect(policy.getId()).toBe("qualified-inverse-probability");
+    });
+  });
+
+  describe("groupListTeamScore", () => {
+    it("returns min threshold when both are qualified", () => {
+      const policy = new QualifiedInverseProbabilityScorePolicy();
+      // min threshold is 32 / 16 = 2
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 3,
+          guessPosition: 3,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(2);
+    });
+
+    it("returns 1 when team is not qualified", () => {
+      const policy = new QualifiedInverseProbabilityScorePolicy();
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 3,
+          guessPosition: 3,
+          teamQualified: false, // not qualified
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(1);
+    });
+  });
+
+  describe("cupTeamScore", () => {
+    it("returns 1", () => {
+      const policy = new QualifiedInverseProbabilityScorePolicy();
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(1);
+    });
+  });
+});
+
+describe("FilterQualifiedScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format", () => {
+      const policy = new FilterQualifiedScorePolicy(new ConstScorePolicy(10));
+      expect(policy.getId()).toBe("filter-qualified(const(10))");
+    });
+  });
+
+  describe("groupListTeamScore", () => {
+    it("returns sub-policy score if both qualified", () => {
+      const policy = new FilterQualifiedScorePolicy(new ConstScorePolicy(10));
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(10);
+    });
+
+    it("returns 0 if either not qualified", () => {
+      const policy = new FilterQualifiedScorePolicy(new ConstScorePolicy(10));
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: false,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(0);
+    });
+  });
+});
+
+describe("MaxScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format including sub-policy IDs", () => {
+      const policy = new MaxScorePolicy(
+        new ConstScorePolicy(1),
+        new ConstScorePolicy(5),
       );
+      expect(policy.getId()).toBe("max(const(1), const(5))");
+    });
+  });
 
-      // In a not started cup, teams are only at the leafs.
-      // team1A is at height 3, so its position is 2^3 = 8.
-      // numTeams = 8. worstPosition = max(8, 1) = 8. 8 / 8 = 1.
-      // log2(1) = 0. scaled(10) = 0.
-      const score = policy.cupTeamScore(team1A, notStartedCup, 1);
-      expect(score).toBe(0);
+  describe("groupListTeamScore", () => {
+    it("returns the max score among the two policies", () => {
+      const policy = new MaxScorePolicy(
+        new ConstScorePolicy(10),
+        new ConstScorePolicy(5),
+      );
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 3,
+          guessPosition: 3,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(10);
+    });
+  });
+
+  describe("cupTeamScore", () => {
+    it("returns the max score among the two policies", () => {
+      const policy = new MaxScorePolicy(
+        new ConstScorePolicy(42),
+        new ConstScorePolicy(100),
+      );
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(100);
+    });
+  });
+});
+
+describe("WithLogarithm2ScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format including sub-policy ID", () => {
+      const policy = new WithLogarithm2ScorePolicy(new ConstScorePolicy(8));
+      expect(policy.getId()).toBe("log2(const(8))");
+    });
+  });
+
+  describe("groupListTeamScore", () => {
+    it("returns log2 of the sub-policy score", () => {
+      const policy = new WithLogarithm2ScorePolicy(new ConstScorePolicy(8));
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(3); // log2(8) = 3
+    });
+  });
+
+  describe("cupTeamScore", () => {
+    it("returns log2 of the sub-policy score", () => {
+      const policy = new WithLogarithm2ScorePolicy(new ConstScorePolicy(16));
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(4); // log2(16) = 4
+    });
+  });
+});
+
+describe("MultScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format including factor and sub-policy ID", () => {
+      const policy = new MultScorePolicy(10, new ConstScorePolicy(5));
+      expect(policy.getId()).toBe("mult(10, const(5))");
+    });
+  });
+
+  describe("groupListTeamScore", () => {
+    it("multiplies the sub-policy score by the factor", () => {
+      const policy = new MultScorePolicy(10, new ConstScorePolicy(5));
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(50); // 10 * 5 = 50
+    });
+  });
+
+  describe("cupTeamScore", () => {
+    it("multiplies the sub-policy score by the factor", () => {
+      const policy = new MultScorePolicy(3, new ConstScorePolicy(7));
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(21); // 3 * 7 = 21
+    });
+  });
+});
+
+describe("FloorScorePolicy", () => {
+  describe("getId", () => {
+    it("returns the correct ID format including sub-policy ID", () => {
+      const policy = new FloorScorePolicy(new ConstScorePolicy(5.7));
+      expect(policy.getId()).toBe("floor(const(5.7))");
+    });
+  });
+
+  describe("groupListTeamScore", () => {
+    it("floors the sub-policy score", () => {
+      const policy = new FloorScorePolicy(new ConstScorePolicy(5.7));
+      expect(
+        policy.groupListTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          teamQualified: true,
+          guessQualified: true,
+          groupNumTeams: 4,
+          groupNumQualified: 2,
+          championshipNumQualified: 16,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(5); // Math.floor(5.7) = 5
+    });
+  });
+
+  describe("cupTeamScore", () => {
+    it("floors the sub-policy score", () => {
+      const policy = new FloorScorePolicy(new ConstScorePolicy(3.1));
+      expect(
+        policy.cupTeamScore({
+          teamPosition: 1,
+          guessPosition: 1,
+          championshipNumTeams: 32,
+        }),
+      ).toBe(3); // Math.floor(3.1) = 3
+    });
+  });
+});
+
+describe("ScorePolicyBuilder", () => {
+  describe("build", () => {
+    it("builds ConstScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("const(10)");
+      expect(policy).toBeInstanceOf(ConstScorePolicy);
+      expect(policy.getId()).toBe("const(10)");
+    });
+
+    it("builds PositionInverseProbabilityScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("position-inverse-probability");
+      expect(policy).toBeInstanceOf(PositionInverseProbabilityScorePolicy);
+      expect(policy.getId()).toBe("position-inverse-probability");
+    });
+
+    it("builds QualifiedInverseProbabilityScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("qualified-inverse-probability");
+      expect(policy).toBeInstanceOf(QualifiedInverseProbabilityScorePolicy);
+      expect(policy.getId()).toBe("qualified-inverse-probability");
+    });
+
+    it("builds MaxScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("max(const(10), const(20))");
+      expect(policy).toBeInstanceOf(MaxScorePolicy);
+      expect(policy.getId()).toBe("max(const(10), const(20))");
+      const maxPolicy = policy as MaxScorePolicy;
+      expect(maxPolicy.param0).toBeInstanceOf(ConstScorePolicy);
+      expect(maxPolicy.param1).toBeInstanceOf(ConstScorePolicy);
+    });
+
+    it("builds FilterQualifiedScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("filter-qualified(const(10))");
+      expect(policy).toBeInstanceOf(FilterQualifiedScorePolicy);
+      expect(policy.getId()).toBe("filter-qualified(const(10))");
+      expect((policy as FilterQualifiedScorePolicy).subPolicy).toBeInstanceOf(
+        ConstScorePolicy,
+      );
+    });
+
+    it("builds WithLogarithm2ScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("log2(const(10))");
+      expect(policy).toBeInstanceOf(WithLogarithm2ScorePolicy);
+      expect(policy.getId()).toBe("log2(const(10))");
+    });
+
+    it("builds MultScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("mult(10, const(1))");
+      expect(policy).toBeInstanceOf(MultScorePolicy);
+      expect(policy.getId()).toBe("mult(10, const(1))");
+    });
+
+    it("builds FloorScorePolicy correctly", () => {
+      const policy = ScorePolicyBuilder.build("floor(const(1))");
+      expect(policy).toBeInstanceOf(FloorScorePolicy);
+      expect(policy.getId()).toBe("floor(const(1))");
+    });
+
+    it("throws error for unknown policy ID", () => {
+      expect(() => ScorePolicyBuilder.build("unknown-policy")).toThrow(
+        "Unknown ScorePolicy ID: unknown-policy",
+      );
     });
   });
 });

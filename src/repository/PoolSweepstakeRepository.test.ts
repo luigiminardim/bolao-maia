@@ -4,9 +4,11 @@ import { GroupListChampionship } from "../entity/Championship";
 import { GroupListChampionshipRepository } from "./GroupListChampionshipRepository";
 import { CupChampionshipRepository } from "./CupChampionshipRepository";
 import {
-  InverseProbabilityQualifiedPositionGroupListScorePolicy,
-  ScaledScorePolicy,
-  WithLogarithm2GroupScorePolicy,
+  PositionInverseProbabilityScorePolicy,
+  FloorScorePolicy,
+  MultScorePolicy,
+  MaxScorePolicy,
+  QualifiedInverseProbabilityScorePolicy,
 } from "../entity/ScorePolicy";
 import { JsonStorage } from "../infra/JsonStorage";
 
@@ -49,8 +51,10 @@ describe("FilePoolSweepstakeRepository", () => {
         2,
         new Date("2026-06-11T12:00:00.000Z"),
       );
-      const groupScorePolicy =
-        new InverseProbabilityQualifiedPositionGroupListScorePolicy();
+      const groupScorePolicy = new MaxScorePolicy(
+        new PositionInverseProbabilityScorePolicy(),
+        new QualifiedInverseProbabilityScorePolicy(),
+      );
       const groupSweepstake = new GroupListSweepstake(
         "2026-world-cup",
         "Test Group Sweepstake",
@@ -89,7 +93,8 @@ describe("FilePoolSweepstakeRepository", () => {
                 name: "Test Group Sweepstake",
                 description: "Test Description",
                 championship: "2026-world-cup",
-                scorePolicy: "inverse-probability-qualified-position",
+                scorePolicy:
+                  "max(position-inverse-probability, qualified-inverse-probability)",
               },
               factor: 1,
             },
@@ -117,7 +122,7 @@ describe("FilePoolSweepstakeRepository", () => {
               id: "2026-world-cup",
               championship: "2026-world-cup",
               scorePolicy:
-                "scaled(10, log2(inverse-probability-qualified-position))",
+                "floor(mult(10, filter-qualified(log2(max(position-inverse-probability, qualified-inverse-probability)))))",
             },
           },
         ],
@@ -150,10 +155,10 @@ describe("FilePoolSweepstakeRepository", () => {
       const groupSweep = item.sweepstake as GroupListSweepstake;
       expect(groupSweep.id).toBe("2026-world-cup");
       expect(groupSweep.championship).toBe(groupChampionship);
-      expect(groupSweep.scorePolicy).toBeInstanceOf(ScaledScorePolicy);
+      expect(groupSweep.scorePolicy).toBeInstanceOf(FloorScorePolicy);
       expect(
-        (groupSweep.scorePolicy as ScaledScorePolicy).scorePolicy,
-      ).toBeInstanceOf(WithLogarithm2GroupScorePolicy);
+        (groupSweep.scorePolicy as FloorScorePolicy).scorePolicy,
+      ).toBeInstanceOf(MultScorePolicy);
 
       expect(mockGroupListChampionshipRepository.findById).toHaveBeenCalledWith(
         "2026-world-cup",

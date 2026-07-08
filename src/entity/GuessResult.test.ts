@@ -43,13 +43,12 @@ describe("GuessResult", () => {
   const c8 = new Team("c8", "Cup 8");
 
   const groupScorePolicyId =
-    "scaled(10, log2(inverse-probability-qualified-position))";
-  const cupScorePolicyId = "scaled(10, log2(inverse-probability-position))";
+    "floor(mult(10, filter-qualified(log2(max(position-inverse-probability, qualified-inverse-probability)))))";
+  const cupScorePolicyId =
+    "floor(mult(10, log2(position-inverse-probability)))";
 
-  const groupScorePolicy =
-    ScorePolicyBuilder.buildGroupListScorePolicyFromId(groupScorePolicyId);
-  const cupScorePolicy =
-    ScorePolicyBuilder.buildCupScorePolicyFromId(cupScorePolicyId);
+  const groupScorePolicy = ScorePolicyBuilder.build(groupScorePolicyId);
+  const cupScorePolicy = ScorePolicyBuilder.build(cupScorePolicyId);
 
   const justStartedGroupListChampionship = new GroupListChampionship(
     "gl1",

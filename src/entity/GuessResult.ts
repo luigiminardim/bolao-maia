@@ -35,9 +35,15 @@ export class CupGuessResult {
 
     if (guess.thirdPlace) {
       const teamPosition = cup.teamPosition(guess.thirdPlace);
-      const score = isLocked
-        ? factor * scorePolicy.cupTeamScore(guess.thirdPlace, cup, 3)
-        : null;
+      const score =
+        isLocked && teamPosition !== null
+          ? factor *
+            scorePolicy.cupTeamScore({
+              teamPosition,
+              guessPosition: 3,
+              championshipNumTeams: cup.numTeams(),
+            })
+          : null;
       this.thirdPlace = {
         team: guess.thirdPlace,
         info:
@@ -65,7 +71,12 @@ export class CupGuessResult {
           return { team, info: null };
         }
         const score = isLocked
-          ? factor * scorePolicy.cupTeamScore(team, cup, guessPosition)
+          ? factor *
+            scorePolicy.cupTeamScore({
+              teamPosition,
+              guessPosition,
+              championshipNumTeams: cup.numTeams(),
+            })
           : null;
         return { team, info: { teamPosition, guessPosition, score } };
       },
@@ -142,23 +153,32 @@ export class GroupListGroupGuessResult {
         const guessQualified =
           sweepstake.championship.positionIsRegularQualified(guessPosition) ||
           guessExtraQualified;
-        const score = isLocked
-          ? factor *
-            scorePolicy.groupListTeamScore(
-              team,
-              championship,
-              guessPosition,
-              extraQualifiedListGuess,
-            )
-          : null;
+        const teamPosition = championship.teamPosition(team);
+        const teamQualified = championship.teamIsQualified(team);
+        const teamExtraQualified = championship.teamIsExtraQualified(team);
+
+        const score =
+          isLocked && teamPosition !== null
+            ? factor *
+              scorePolicy.groupListTeamScore({
+                teamPosition,
+                guessPosition,
+                teamQualified,
+                guessQualified,
+                groupNumTeams: group.numTeams(),
+                groupNumQualified: championship.maxRegularQualifiedPosition,
+                championshipNumQualified: championship.numQualifiedTeams(),
+                championshipNumTeams: championship.numTeams(),
+              })
+            : null;
         return {
           team,
           guessPosition,
           guessQualified,
           guessExtraQualified,
-          teamPosition: championship.teamPosition(team),
-          teamQualified: championship.teamIsQualified(team),
-          teamExtraQualified: championship.teamIsExtraQualified(team),
+          teamPosition,
+          teamQualified,
+          teamExtraQualified,
           score,
         };
       },

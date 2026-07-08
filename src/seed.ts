@@ -308,8 +308,8 @@ async function seed() {
     "Fase de Grupos",
     "Ordene as posições dos times dos grupos A a L e selecione os 8 melhores terceiros colocados que avançam de fase.",
     worldCup2026GroupList,
-    ScorePolicyBuilder.buildGroupListScorePolicyFromId(
-      "scaled(10, log2(inverse-probability-qualified-position))",
+    ScorePolicyBuilder.build(
+      "floor(mult(10, filter-qualified(log2(max(position-inverse-probability, qualified-inverse-probability)))))",
     ),
   );
 
@@ -318,8 +318,8 @@ async function seed() {
     "Mata-Mata",
     "Defina os vencedores de cada confronto eliminatório até a grande final.",
     worldCup2026Cup,
-    ScorePolicyBuilder.buildCupScorePolicyFromId(
-      "scaled(10, log2(inverse-probability-position))",
+    ScorePolicyBuilder.build(
+      "floor(mult(10, log2(position-inverse-probability)))",
     ),
   );
 
