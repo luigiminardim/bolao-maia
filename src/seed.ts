@@ -204,7 +204,7 @@ async function seed() {
     "Copa do Mundo FIFA 2026",
     new BinaryTree(null, [
       new BinaryTree(null, [
-        new BinaryTree(null, [
+        new BinaryTree(france, [
           new BinaryTree(france, [
             new BinaryTree(paraguay, [
               new BinaryTree(germany),
