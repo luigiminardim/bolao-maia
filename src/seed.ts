@@ -272,7 +272,7 @@ async function seed() {
             ]),
           ]),
         ]),
-        new BinaryTree(null, [
+        new BinaryTree(argentina, [
           new BinaryTree(argentina, [
             new BinaryTree(argentina, [
               new BinaryTree(argentina),
