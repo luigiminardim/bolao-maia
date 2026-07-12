@@ -250,7 +250,7 @@ async function seed() {
         ]),
       ]),
       new BinaryTree(null, [
-        new BinaryTree(null, [
+        new BinaryTree(england, [
           new BinaryTree(norway, [
             new BinaryTree(brazil, [
               new BinaryTree(brazil),
